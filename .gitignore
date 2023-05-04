@@ -2,8 +2,9 @@ __pycache__/
 .idea
 .eggs/
 build/
-air_bot.egg-info/
 .env
 *.log
 temp/
 dist/
+.mypy_cache
+src/air_bot.egg-info

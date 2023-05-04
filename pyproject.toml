@@ -1,0 +1,44 @@
+[project]
+name = "air_bot"
+version = "0.1"
+description = "Bot for tracking prices for flight tickets"
+
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tools.setuptools.packages.find]
+where = ["src"]
+
+[tool.mypy]
+files = ['src']
+plugins = [
+  "pydantic.mypy"
+]
+
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+
+# for strict mypy: (this is the tricky one :-))
+disallow_untyped_defs = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
+asyncio_mode = "auto"
+filterwarnings = [
+  'ignore:pkg_resources is deprecated as an API:DeprecationWarning',
+  'ignore:The explicit passing of coroutine objects to asyncio.wait:DeprecationWarning'
+]
+markers = "ticket_price_checker_config_values(values)"
