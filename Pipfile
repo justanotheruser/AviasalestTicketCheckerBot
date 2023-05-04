@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+aiogram = "==3.0.0b4"
+aiohttp = "*"
+pydantic = {extras = ["dotenv"], version = "*"}
+
+[dev-packages]
+flake8 = "*"
+
+[requires]
+python_version = "3.10"
+python_full_version = "3.10.0"
