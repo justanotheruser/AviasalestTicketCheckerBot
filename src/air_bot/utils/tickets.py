@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Tuple
 
 from air_bot.bot_types import FlightDirection
 
@@ -40,7 +40,7 @@ def print_one_way_ticket(ticket: Any, direction: FlightDirection) -> str:
         f"{direction.start_name}({direction.start_code}) - {direction.end_name}({direction.end_code})\n"
         f"🕛 Отправление: {departure_at_str}\n"
         f"🕞 Прибытие: {arrival_at_str}\n"
-        f'💳 {ticket["price"]} ₽ | <a href="https://www.aviasales.ru{get_ticket_link(ticket)}">Купить билет</a>'
+        f'💳 {ticket["price"]} ₽ | {get_ticket_link(ticket, "Купить билет")}'
     )
 
 
@@ -69,9 +69,12 @@ def print_two_way_ticket(ticket: Any, direction: FlightDirection) -> str:
         f"🕞 Прибытие (туда): {departure_arrival_at_str}\n"
         f"🕛 Отправление (обратно): {return_at_str}\n"
         f"🕞 Прибытие (обратно): {return_arrival_at_str}\n"
-        f'💳 {ticket["price"]} ₽ | <a href="https://www.aviasales.ru{get_ticket_link(ticket)}">Купить билет</a>'
+        f'💳 {ticket["price"]} ₽ | {get_ticket_link(ticket, "Купить билет")}'
     )
 
 
-def get_ticket_link(ticket: dict[str, Any]) -> str:
-    return str(ticket["link"]) + "&marker=18946"
+def get_ticket_link(ticket: dict[str, Any], link_text: str) -> str:
+    return f'<a href="https://www.aviasales.ru{ticket["link"]}&marker=18946">{link_text}</a>'
+
+
+

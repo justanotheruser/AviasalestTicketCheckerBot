@@ -98,6 +98,7 @@ async def choose_specific_airport_start(
     message: Message, state: FSMContext, aviasales_api: AviasalesAPILayer
 ) -> None:
     try:
+        # TODO: move timeout inside AviasalesAPILayer
         async with timeout(10):
             text: str = message.text  # type: ignore[assignment]
             locations = await aviasales_api.get_locations(text)
@@ -313,6 +314,7 @@ async def show_tickets(
         departure_at=user_data["departure_date"],
         return_at=return_date,
     )
+    # TODO: move timeout inside AviasalesAPILayer
     try:
         async with timeout(10):
             tickets = await aviasales_api.get_tickets(direction)
@@ -336,5 +338,4 @@ async def show_tickets(
 
     ticket_price_checker.schedule_check(user_id, direction)
     cheapest_price = tickets[0]["price"] if tickets else None
-    # TODO: handle duplicated direction
     db.save_flight_direction(user_id=user_id, direction=direction, price=cheapest_price)

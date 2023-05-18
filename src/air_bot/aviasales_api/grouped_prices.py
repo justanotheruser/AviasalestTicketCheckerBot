@@ -51,4 +51,4 @@ async def get_grouped_prices(
                 f"get_grouped_prices got an unexpected response {json_response}"
             )
         return None
-    return json_response["data"]
+    return json_response

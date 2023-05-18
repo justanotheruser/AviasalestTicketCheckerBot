@@ -64,7 +64,7 @@ async def show_direction_info(
         return
     if not ticket:
         await callback.message.answer(  # type: ignore[union-attr]
-            "Рейсов нет!", reply_markup=low_prices_calendar_keyboard()
+            "Рейсов нет!", reply_markup=low_prices_calendar_keyboard(direction_id)
         )
     else:
         text = print_ticket(ticket, direction)
@@ -72,7 +72,7 @@ async def show_direction_info(
             text=text,
             parse_mode="html",
             disable_web_page_preview=True,
-            reply_markup=low_prices_calendar_keyboard(),
+            reply_markup=low_prices_calendar_keyboard(direction_id),
         )
     await callback.answer()
 
