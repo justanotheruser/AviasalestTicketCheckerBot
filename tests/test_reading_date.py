@@ -22,6 +22,7 @@ def test_simple_formats():
         "2025.09.01": get_date(2025, 9, 1),
         "2024-08-01": get_date(2024, 8, 1),
         "2023 10 11": get_date(2023, 10, 11),
+        "2023-06": get_date(2023, 6)
     }
     for user_input, expected_result in user_input2expected_result.items():
         assert date_reader.read_date(user_input) == expected_result
