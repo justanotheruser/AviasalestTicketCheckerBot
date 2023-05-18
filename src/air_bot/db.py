@@ -1,4 +1,5 @@
 import logging
+import typing
 from contextlib import contextmanager
 from typing import Optional, Any
 
@@ -43,7 +44,6 @@ class DB:
             connection = self.open_connection()
             yield connection.cursor()
         except pymysql.DatabaseError as err:
-            print("DatabaseError {} ".format(err))
             if connection:
                 connection.rollback()
             raise err
@@ -58,35 +58,11 @@ class DB:
         self, user_id: int, direction: FlightDirection, price: int
     ) -> None:
         with self.cursor(commit=True) as cursor:
-            query = (
-                "INSERT INTO flight_direction (user_id, start_code, start_name, end_code, end_name, "
-                "with_transfer, departure_at, return_at, price) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            select_query = (
+                "SELECT id FROM flight_direction WHERE user_id=%s AND start_code=%s AND start_name=%s AND end_code=%s"
+                " AND end_name=%s AND with_transfer=%s AND departure_at=%s"
             )
-            cursor.execute(
-                query,
-                (
-                    user_id,
-                    direction.start_code,
-                    direction.start_name,
-                    direction.end_code,
-                    direction.end_name,
-                    direction.with_transfer,
-                    direction.departure_at,
-                    direction.return_at,
-                    price,
-                ),
-            )
-
-    def update_flight_direction_price(
-        self, user_id: int, direction: FlightDirection, price: int
-    ) -> None:
-        with self.cursor(commit=True) as cursor:
-            query = (
-                "UPDATE flight_direction SET price=%s WHERE user_id=%s AND start_code=%s AND start_name=%s "
-                "AND end_code=%s AND end_name=%s AND with_transfer=%s AND departure_at=%s"
-            )
-            args = (
-                price,
+            select_args = (
                 user_id,
                 direction.start_code,
                 direction.start_name,
@@ -96,11 +72,48 @@ class DB:
                 direction.departure_at,
             )
             if direction.return_at:
-                query += " AND return_at=%s"
-                args = (*args, direction.return_at)  # type: ignore
+                select_query += " AND return_at=%s"
+                select_args = (*select_args, direction.return_at)  # type: ignore
             else:
-                query += " AND return_at IS NULL"
-            cursor.execute(query, args)
+                select_query += " AND return_at IS NULL"
+            try:
+                cursor.execute(select_query, select_args)
+                if cursor.fetchone():
+                    update_flight_direction_price_with_cursor(
+                        user_id, direction, price, cursor
+                    )
+                    return
+            except Exception as e:
+                logger.error(
+                    f"DatabaseError {e}, query {select_query}, args {select_args}"
+                )
+                return
+
+            query = (
+                "INSERT INTO flight_direction (user_id, start_code, start_name, end_code, end_name, "
+                "with_transfer, departure_at, return_at, price) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            )
+            args = (
+                user_id,
+                direction.start_code,
+                direction.start_name,
+                direction.end_code,
+                direction.end_name,
+                direction.with_transfer,
+                direction.departure_at,
+                direction.return_at,
+                price,
+            )
+            try:
+                cursor.execute(query, args)
+            except Exception as e:
+                logger.error(f"DatabaseError {e}, query {query}, args {args}")
+
+    def update_flight_direction_price(
+        self, user_id: int, direction: FlightDirection, price: int
+    ) -> None:
+        with self.cursor(commit=True) as cursor:
+            update_flight_direction_price_with_cursor(user_id, direction, price, cursor)
 
     def get_all_flight_directions(self) -> list[FlightDirectionFull]:
         with self.cursor() as cursor:
@@ -108,8 +121,11 @@ class DB:
                 "SELECT id, user_id, start_code, start_name, end_code, end_name, "
                 "with_transfer, departure_at, return_at FROM flight_direction;"
             )
-            cursor.execute(query)
-            rows = cursor.fetchall()
+            try:
+                cursor.execute(query)
+                rows = cursor.fetchall()
+            except Exception as e:
+                logger.error(f"DatabaseError {e}, query {query}")
         return rows2flight_direction_full(rows)
 
     def get_price(self, user_id: int, direction: FlightDirection) -> Optional[int]:
@@ -130,8 +146,11 @@ class DB:
                 args = (*args, direction.return_at)  # type: ignore
             else:
                 query += " AND return_at IS NULL"
-            cursor.execute(query, args)
-            result = cursor.fetchone()
+            try:
+                cursor.execute(query, args)
+                result = cursor.fetchone()
+            except Exception as e:
+                logger.error(f"DatabaseError {e}, query {query}, args {args}")
         if not result:
             return None
         return int(result["price"])
@@ -142,8 +161,12 @@ class DB:
                 "SELECT id, start_code, start_name, end_code, end_name, with_transfer, departure_at, return_at "
                 "FROM flight_direction WHERE user_id = %s;"
             )
-            cursor.execute(query, (user_id,))
-            rows = cursor.fetchall()
+            args = (user_id,)
+            try:
+                cursor.execute(query, args)
+                rows = cursor.fetchall()
+            except Exception as e:
+                logger.error(f"DatabaseError {e}, query {query}, args {args}")
         for row in rows:
             row["user_id"] = user_id
         return rows2flight_direction_full(rows)
@@ -156,14 +179,22 @@ class DB:
                 "SELECT start_code, start_name, end_code, end_name, with_transfer, departure_at, return_at "
                 "FROM flight_direction WHERE user_id = %s AND id = %s;"
             )
-            cursor.execute(query, (user_id, direction_id))
-            row = cursor.fetchone()
+            args = (user_id, direction_id)
+            try:
+                cursor.execute(query, args)
+                row = cursor.fetchone()
+            except Exception as e:
+                logger.error(f"DatabaseError {e}, query {query}, args {args}")
         return single_row2flight_direction(row)
 
     def delete_users_flight_direction(self, user_id: int, direction_id: int) -> None:
         with self.cursor(commit=True) as cursor:
             query = "DELETE FROM flight_direction WHERE user_id = %s AND id = %s;"
-            cursor.execute(query, (user_id, direction_id))
+            args = (user_id, direction_id)
+            try:
+                cursor.execute(query, args)
+            except Exception as e:
+                logger.error(f"DatabaseError {e}, query {query}, args {args}")
 
 
 def rows2flight_direction_full(rows: list[dict[str, Any]]) -> list[FlightDirectionFull]:
@@ -191,3 +222,31 @@ def single_row2flight_direction(row: dict[str, Any]) -> FlightDirection:
         departure_at=row["departure_at"],
         return_at=row["return_at"],
     )
+
+
+def update_flight_direction_price_with_cursor(
+    user_id: int, direction: FlightDirection, price: int, cursor: typing.Any
+):
+    query = (
+        "UPDATE flight_direction SET price=%s WHERE user_id=%s AND start_code=%s AND start_name=%s "
+        "AND end_code=%s AND end_name=%s AND with_transfer=%s AND departure_at=%s"
+    )
+    args = (
+        price,
+        user_id,
+        direction.start_code,
+        direction.start_name,
+        direction.end_code,
+        direction.end_name,
+        direction.with_transfer,
+        direction.departure_at,
+    )
+    if direction.return_at:
+        query += " AND return_at=%s"
+        args = (*args, direction.return_at)  # type: ignore
+    else:
+        query += " AND return_at IS NULL"
+    try:
+        cursor.execute(query, args)
+    except Exception as e:
+        logger.error(f"DatabaseError {e}, query {query}, args {args}")
