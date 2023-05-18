@@ -71,12 +71,12 @@ class AviasalesAPILayer:
         else:
             group_by = "month"
         response = await get_grouped_prices(
-            self.session,
-            self.token.get_secret_value(),
-            direction,
-            group_by=group_by)
+            self.session, self.token.get_secret_value(), direction, group_by=group_by
+        )
         if response is None:
             return None, False
+        if not response:
+            return None, True
         return response[direction.departure_at], True
 
 

@@ -335,10 +335,6 @@ async def show_tickets(
     await state.clear()
 
     ticket_price_checker.schedule_check(user_id, direction)
-
-    if tickets:
-        cheapest_price = tickets[0]["price"]
-        # TODO: handle duplicated direction
-        db.save_flight_direction(
-            user_id=user_id, direction=direction, price=cheapest_price
-        )
+    cheapest_price = tickets[0]["price"] if tickets else None
+    # TODO: handle duplicated direction
+    db.save_flight_direction(user_id=user_id, direction=direction, price=cheapest_price)

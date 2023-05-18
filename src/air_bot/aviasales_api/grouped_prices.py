@@ -1,10 +1,12 @@
+import asyncio
 import json
 import logging
+from typing import Optional
+
+from aiohttp import ClientSession, ClientConnectionError
 from async_timeout import timeout
 
 from air_bot.bot_types import FlightDirection
-from typing import Optional
-from aiohttp import ClientSession, ClientConnectionError
 
 logger = logging.getLogger("AirBot")
 
@@ -31,19 +33,22 @@ async def get_grouped_prices(
     try:
         async with timeout(timeout_sec):
             async with session.get(travel_payouts_url, params=params) as response:
-                response = await response.text()
+                response_text = await response.text()
     except ClientConnectionError as e:
         logger.error(
             f"ClientConnectionError: url={travel_payouts_url}, params={params}", {e}
         )
         return None
-    except TimeoutError:
-        logger.error(f"get_grouped_prices request timed out")
-    json_response = json.loads(response)
+    except asyncio.TimeoutError:
+        logger.error("get_grouped_prices request timed out")
+        return None
+    json_response = json.loads(response_text)
     if "success" not in json_response or not json_response["success"]:
         if "error" in json_response:
             logger.error(f"get_grouped_prices got an error response {json_response}")
         else:
-            logger.error(f"get_grouped_prices got an unexpected response {json_response}")
+            logger.error(
+                f"get_grouped_prices got an unexpected response {json_response}"
+            )
         return None
     return json_response["data"]

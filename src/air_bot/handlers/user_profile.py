@@ -56,8 +56,10 @@ async def show_direction_info(
     direction = db.get_users_flight_direction(callback.from_user.id, direction_id)
     ticket, success = await aviasales_api.get_cheapest_ticket(direction)
     if not success:
-        await callback.message.answer("Произошла ошибка, попробуйте ещё раз чуть позже",  # type: ignore[union-attr]
-                                      reply_markup=user_home_keyboard())
+        await callback.message.answer(  # type: ignore[union-attr]
+            "Произошла ошибка, попробуйте ещё раз чуть позже",
+            reply_markup=user_home_keyboard(),
+        )
         await callback.answer()
         return
     if not ticket:

@@ -37,7 +37,11 @@ FLIGHT_DIRECTION_WITH_RETURN = FlightDirection(
         "price_reduction_threshold_percents": 10,
     }
 )
-async def test_schedule_check_receive_no_tickets(
+@patch(
+    "air_bot.checker.ticket_price_checker.print_ticket",
+    Mock(return_value="printed ticket"),
+)
+async def test_schedule_check_receive_no_tickets_then_ticket_appears(
     ticket_price_checker_config, db, mocker, direction
 ):
     bot = mocker.Mock()
@@ -65,10 +69,15 @@ async def test_schedule_check_receive_no_tickets(
     )
     assert seconds == 30
 
-    aviasales_api.get_cheapest_ticket.return_value = None
+    aviasales_api.get_cheapest_ticket.return_value = (None, True)
     await scheduled_fn(*scheduled_fn_args)
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     bot.send_message.assert_not_awaited()
+
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
+    await scheduled_fn(*scheduled_fn_args)
+    aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
+    assert bot.send_message.await_count == 2
 
 
 def schedule_ticket_check(
@@ -123,26 +132,26 @@ async def test_schedule_check_receive_tickets_then_lower_price_below_threshold(
     bot_send_message, aviasales_api, scheduled_check = schedule_ticket_check(
         mocker, db, direction, ticket_price_checker_config, check_interval=30
     )
-    aviasales_api.get_cheapest_ticket.return_value = {"price": 100}
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert bot_send_message.await_count == 2
 
-    aviasales_api.get_cheapest_ticket.return_value = {"price": 90}
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 90}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 2
     # New message to user (price went down below threshold)
     assert bot_send_message.await_count == 4
 
-    aviasales_api.get_cheapest_ticket.return_value = {"price": 110}
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 110}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 3
     # No message to user
     assert bot_send_message.await_count == 4
 
-    aviasales_api.get_cheapest_ticket.return_value = {"price": 95}
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 95}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 4
@@ -167,19 +176,19 @@ async def test_schedule_check_then_prise_declines_slowly(
         mocker, db, direction, ticket_price_checker_config
     )
 
-    aviasales_api.get_cheapest_ticket.return_value = {"price": 100}
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert bot_send_message.await_count == 2
 
-    aviasales_api.get_cheapest_ticket.return_value = {"price": 90}
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 90}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 2
     # No new messages to user (because 90 > 100*(1-0.2))
     assert bot_send_message.await_count == 2
 
-    aviasales_api.get_cheapest_ticket.return_value = {"price": 79}
+    aviasales_api.get_cheapest_ticket.return_value = ({"price": 79}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 3

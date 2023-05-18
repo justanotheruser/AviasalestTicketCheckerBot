@@ -65,7 +65,7 @@ class TicketPriceChecker:
             del self.users_jobs[user_id]
 
     async def _check_tickets(self, user_id: int, direction: FlightDirection) -> None:
-        ticket = await self.aviasales_api.get_cheapest_ticket(direction)
+        ticket, _ = await self.aviasales_api.get_cheapest_ticket(direction)
         if not ticket:
             return
         last_price = self.db.get_price(user_id, direction)

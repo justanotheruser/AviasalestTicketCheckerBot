@@ -25,4 +25,3 @@ from air_bot.utils.tickets import print_tickets
 logger = logging.getLogger("AirBot")
 
 router = Router()
-
