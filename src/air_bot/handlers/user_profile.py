@@ -9,6 +9,7 @@ from air_bot.checker.ticket_price_checker import TicketPriceChecker
 from air_bot.db import DB
 from air_bot.keyboards.user_home_kb import user_home_keyboard
 from air_bot.keyboards.user_profile_kb import flight_direction_actions
+from air_bot.keyboards.low_prices_calendar_kb import low_prices_calendar_keyboard
 from air_bot.utils.tickets import print_ticket
 
 logger = logging.getLogger("AirBot")
@@ -53,16 +54,23 @@ async def show_direction_info(
     _, direction_id = callback.data.split("|")  # type: ignore[union-attr]
     direction_id = int(direction_id)
     direction = db.get_users_flight_direction(callback.from_user.id, direction_id)
-    ticket = await aviasales_api.get_cheapest_ticket(direction)
+    ticket, success = await aviasales_api.get_cheapest_ticket(direction)
+    if not success:
+        await callback.message.answer("Произошла ошибка, попробуйте ещё раз чуть позже",  # type: ignore[union-attr]
+                                      reply_markup=user_home_keyboard())
+        await callback.answer()
+        return
     if not ticket:
-        await callback.message.answer("Рейсов нет!", reply_markup=user_home_keyboard())  # type: ignore[union-attr]
+        await callback.message.answer(  # type: ignore[union-attr]
+            "Рейсов нет!", reply_markup=low_prices_calendar_keyboard()
+        )
     else:
         text = print_ticket(ticket, direction)
         await callback.message.answer(  # type: ignore[union-attr]
             text=text,
             parse_mode="html",
             disable_web_page_preview=True,
-            reply_markup=user_home_keyboard(),
+            reply_markup=low_prices_calendar_keyboard(),
         )
     await callback.answer()
 

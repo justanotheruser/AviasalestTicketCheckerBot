@@ -1,6 +1,6 @@
 [project]
 name = "air_bot"
-version = "0.1"
+version = "0.2"
 description = "Bot for tracking prices for flight tickets"
 
 [build-system]

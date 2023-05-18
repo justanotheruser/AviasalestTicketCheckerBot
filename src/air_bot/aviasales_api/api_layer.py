@@ -1,11 +1,11 @@
 import json
 import logging
-from typing import Any
+from typing import Any, Tuple
 
 from aiohttp import ClientSession
-from async_timeout import timeout
 from pydantic import SecretStr
 
+from air_bot.aviasales_api.grouped_prices import get_grouped_prices
 from air_bot.aviasales_api.locations_api import get_locations_response
 from air_bot.aviasales_api.tickets_api import get_tickets_response
 from air_bot.bot_types import FlightDirection
@@ -64,13 +64,21 @@ class AviasalesAPILayer:
             return []
         return json_response["data"]
 
-    async def get_cheapest_ticket(self, request: FlightDirection) -> Any:
-        try:
-            async with timeout(10):
-                tickets = await self.get_tickets(request, limit=1)
-        except Exception as e:
-            logger.exception(e)
-            return None
-        if not tickets:
-            return None
-        return tickets[0]
+    async def get_cheapest_ticket(self, direction: FlightDirection) -> Tuple[Any, bool]:
+        """Returns the cheapest tickets grouped by the departure date"""
+        if does_include_day(direction.departure_at):
+            group_by = "departure_at"
+        else:
+            group_by = "month"
+        response = await get_grouped_prices(
+            self.session,
+            self.token.get_secret_value(),
+            direction,
+            group_by=group_by)
+        if response is None:
+            return None, False
+        return response[direction.departure_at], True
+
+
+def does_include_day(date_str: str):
+    return len(date_str) > 7
