@@ -55,8 +55,8 @@ class DB:
                 connection.close()
 
     def save_flight_direction(
-        self, user_id: int, direction: FlightDirection, price: int
-    ) -> None:
+            self, user_id: int, direction: FlightDirection, price: int
+    ) -> Optional[int]:
         with self.cursor(commit=True) as cursor:
             select_query = (
                 "SELECT id FROM flight_direction WHERE user_id=%s AND start_code=%s AND start_name=%s AND end_code=%s"
@@ -78,11 +78,11 @@ class DB:
                 select_query += " AND return_at IS NULL"
             try:
                 cursor.execute(select_query, select_args)
-                if cursor.fetchone():
+                if result := cursor.fetchone():
                     update_flight_direction_price_with_cursor(
                         user_id, direction, price, cursor
                     )
-                    return
+                    return result["id"]
             except Exception as e:
                 logger.error(
                     f"DatabaseError {e}, query {select_query}, args {select_args}"
@@ -106,11 +106,12 @@ class DB:
             )
             try:
                 cursor.execute(query, args)
+                return cursor.lastrowid
             except Exception as e:
                 logger.error(f"DatabaseError {e}, query {query}, args {args}")
 
     def update_flight_direction_price(
-        self, user_id: int, direction: FlightDirection, price: int
+            self, user_id: int, direction: FlightDirection, price: int
     ) -> None:
         with self.cursor(commit=True) as cursor:
             update_flight_direction_price_with_cursor(user_id, direction, price, cursor)
@@ -172,7 +173,7 @@ class DB:
         return rows2flight_direction_full(rows)
 
     def get_users_flight_direction(
-        self, user_id: int, direction_id: int
+            self, user_id: int, direction_id: int
     ) -> FlightDirection:
         with self.cursor() as cursor:
             query = (
@@ -225,7 +226,7 @@ def single_row2flight_direction(row: dict[str, Any]) -> FlightDirection:
 
 
 def update_flight_direction_price_with_cursor(
-    user_id: int, direction: FlightDirection, price: int, cursor: typing.Any
+        user_id: int, direction: FlightDirection, price: int, cursor: typing.Any
 ):
     query = (
         "UPDATE flight_direction SET price=%s WHERE user_id=%s AND start_code=%s AND start_name=%s "

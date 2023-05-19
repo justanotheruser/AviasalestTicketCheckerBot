@@ -19,6 +19,7 @@ from air_bot.keyboards.add_flight_direction_kb import (
     choose_month_keyboard,
 )
 from air_bot.keyboards.user_home_kb import user_home_keyboard
+from air_bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_keyboard
 from air_bot.utils.date import DateReader
 from air_bot.utils.tickets import print_tickets
 
@@ -328,15 +329,23 @@ async def show_tickets(
         await state.clear()
         return
 
+    ticket_price_checker.schedule_check(user_id, direction)
+    cheapest_price = tickets[0]["price"] if tickets else None
+    direction_id = db.save_flight_direction(user_id=user_id, direction=direction, price=cheapest_price)
+    if not direction_id:
+        await message.answer(
+            "Что-то пошло не так. 😔 \nПопробуйте задать поиск заного. 🔄",
+            reply_markup=user_home_keyboard(),
+        )
+        await state.clear()
+        return
+
     text = print_tickets(tickets, direction)
     await message.answer(
         text=text,
         parse_mode="html",
         disable_web_page_preview=True,
-        reply_markup=user_home_keyboard(),
+        reply_markup=show_low_prices_calendar_keyboard(direction_id),
     )
     await state.clear()
 
-    ticket_price_checker.schedule_check(user_id, direction)
-    cheapest_price = tickets[0]["price"] if tickets else None
-    db.save_flight_direction(user_id=user_id, direction=direction, price=cheapest_price)
