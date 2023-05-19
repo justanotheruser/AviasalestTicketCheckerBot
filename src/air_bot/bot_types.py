@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
@@ -25,6 +26,11 @@ class FlightDirection:
     with_transfer: bool
     departure_at: str
     return_at: Optional[str]
+
+    def departure_date(self) -> datetime.date:
+        if len(self.departure_at) == 7:
+            return datetime.datetime.strptime(self.departure_at, "%Y-%m")
+        return datetime.datetime.strptime(self.departure_at, "%Y-%m-%d")
 
     def __hash__(self) -> int:
         result = hash(self.start_code)

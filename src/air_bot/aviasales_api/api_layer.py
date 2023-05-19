@@ -83,7 +83,7 @@ class AviasalesAPILayer:
 
     async def get_cheapest_tickets_for_month(self, direction: FlightDirection, year: int, month: int):
         if not request_is_valid(direction, year, month):
-            return None, True
+            return dict(), True
         direction.departure_at = f'{year}-{month:02d}'
         response = await get_grouped_prices(self.session, self.token.get_secret_value(), direction)
         if response is None:

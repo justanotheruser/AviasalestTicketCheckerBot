@@ -1,6 +1,7 @@
 import asyncio
 from typing import Callable, Coroutine, Any
 
+# TODO: switch to https://github.com/agronholm/apscheduler
 import aioschedule as schedule  # type: ignore[import]
 
 

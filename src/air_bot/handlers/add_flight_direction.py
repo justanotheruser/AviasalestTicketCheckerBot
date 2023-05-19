@@ -62,6 +62,7 @@ async def add_flight_direction(message: Message, state: FSMContext) -> None:
     await message.answer(
         "Выберите тип поиска 👇", reply_markup=with_or_without_return_keyboard()
     )
+    await state.clear()
     await state.set_state(NewDirection.choosing_with_return_or_not)
 
 
