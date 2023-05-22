@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from typing import Optional
+from typing import Optional, Any
 
 from aiohttp import ClientSession, ClientConnectionError
 from async_timeout import timeout
@@ -17,7 +17,7 @@ async def get_grouped_prices(
     direction: FlightDirection,
     group_by: str = "departure_at",
     timeout_sec: int = 10,
-) -> Optional[dict]:
+) -> Optional[dict[str, Any]]:
     travel_payouts_url = "https://api.travelpayouts.com/aviasales/v3/grouped_prices"
     is_direct = "false" if direction.with_transfer else "true"
     params = {

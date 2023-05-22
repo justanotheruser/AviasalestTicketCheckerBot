@@ -1,5 +1,6 @@
 import json
 import logging
+import typing
 from typing import Any, Tuple
 from datetime import datetime
 
@@ -67,7 +68,7 @@ class AviasalesAPILayer:
 
     async def get_cheapest_ticket(self, direction: FlightDirection) -> Tuple[Any, bool]:
         """Returns the cheapest ticket (or None if there's no tickets).
-           Second return value is True if request was successful."""
+        Second return value is True if request was successful."""
         if does_include_day(direction.departure_at):
             group_by = "departure_at"
         else:
@@ -81,21 +82,25 @@ class AviasalesAPILayer:
             return None, True
         return response["data"][direction.departure_at], True
 
-    async def get_cheapest_tickets_for_month(self, direction: FlightDirection, year: int, month: int):
+    async def get_cheapest_tickets_for_month(
+        self, direction: FlightDirection, year: int, month: int
+    ) -> typing.Tuple[dict[str, Any], bool]:
         if not request_is_valid(direction, year, month):
             return dict(), True
-        direction.departure_at = f'{year}-{month:02d}'
-        response = await get_grouped_prices(self.session, self.token.get_secret_value(), direction)
+        direction.departure_at = f"{year}-{month:02d}"
+        response = await get_grouped_prices(
+            self.session, self.token.get_secret_value(), direction
+        )
         if response is None:
-            return None, False
+            return dict(), False
         return response["data"], True
 
 
-def does_include_day(date_str: str):
+def does_include_day(date_str: str) -> bool:
     return len(date_str) > 7
 
 
-def request_is_valid(direction: FlightDirection, year: int, month: int):
+def request_is_valid(direction: FlightDirection, year: int, month: int) -> bool:
     if direction.return_at:
         return_date = datetime.strptime(direction.departure_at, "%Y-%m")
         if return_date.year != year or return_date.month > month:

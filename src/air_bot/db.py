@@ -55,7 +55,7 @@ class DB:
                 connection.close()
 
     def save_flight_direction(
-            self, user_id: int, direction: FlightDirection, price: int
+        self, user_id: int, direction: FlightDirection, price: int
     ) -> Optional[int]:
         with self.cursor(commit=True) as cursor:
             select_query = (
@@ -87,7 +87,7 @@ class DB:
                 logger.error(
                     f"DatabaseError {e}, query {select_query}, args {select_args}"
                 )
-                return
+                return None
 
             query = (
                 "INSERT INTO flight_direction (user_id, start_code, start_name, end_code, end_name, "
@@ -106,12 +106,13 @@ class DB:
             )
             try:
                 cursor.execute(query, args)
-                return cursor.lastrowid
             except Exception as e:
                 logger.error(f"DatabaseError {e}, query {query}, args {args}")
+                return None
+            return cursor.lastrowid
 
     def update_flight_direction_price(
-            self, user_id: int, direction: FlightDirection, price: int
+        self, user_id: int, direction: FlightDirection, price: int
     ) -> None:
         with self.cursor(commit=True) as cursor:
             update_flight_direction_price_with_cursor(user_id, direction, price, cursor)
@@ -173,7 +174,7 @@ class DB:
         return rows2flight_direction_full(rows)
 
     def get_users_flight_direction(
-            self, user_id: int, direction_id: int
+        self, user_id: int, direction_id: int
     ) -> FlightDirection:
         with self.cursor() as cursor:
             query = (
@@ -226,8 +227,8 @@ def single_row2flight_direction(row: dict[str, Any]) -> FlightDirection:
 
 
 def update_flight_direction_price_with_cursor(
-        user_id: int, direction: FlightDirection, price: int, cursor: typing.Any
-):
+    user_id: int, direction: FlightDirection, price: int, cursor: typing.Any
+) -> None:
     query = (
         "UPDATE flight_direction SET price=%s WHERE user_id=%s AND start_code=%s AND start_name=%s "
         "AND end_code=%s AND end_name=%s AND with_transfer=%s AND departure_at=%s"

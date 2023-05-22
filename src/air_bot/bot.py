@@ -9,7 +9,12 @@ import air_bot.db as db
 from air_bot.aiohttp_logging import get_trace_config
 from air_bot.checker.ticket_price_checker import TicketPriceChecker
 from air_bot.config import config
-from air_bot.handlers import start, add_flight_direction, user_profile, low_prices_calendar
+from air_bot.handlers import (
+    start,
+    add_flight_direction,
+    user_profile,
+    low_prices_calendar,
+)
 from air_bot.middlewares.add_aviasales_api_layer import AddAviasalesAPILayerMiddleware
 from air_bot.middlewares.add_db import AddDb
 from air_bot.middlewares.add_ticket_price_checker import AddTicketPriceChecker

@@ -331,7 +331,9 @@ async def show_tickets(
 
     ticket_price_checker.schedule_check(user_id, direction)
     cheapest_price = tickets[0]["price"] if tickets else None
-    direction_id = db.save_flight_direction(user_id=user_id, direction=direction, price=cheapest_price)
+    direction_id = db.save_flight_direction(
+        user_id=user_id, direction=direction, price=cheapest_price
+    )
     if not direction_id:
         await message.answer(
             "Что-то пошло не так. 😔 \nПопробуйте задать поиск заного. 🔄",
@@ -348,4 +350,3 @@ async def show_tickets(
         reply_markup=show_low_prices_calendar_keyboard(direction_id),
     )
     await state.clear()
-
