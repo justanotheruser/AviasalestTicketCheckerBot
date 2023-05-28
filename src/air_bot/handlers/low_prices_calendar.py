@@ -61,9 +61,10 @@ async def show_low_prices_calendar(
 
 async def show_calendar(
     message: Message, month: int, tickets_by_date: dict[str, Any]
-) -> None:
-    await message.answer(
-        print_calendar(month, tickets_by_date),
+) -> Message:
+    tickets_table = print_calendar(month, tickets_by_date)
+    return await message.answer(
+        tickets_table,
         reply_markup=low_prices_calendar_nav_keyboard(),
         parse_mode="Markdownv2",
         disable_web_page_preview=True,
