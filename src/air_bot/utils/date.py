@@ -5,10 +5,6 @@ from random import shuffle
 from typing import Optional, Any
 
 
-def get_date_examples() -> str:
-    return "январь,  01,  01.2023,  01 2023,  01 23"
-
-
 class DateReader:
     def __init__(self) -> None:
         self.strptime_patterns = [

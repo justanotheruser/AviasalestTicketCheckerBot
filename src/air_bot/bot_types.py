@@ -39,10 +39,3 @@ class FlightDirection:
         result = 31 * result + hash(self.departure_at)
         result = 31 * result + hash(self.return_at)
         return result
-
-
-@dataclass
-class FlightDirectionFull:
-    id: int
-    user_id: int
-    direction: FlightDirection

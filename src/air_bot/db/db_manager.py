@@ -1,21 +1,13 @@
 import logging
-import typing
-from contextlib import contextmanager
-from typing import Optional, Any
-import asyncio
+from typing import Optional, Sequence
 
-from air_bot.bot_types import FlightDirectionFull, FlightDirection
-from air_bot.config import BotConfig
+from sqlalchemy import select, delete
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from sqlalchemy.orm import DeclarativeBase, Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy import Integer, String, Boolean
-from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from air_bot.bot_types import FlightDirection
+from air_bot.config import BotConfig
 from air_bot.db.mapping import Base, UserFlightDirection
-from sqlalchemy import select, delete
 
 logger = logging.getLogger(__name__)
 
@@ -31,38 +23,44 @@ class DBManager:
             echo=True,
         )
 
-    async def start(self):
-        logger.info(f'DBManager: starting')
+    async def start(self) -> None:
+        logger.info("DBManager: starting")
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-        logger.info(f'DBManager: started')
-        '''user_id = 1
-        direction = FlightDirection(start_code='ABC', start_name='bbbbAggggggA', end_code='DEF', end_name='BBBBB',
-                               with_transfer=True, departure_at='2023-06-01', return_at=None)
-        await self.save_or_update_flight_direction(user_id, direction, price=None)
-        print(await self.delete_users_flight_direction(user_id, 65))'''
+        logger.info("DBManager: started")
 
-    async def stop(self):
-        logger.info(f'DBManager: stopping')
+    async def stop(self) -> None:
+        logger.info("DBManager: stopping")
         await self.engine.dispose()
-        logger.info(f'DBManager: stopped')
+        logger.info("DBManager: stopped")
 
-    async def save_or_update_flight_direction(self, user_id: int, direction: FlightDirection, price: int) -> Optional[int]:
+    async def save_or_update_flight_direction(
+        self, user_id: int, direction: FlightDirection, price: int
+    ) -> Optional[int]:
         async_session = async_sessionmaker(self.engine, expire_on_commit=False)
         async with async_session() as session:
             async with session.begin():
                 stmt = select(UserFlightDirection)
                 stmt = where_flight_direction_and_user(stmt, direction, user_id)
                 stmt_result = await session.scalars(stmt)
-                existing_direction = stmt_result.first()  # type: Optional[UserFlightDirection]
+                existing_direction = (
+                    stmt_result.first()
+                )  # type: Optional[UserFlightDirection]
                 if existing_direction:
                     existing_direction.price = price
                     return existing_direction.id
 
-                new_direction = UserFlightDirection(user_id=user_id, start_code=direction.start_code,
-                    start_name=direction.start_name, end_code=direction.end_code,
-                    end_name=direction.end_name, price=price, with_transfer=direction.with_transfer,
-                    departure_at=direction.departure_at, return_at=direction.return_at)
+                new_direction = UserFlightDirection(
+                    user_id=user_id,
+                    start_code=direction.start_code,
+                    start_name=direction.start_name,
+                    end_code=direction.end_code,
+                    end_name=direction.end_name,
+                    price=price,
+                    with_transfer=direction.with_transfer,
+                    departure_at=direction.departure_at,
+                    return_at=direction.return_at,
+                )
                 try:
                     session.add(new_direction)
                     await session.flush()
@@ -84,7 +82,9 @@ class DBManager:
                 users_direction = stmt_result.one()
                 users_direction.price = price
 
-    async def get_price(self, user_id: int, direction: FlightDirection) -> Optional[int]:
+    async def get_price(
+        self, user_id: int, direction: FlightDirection
+    ) -> Optional[int]:
         async_session = async_sessionmaker(self.engine, expire_on_commit=False)
         async with async_session() as session:
             async with session.begin():
@@ -93,44 +93,66 @@ class DBManager:
                 stmt_result = await session.scalars(stmt)
                 return stmt_result.one()
 
-    async def get_users_flight_directions(self, user_id: int) -> list[UserFlightDirection]:
+    async def get_users_flight_directions(
+        self, user_id: int
+    ) -> Sequence[UserFlightDirection]:
         async_session = async_sessionmaker(self.engine, expire_on_commit=False)
         async with async_session() as session:
             async with session.begin():
-                stmt = select(UserFlightDirection).where(UserFlightDirection.user_id == user_id)
+                stmt = select(UserFlightDirection).where(
+                    UserFlightDirection.user_id == user_id
+                )
                 stmt_result = await session.scalars(stmt)
                 return stmt_result.all()
 
-    async def get_users_flight_direction(self, user_id: int, direction_id: int) -> UserFlightDirection:
+    async def get_users_flight_direction(
+        self, user_id: int, direction_id: int
+    ) -> Optional[UserFlightDirection]:
         async_session = async_sessionmaker(self.engine, expire_on_commit=False)
         async with async_session() as session:
             async with session.begin():
-                stmt = (select(UserFlightDirection)
-                        .where(UserFlightDirection.user_id == user_id)
-                        .where(UserFlightDirection.id == direction_id)
-                        )
+                stmt = (
+                    select(UserFlightDirection)
+                    .where(UserFlightDirection.user_id == user_id)
+                    .where(UserFlightDirection.id == direction_id)
+                )
                 stmt_result = await session.scalars(stmt)
                 return stmt_result.first()
 
-    async def delete_users_flight_direction(self, user_id: int, direction_id: int) -> None:
+    async def get_all_flight_directions(self) -> Sequence[UserFlightDirection]:
         async_session = async_sessionmaker(self.engine, expire_on_commit=False)
         async with async_session() as session:
             async with session.begin():
-                stmt = (delete(UserFlightDirection)
-                        .where(UserFlightDirection.user_id == user_id)
-                        .where(UserFlightDirection.id == direction_id)
-                        )
+                stmt = select(UserFlightDirection)
+                stmt_result = await session.scalars(stmt)
+                return stmt_result.all()
+
+    async def delete_users_flight_direction(
+        self, user_id: int, direction_id: int
+    ) -> None:
+        async_session = async_sessionmaker(self.engine, expire_on_commit=False)
+        async with async_session() as session:
+            async with session.begin():
+                stmt = (
+                    delete(UserFlightDirection)
+                    .where(UserFlightDirection.user_id == user_id)
+                    .where(UserFlightDirection.id == direction_id)
+                )
                 result = await session.execute(stmt)
                 if result.rowcount == 0:
-                    logger.warning(f"Attempt to delete non existing direction for user {user_id}, direction id {direction_id}")
+                    logger.warning(
+                        f"Attempt to delete non existing direction for user {user_id}, direction id {direction_id}"
+                    )
 
 
-def where_flight_direction_and_user(stmt, direction: FlightDirection, user_id: int):
-    return (stmt.where(UserFlightDirection.user_id == user_id)
-                    .where(UserFlightDirection.start_code == direction.start_code)
-                    .where(UserFlightDirection.start_name == direction.start_name)
-                    .where(UserFlightDirection.end_code == direction.end_code)
-                    .where(UserFlightDirection.end_name == direction.end_name)
-                    .where(UserFlightDirection.with_transfer == direction.with_transfer)
-                    .where(UserFlightDirection.departure_at == direction.departure_at)
-                    .where(UserFlightDirection.return_at == direction.return_at))
+def where_flight_direction_and_user(stmt, direction: FlightDirection, user_id: int):  # type: ignore[no-untyped-def]
+    return (
+        stmt.where(UserFlightDirection.user_id == user_id)
+        .where(UserFlightDirection.start_code == direction.start_code)
+        .where(UserFlightDirection.start_name == direction.start_name)
+        .where(UserFlightDirection.end_code == direction.end_code)
+        .where(UserFlightDirection.end_name == direction.end_name)
+        .where(UserFlightDirection.with_transfer == direction.with_transfer)
+        .where(UserFlightDirection.departure_at == direction.departure_at)
+        .where(UserFlightDirection.return_at == direction.return_at)
+    )

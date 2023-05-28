@@ -11,7 +11,7 @@ from async_timeout import timeout
 from air_bot.aviasales_api.api_layer import AviasalesAPILayer
 from air_bot.bot_types import FlightDirection
 from air_bot.checker.ticket_price_checker import TicketPriceChecker
-from air_bot.db import DB
+from air_bot.db.db_manager import DBManager
 from air_bot.keyboards.add_flight_direction_kb import (
     with_or_without_return_keyboard,
     with_or_without_transfer_keyboard,
@@ -23,7 +23,7 @@ from air_bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_ke
 from air_bot.utils.date import DateReader
 from air_bot.utils.tickets import print_tickets
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 router = Router()
 
@@ -180,7 +180,7 @@ async def got_departure_date_as_text(
     message: Message,
     state: FSMContext,
     aviasales_api: AviasalesAPILayer,
-    db: DB,
+    db_manager: DBManager,
     ticket_price_checker: TicketPriceChecker,
 ) -> None:
     departure_date = DateReader().read_date(message.text)  # type: ignore[arg-type]
@@ -195,7 +195,7 @@ async def got_departure_date_as_text(
         message,
         state,
         aviasales_api,
-        db,
+        db_manager,
         ticket_price_checker,
     )
 
@@ -205,7 +205,7 @@ async def got_departure_date_from_button(
     callback: CallbackQuery,
     state: FSMContext,
     aviasales_api: AviasalesAPILayer,
-    db: DB,
+    db_manager: DBManager,
     ticket_price_checker: TicketPriceChecker,
 ) -> None:
     departure_date: str = callback.data  # type: ignore[assignment]
@@ -215,7 +215,7 @@ async def got_departure_date_from_button(
         callback.message,  # type: ignore[arg-type]
         state,
         aviasales_api,
-        db,
+        db_manager,
         ticket_price_checker,
     )
     await callback.answer()
@@ -227,7 +227,7 @@ async def got_departure_date(
     message: Message,
     state: FSMContext,
     aviasales_api: AviasalesAPILayer,
-    db: DB,
+    db_manager: DBManager,
     ticket_price_checker: TicketPriceChecker,
 ) -> None:
     await state.update_data(departure_date=departure_date)
@@ -236,7 +236,7 @@ async def got_departure_date(
         await ask_for_return_date(message, state)
     else:
         await show_tickets(
-            message, user_id, aviasales_api, state, db, ticket_price_checker
+            message, user_id, aviasales_api, state, db_manager, ticket_price_checker
         )
 
 
@@ -256,7 +256,7 @@ async def got_return_date_as_text(
     message: Message,
     aviasales_api: AviasalesAPILayer,
     state: FSMContext,
-    db: DB,
+    db_manager: DBManager,
     ticket_price_checker: TicketPriceChecker,
 ) -> None:
     return_date = DateReader().read_date(message.text)  # type: ignore[arg-type]
@@ -271,7 +271,7 @@ async def got_return_date_as_text(
         message.from_user.id,  # type: ignore[union-attr]
         aviasales_api,
         state,
-        db,
+        db_manager,
         ticket_price_checker,
     )
 
@@ -281,7 +281,7 @@ async def got_return_date_from_button(
     callback: CallbackQuery,
     aviasales_api: AviasalesAPILayer,
     state: FSMContext,
-    db: DB,
+    db_manager: DBManager,
     ticket_price_checker: TicketPriceChecker,
 ) -> None:
     return_date: str = callback.data  # type: ignore[assignment]
@@ -291,7 +291,7 @@ async def got_return_date_from_button(
         callback.from_user.id,
         aviasales_api,
         state,
-        db,
+        db_manager,
         ticket_price_checker,
     )
     await callback.answer()
@@ -302,7 +302,7 @@ async def show_tickets(
     user_id: int,
     aviasales_api: AviasalesAPILayer,
     state: FSMContext,
-    db: DB,
+    db_manager: DBManager,
     ticket_price_checker: TicketPriceChecker,
 ) -> None:
     user_data = await state.get_data()
@@ -331,7 +331,7 @@ async def show_tickets(
 
     ticket_price_checker.schedule_check(user_id, direction)
     cheapest_price = tickets[0]["price"] if tickets else None
-    direction_id = db.save_flight_direction(
+    direction_id = await db_manager.save_or_update_flight_direction(
         user_id=user_id, direction=direction, price=cheapest_price
     )
     if not direction_id:

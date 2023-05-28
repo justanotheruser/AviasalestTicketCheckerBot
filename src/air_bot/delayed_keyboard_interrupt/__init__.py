@@ -4,22 +4,21 @@ import os
 import signal
 import logging
 
-logger = logging.getLogger("AirBot")
+from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
-__all__ = [
-    'SIGNAL_TRANSLATION_MAP',
-    'DelayedKeyboardInterrupt'
-]
+__all__ = ["SIGNAL_TRANSLATION_MAP", "DelayedKeyboardInterrupt"]
 
 SIGNAL_TRANSLATION_MAP = {
-    signal.SIGINT: 'SIGINT',
-    signal.SIGTERM: 'SIGTERM',
+    signal.SIGINT: "SIGINT",
+    signal.SIGTERM: "SIGTERM",
 }
 
 
 class DelayedKeyboardInterrupt:
-    def __init__(self, propagate_to_forked_processes=None):
+    def __init__(self, propagate_to_forked_processes: Optional[bool] = None) -> None:
         """
         Constructs a context manager that suppresses SIGINT & SIGTERM signal handlers
         for a block of code.
@@ -40,13 +39,13 @@ class DelayedKeyboardInterrupt:
         self._frame = None
         self._old_signal_handler_map = None
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self._old_signal_handler_map = {
             sig: signal.signal(sig, self._handler)
             for sig, _ in SIGNAL_TRANSLATION_MAP.items()
         }
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         for sig, handler in self._old_signal_handler_map.items():
             signal.signal(sig, handler)
 
@@ -55,7 +54,7 @@ class DelayedKeyboardInterrupt:
 
         self._old_signal_handler_map[self._sig](self._sig, self._frame)
 
-    def _handler(self, sig, frame):
+    def _handler(self, sig, frame) -> None:
         self._sig = sig
         self._frame = frame
 
@@ -64,15 +63,20 @@ class DelayedKeyboardInterrupt:
         #
         if os.getpid() != self._pid:
             if self._propagate_to_forked_processes is False:
-                logger.info(f'!!! DelayedKeyboardInterrupt._handler: {SIGNAL_TRANSLATION_MAP[sig]} received; '
-                      f'PID mismatch: {os.getpid()=}, {self._pid=}, calling original handler')
+                logger.info(
+                    f"!!! DelayedKeyboardInterrupt._handler: {SIGNAL_TRANSLATION_MAP[sig]} received; "
+                    f"PID mismatch: {os.getpid()=}, {self._pid=}, calling original handler"
+                )
                 self._old_signal_handler_map[self._sig](self._sig, self._frame)
             elif self._propagate_to_forked_processes is None:
-                logger.info(f'!!! DelayedKeyboardInterrupt._handler: {SIGNAL_TRANSLATION_MAP[sig]} received; '
-                      f'PID mismatch: {os.getpid()=}, ignoring the signal')
+                logger.info(
+                    f"!!! DelayedKeyboardInterrupt._handler: {SIGNAL_TRANSLATION_MAP[sig]} received; "
+                    f"PID mismatch: {os.getpid()=}, ignoring the signal"
+                )
                 return
             # elif self._propagate_to_forked_processes is True:
             #   ... passthrough
 
-        logger.info(f'!!! DelayedKeyboardInterrupt._handler: {SIGNAL_TRANSLATION_MAP[sig]} received; delaying KeyboardInterrupt')
-
+        logger.info(
+            f"!!! DelayedKeyboardInterrupt._handler: {SIGNAL_TRANSLATION_MAP[sig]} received; delaying KeyboardInterrupt"
+        )

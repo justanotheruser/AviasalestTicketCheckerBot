@@ -2,12 +2,13 @@ from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from air_bot.db import DB
+
+from air_bot.db.db_manager import DBManager
 
 
-class AddDb(BaseMiddleware):
-    def __init__(self, db: DB):
-        self.db = db
+class AddDBManager(BaseMiddleware):
+    def __init__(self, db_manager: DBManager):
+        self.db_manager = db_manager
         super().__init__()
 
     async def __call__(
@@ -16,5 +17,5 @@ class AddDb(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Any:
-        data["db"] = self.db
+        data["db_manager"] = self.db_manager
         return await handler(event, data)

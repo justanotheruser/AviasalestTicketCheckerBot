@@ -3,7 +3,7 @@ import logging
 
 from aiohttp import ClientSession, ClientConnectionError
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 
 async def get_locations_response(session: ClientSession, airport_or_city: str) -> str:

@@ -8,7 +8,7 @@ from async_timeout import timeout
 
 from air_bot.bot_types import FlightDirection
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 
 async def get_grouped_prices(

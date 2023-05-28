@@ -4,7 +4,7 @@ from typing import Optional
 
 from aiohttp import ClientSession, ClientConnectionError
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 
 async def get_tickets_response(

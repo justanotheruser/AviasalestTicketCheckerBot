@@ -4,7 +4,7 @@ from typing import Any
 
 from air_bot.bot_types import FlightDirection
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 
 def print_tickets(tickets: Any, direction: FlightDirection) -> str:

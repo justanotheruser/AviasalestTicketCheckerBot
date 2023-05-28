@@ -8,23 +8,33 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from air_bot.aviasales_api.api_layer import AviasalesAPILayer
-from air_bot.db import DB
+from air_bot.db.db_manager import DBManager
 from air_bot.keyboards.low_prices_calendar_kb import low_prices_calendar_nav_keyboard
 from air_bot.utils.low_prices_calendar import print_calendar
+from air_bot.utils.db import flight_direction_from_db_type
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 router = Router()
 
 
 @router.callback_query(Text(text_startswith="show_low_prices_calendar"))
 async def show_low_prices_calendar(
-    callback: CallbackQuery, state: FSMContext, db: DB, aviasales_api: AviasalesAPILayer
+    callback: CallbackQuery,
+    state: FSMContext,
+    db_manager: DBManager,
+    aviasales_api: AviasalesAPILayer,
 ) -> None:
     _, direction_id = callback.data.split("|")  # type: ignore[union-attr]
     direction_id = int(direction_id)
-    direction = db.get_users_flight_direction(callback.from_user.id, direction_id)
+    user_direction = await db_manager.get_users_flight_direction(
+        callback.from_user.id, direction_id
+    )
+    if not user_direction:
+        await callback.answer("Кнопка устарела")
+        return
 
+    direction = flight_direction_from_db_type(user_direction)
     departure_date = direction.departure_date()
     tickets_by_date, success = await aviasales_api.get_cheapest_tickets_for_month(
         direction, year=departure_date.year, month=departure_date.month

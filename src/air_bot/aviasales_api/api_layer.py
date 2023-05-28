@@ -1,8 +1,8 @@
 import json
 import logging
 import typing
-from typing import Any, Tuple
 from datetime import datetime
+from typing import Any, Tuple
 
 from aiohttp import ClientSession
 from pydantic import SecretStr
@@ -13,7 +13,7 @@ from air_bot.aviasales_api.tickets_api import get_tickets_response
 from air_bot.bot_types import FlightDirection
 from air_bot.bot_types import Location, LocationType
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 
 class AviasalesAPILayer:

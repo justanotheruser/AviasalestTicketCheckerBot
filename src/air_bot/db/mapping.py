@@ -1,19 +1,8 @@
-import logging
-import typing
-from contextlib import contextmanager
-from typing import Optional, Any
-import asyncio
+from typing import Optional
 
-from air_bot.bot_types import FlightDirectionFull, FlightDirection
-from air_bot.config import BotConfig
-from sqlalchemy.ext.asyncio import create_async_engine
-
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import Integer, String, Boolean
-from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.ext.asyncio import async_sessionmaker
 
 
 class Base(AsyncAttrs, DeclarativeBase):

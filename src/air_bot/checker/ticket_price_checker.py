@@ -1,17 +1,19 @@
+import asyncio
 import logging
-import time
 
 import aiogram
-from air_bot.scheduler import Scheduler
+
 from air_bot.aviasales_api.api_layer import AviasalesAPILayer
 from air_bot.bot_types import FlightDirection
 from air_bot.checker.conf import Interval
 from air_bot.checker.conf import read_config
-from air_bot.db import DB
+from air_bot.db.db_manager import DBManager
 from air_bot.keyboards.user_home_kb import user_home_keyboard
+from air_bot.scheduler import Scheduler
+from air_bot.utils.db import flight_direction_from_db_type
 from air_bot.utils.tickets import print_ticket
 
-logger = logging.getLogger("AirBot")
+logger = logging.getLogger(__name__)
 
 
 class TicketPriceChecker:
@@ -19,7 +21,7 @@ class TicketPriceChecker:
         self,
         bot: aiogram.Bot,
         aviasales_api: AviasalesAPILayer,
-        db: DB,
+        db: DBManager,
         scheduler: Scheduler,
         config_file_path: str,
     ):
@@ -38,7 +40,9 @@ class TicketPriceChecker:
             )
             return
         self.scheduler.schedule_every_seconds(5, self._reload_config)
-        self._schedule_checks_from_db()
+
+    async def start(self) -> None:
+        asyncio.create_task(self._schedule_checks_from_db())
 
     def schedule_check(self, user_id: int, direction: FlightDirection) -> None:
         if user_id not in self.users_jobs:
@@ -68,7 +72,7 @@ class TicketPriceChecker:
         ticket, _ = await self.aviasales_api.get_cheapest_ticket(direction)
         if not ticket:
             return
-        last_price = self.db.get_price(user_id, direction)
+        last_price = await self.db.get_price(user_id, direction)
         if not last_price:
             await self.bot.send_message(user_id, "Появился билет!")
             await self.bot.send_message(
@@ -78,9 +82,11 @@ class TicketPriceChecker:
                 disable_web_page_preview=True,
                 reply_markup=user_home_keyboard(),
             )
-            self.db.save_flight_direction(user_id, direction, ticket["price"])
+            await self.db.save_or_update_flight_direction(
+                user_id, direction, ticket["price"]
+            )
             return
-        self.db.update_flight_direction_price(user_id, direction, ticket["price"])
+        await self.db.update_flight_direction_price(user_id, direction, ticket["price"])
         if ticket["price"] <= last_price * (
             1 - self.config.price_reduction_threshold_percents / 100
         ):
@@ -93,14 +99,15 @@ class TicketPriceChecker:
                 reply_markup=user_home_keyboard(),
             )
 
-    def _schedule_checks_from_db(self) -> None:
-        directions = self.db.get_all_flight_directions()
+    async def _schedule_checks_from_db(self) -> None:
+        directions = await self.db.get_all_flight_directions()
         logger.info(
             f"[TicketPriceChecker] Scheduling ticker price check for {len(directions)} existing flight directions"
         )
-        for direction in directions:
-            self.schedule_check(direction.user_id, direction.direction)
-            time.sleep(0.5)
+        for user_direction in directions:
+            direction = flight_direction_from_db_type(user_direction)
+            self.schedule_check(user_direction.user_id, direction)
+            await asyncio.sleep(1)
 
     async def _reload_config(self) -> None:
         config = read_config(self.config_file_path)

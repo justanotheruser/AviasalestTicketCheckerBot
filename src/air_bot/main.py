@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
+
 from air_bot.air_bot_app import AirBotApp
 
 CONFIG_DIR = "../../config"
@@ -12,7 +13,7 @@ LOG_DIR = "../../logs"
 logger = logging.getLogger(__name__)
 
 
-def setup_logging():
+def setup_logging() -> None:
     """Load logging configuration"""
     log_configs = {"dev": "logging.dev.ini", "prod": "logging.prod.ini"}
     config = log_configs.get(os.environ["ENV"], "logging.dev.ini")
@@ -27,15 +28,15 @@ def setup_logging():
     )
 
 
-def main():
+def main() -> None:
     load_dotenv()
     setup_logging()
     logger.setLevel(logging.INFO)
-    logger.info('Starting app')
+    logger.info("Starting app")
     app = AirBotApp()
     app.run()
-    logger.info(f'App stopped')
+    logger.info("App stopped")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
