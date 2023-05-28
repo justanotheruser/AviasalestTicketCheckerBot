@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 
 from air_bot.air_bot_app import AirBotApp
 
-CONFIG_DIR = "../../config"
-LOG_DIR = "../../logs"
+CONFIG_DIR = "./config"
+LOG_DIR = "./logs"
 
 logger = logging.getLogger(__name__)
 
