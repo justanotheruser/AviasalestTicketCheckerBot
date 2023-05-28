@@ -7,11 +7,15 @@ name = "pypi"
 aiogram = "==3.0.0b4"
 aiohttp = "*"
 pydantic = {extras = ["dotenv"], version = "*"}
-pymysql = "*"
 async-timeout = "*"
 aioschedule = "*"
 configparser = "*"
 cryptography = "*"
+mysqlclient = {version = "*", sys_platform = "== 'win32'"}
+mysql-connector-python = "*"
+sqlalchemy = {extras = ["asyncio"], version = "*"}
+asyncmy = "*"
+python-dotenv = "*"
 
 [dev-packages]
 flake8 = "*"
