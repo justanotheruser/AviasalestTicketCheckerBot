@@ -11,24 +11,40 @@ class CalendarTicket:
         self.markup = rf"{self.day:02} \- {link}"
 
 
-def print_calendar(month: int, tickets_by_date: dict[str, Any]) -> str:
+def print_calendar(month: int, tickets_by_date: dict[str, Any]) -> list[str]:
     calendar_tickets = get_calendar_tickets(tickets_by_date)
-    day_prices_table = get_calendar_table(calendar_tickets)
-    return f"📅 {russian_months[month]}\n" f"{day_prices_table}"
+    calendar_lines = get_calendar_lines(calendar_tickets)
+    calendar_tables = get_calendar_tables(calendar_lines)
+    table_header = f"📅 {russian_months[month]}"
+    return [f"{table_header}\n" f"{table}" for table in calendar_tables]
 
 
-def get_calendar_table(calendar_tickets: list[CalendarTicket]) -> str:
+def get_calendar_tables(lines: list[str]) -> list[str]:
+    # Because all lines together can easily exceed message symbol limit we split table if necessary
+    tables = []
+    cur_table = ""
+    for line in lines:
+        if len(line) + len(cur_table) >= 9450:
+            tables.append(cur_table)
+            cur_table = line + "\n"
+        else:
+            cur_table += line + "\n"
+    tables.append(cur_table)
+    return tables
+
+
+def get_calendar_lines(calendar_tickets: list[CalendarTicket]) -> list[str]:
     if not calendar_tickets:
-        return ""
+        return [""]
     if len(calendar_tickets) == 1:
-        return calendar_tickets[0].markup
+        return [calendar_tickets[0].markup]
     lines = []
     left_column, right_column = calendar_tickets[::2], calendar_tickets[1::2]
     first_column_width = max([len(x.visible_text) for x in left_column])
     for left, right in zip(left_column, right_column):
         padding = " " * (first_column_width - len(left.visible_text))
         lines.append(rf"{left.markup}`{padding}`\|{right.markup}")
-    return "\n".join(lines)
+    return lines
 
 
 def get_calendar_tickets(tickets_by_date: dict[str, Any]) -> list[CalendarTicket]:

@@ -32,6 +32,13 @@ class FlightDirection:
             return datetime.datetime.strptime(self.departure_at, "%Y-%m")
         return datetime.datetime.strptime(self.departure_at, "%Y-%m-%d")
 
+    def return_date(self) -> Optional[datetime.date]:
+        if not self.return_at:
+            return None
+        if len(self.return_at) == 7:
+            return datetime.datetime.strptime(self.return_at, "%Y-%m")
+        return datetime.datetime.strptime(self.return_at, "%Y-%m-%d")
+
     def __hash__(self) -> int:
         result = hash(self.start_code)
         result = 31 * result + hash(self.end_code)

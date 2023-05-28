@@ -1,7 +1,6 @@
 import json
 import logging
 import typing
-from datetime import datetime
 from typing import Any, Tuple
 
 from aiohttp import ClientSession
@@ -83,11 +82,9 @@ class AviasalesAPILayer:
         return response["data"][direction.departure_at], True
 
     async def get_cheapest_tickets_for_month(
-        self, direction: FlightDirection, year: int, month: int
+        self, direction: FlightDirection, departure_year: int, departure_month: int
     ) -> typing.Tuple[dict[str, Any], bool]:
-        if not request_is_valid(direction, year, month):
-            return dict(), True
-        direction.departure_at = f"{year}-{month:02d}"
+        direction.departure_at = f"{departure_year}-{departure_month:02d}"
         response = await get_grouped_prices(
             self.session, self.token.get_secret_value(), direction
         )
@@ -98,11 +95,3 @@ class AviasalesAPILayer:
 
 def does_include_day(date_str: str) -> bool:
     return len(date_str) > 7
-
-
-def request_is_valid(direction: FlightDirection, year: int, month: int) -> bool:
-    if direction.return_at:
-        return_date = datetime.strptime(direction.departure_at, "%Y-%m")
-        if return_date.year != year or return_date.month > month:
-            return False  # Not supported by Aviasales API
-    return True
