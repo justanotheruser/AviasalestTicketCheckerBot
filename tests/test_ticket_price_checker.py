@@ -57,6 +57,9 @@ async def test_schedule_check_receive_no_tickets_then_ticket_appears(
     assert aviasales_api.mock_calls == []
 
     user_id = 1
+    # Flight direction is in DB after user added it (but there were no tickets at the moment, so the price is NULL)
+    await db.save_or_update_flight_direction(user_id, direction, None)
+
     checker.schedule_check(user_id, direction)
     assert schedule_every_seconds.call_count == 2
     first_call_args = schedule_every_seconds.call_args_list[0][0]
@@ -69,18 +72,20 @@ async def test_schedule_check_receive_no_tickets_then_ticket_appears(
     )
     assert seconds == 30
 
+    # First scheduled check (still no tickets)
     aviasales_api.get_cheapest_ticket.return_value = (None, True)
     await scheduled_fn(*scheduled_fn_args)
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     bot.send_message.assert_not_awaited()
 
+    # Second scheduled check - ticket appeared! Send it to user.
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
     await scheduled_fn(*scheduled_fn_args)
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert bot.send_message.await_count == 2
 
 
-def schedule_ticket_check(
+async def schedule_ticket_check(
     mocker, db, direction, ticket_price_checker_config, check_interval: int = 60
 ):
     bot = mocker.Mock()
@@ -96,6 +101,7 @@ def schedule_ticket_check(
     assert aviasales_api.mock_calls == []
 
     user_id = 1
+    await db.save_or_update_flight_direction(user_id, direction, None)
     checker.schedule_check(user_id, direction)
     assert schedule_every_minutes.call_count == 1
     scheduler_call_args = schedule_every_minutes.call_args[0]
@@ -129,7 +135,7 @@ def schedule_ticket_check(
 async def test_schedule_check_receive_tickets_then_lower_price_below_threshold(
     ticket_price_checker_config, db, mocker, direction
 ):
-    bot_send_message, aviasales_api, scheduled_check = schedule_ticket_check(
+    bot_send_message, aviasales_api, scheduled_check = await schedule_ticket_check(
         mocker, db, direction, ticket_price_checker_config, check_interval=30
     )
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
@@ -172,7 +178,7 @@ async def test_schedule_check_receive_tickets_then_lower_price_below_threshold(
 async def test_schedule_check_then_prise_declines_slowly(
     ticket_price_checker_config, db, mocker, direction
 ):
-    bot_send_message, aviasales_api, scheduled_check = schedule_ticket_check(
+    bot_send_message, aviasales_api, scheduled_check = await schedule_ticket_check(
         mocker, db, direction, ticket_price_checker_config
     )
 

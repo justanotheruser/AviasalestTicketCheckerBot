@@ -1,10 +1,10 @@
 import pytest
 
-from air_bot.db import DB
+from .db_manager_for_tests import DBManagerForTests
 
 
 @pytest.fixture()
-def db(mocker):
+async def db(mocker):
     config = mocker.Mock()
     config.db_host = "localhost"
     config.db_port = 3306
@@ -13,11 +13,11 @@ def db(mocker):
     db_pass.get_secret_value = lambda: "air_bot_test_pass"
     config.db_pass = db_pass
     config.db_name = "air_bot_test"
-    test_db = DB(config)
+    test_db = DBManagerForTests(config)
+    await test_db.start()
     yield test_db
-    with test_db.cursor(commit=True) as cursor:
-        query = "DELETE FROM flight_direction;"
-        cursor.execute(query)
+    await test_db.delete_all()
+    await test_db.stop()
 
 
 @pytest.fixture()

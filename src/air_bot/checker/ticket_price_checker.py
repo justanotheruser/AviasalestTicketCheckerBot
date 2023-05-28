@@ -73,21 +73,7 @@ class TicketPriceChecker:
         if not ticket:
             return
         last_price = await self.db.get_price(user_id, direction)
-        if not last_price:
-            await self.bot.send_message(user_id, "Появился билет!")
-            await self.bot.send_message(
-                user_id,
-                print_ticket(ticket, direction),
-                parse_mode="html",
-                disable_web_page_preview=True,
-                reply_markup=user_home_keyboard(),
-            )
-            await self.db.save_or_update_flight_direction(
-                user_id, direction, ticket["price"]
-            )
-            return
-        await self.db.update_flight_direction_price(user_id, direction, ticket["price"])
-        if ticket["price"] <= last_price * (
+        if not last_price or ticket["price"] <= last_price * (
             1 - self.config.price_reduction_threshold_percents / 100
         ):
             await self.bot.send_message(user_id, "Появился билет!")
@@ -98,6 +84,7 @@ class TicketPriceChecker:
                 disable_web_page_preview=True,
                 reply_markup=user_home_keyboard(),
             )
+        await self.db.update_flight_direction_price(user_id, direction, ticket["price"])
 
     async def _schedule_checks_from_db(self) -> None:
         directions = await self.db.get_all_flight_directions()
