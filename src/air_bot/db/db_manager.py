@@ -86,20 +86,20 @@ class DBManager:
         except Exception as e:
             logger.error(f"DatabaseError {e}")
 
-    async def get_price(
+    async def get_price_and_row_id(
         self, user_id: int, direction: FlightDirection
-    ) -> Tuple[Optional[int], bool]:
+    ) -> Tuple[Optional[int], Optional[int], bool]:
         try:
             async_session = async_sessionmaker(self.engine, expire_on_commit=False)
             async with async_session() as session:
                 async with session.begin():
-                    stmt = select(UserFlightDirection.price)
+                    stmt = select(UserFlightDirection.price, UserFlightDirection.id)
                     stmt = where_flight_direction_and_user(stmt, direction, user_id)
-                    stmt_result = await session.scalars(stmt)
-                    return stmt_result.one(), True
+                    result = await session.execute(stmt)
+                    return *result.one(), True  # type: ignore[return-value]
         except Exception as e:
             logger.error(f"DatabaseError {e}")
-            return None, False
+            return None, None, False
 
     async def get_users_flight_directions(
         self, user_id: int

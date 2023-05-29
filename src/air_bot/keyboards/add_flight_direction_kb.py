@@ -20,12 +20,12 @@ def with_or_without_return_keyboard() -> types.InlineKeyboardMarkup:
     kb = [
         [
             types.InlineKeyboardButton(
-                text="В один конец ️➡️", callback_data="without_return"
+                text="➡️ в одну сторону", callback_data="without_return"
             )
         ],
         [
             types.InlineKeyboardButton(
-                text="Туда и обратно ➡️⬅️", callback_data="with_return"
+                text="↔️ туда-обратно", callback_data="with_return"
             )
         ],
     ]
@@ -36,12 +36,12 @@ def with_or_without_transfer_keyboard() -> types.InlineKeyboardMarkup:
     kb = [
         [
             types.InlineKeyboardButton(
-                text="С пересадками ➡️➡️", callback_data="with_transfer"
+                text="➡️ прямые рейсы", callback_data="without_transfer"
             )
         ],
         [
             types.InlineKeyboardButton(
-                text="Прямые рейсы ➡️", callback_data="without_transfer"
+                text="↕️ с пересадками", callback_data="with_transfer"
             )
         ],
     ]

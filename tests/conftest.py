@@ -15,6 +15,7 @@ async def db(mocker):
     config.db_name = "air_bot_test"
     test_db = DBManagerForTests(config)
     await test_db.start()
+    await test_db.delete_all()
     yield test_db
     await test_db.delete_all()
     await test_db.stop()

@@ -8,7 +8,7 @@ from air_bot.bot_types import FlightDirection
 from air_bot.checker.conf import Interval
 from air_bot.checker.conf import read_config
 from air_bot.db.db_manager import DBManager
-from air_bot.keyboards.user_home_kb import user_home_keyboard
+from air_bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_keyboard
 from air_bot.scheduler import Scheduler
 from air_bot.utils.db import flight_direction_from_db_type
 from air_bot.utils.tickets import print_ticket
@@ -72,22 +72,25 @@ class TicketPriceChecker:
         ticket, _ = await self.aviasales_api.get_cheapest_ticket(direction)
         if not ticket:
             return
-        last_price, success = await self.db.get_price(user_id, direction)
+        last_price, user_direction_id, success = await self.db.get_price_and_row_id(
+            user_id, direction
+        )
         if not success:
             logger.error("Failed to get price from DB for comparison")
             return
+        await self.db.update_flight_direction_price(user_id, direction, ticket["price"])
         if not last_price or ticket["price"] <= last_price * (
             1 - self.config.price_reduction_threshold_percents / 100
         ):
-            await self.bot.send_message(user_id, "Появился билет!")
             await self.bot.send_message(
                 user_id,
                 print_ticket(ticket, direction),
                 parse_mode="html",
                 disable_web_page_preview=True,
-                reply_markup=user_home_keyboard(),
+                reply_markup=show_low_prices_calendar_keyboard(
+                    user_direction_id  # type: ignore[arg-type]
+                ),
             )
-        await self.db.update_flight_direction_price(user_id, direction, ticket["price"])
 
     async def _schedule_checks_from_db(self) -> None:
         directions = await self.db.get_all_flight_directions()

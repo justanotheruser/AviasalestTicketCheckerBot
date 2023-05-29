@@ -76,7 +76,7 @@ async def choose_with_or_without_transfer(
 ) -> None:
     await state.update_data(with_return=callback.data == "with_return")
     await callback.message.answer(  # type: ignore[union-attr]
-        "Выберите тип поиска 👇",
+        "Прямые рейсы 👇",
         reply_markup=with_or_without_transfer_keyboard(),
     )
     await state.set_state(NewDirection.choosing_with_transfer_or_not)
@@ -165,11 +165,11 @@ async def choose_departure_date(callback: CallbackQuery, state: FSMContext) -> N
 
 
 async def ask_for_departure_date(message: Message, state: FSMContext) -> None:
-    date_examples = ", ".join(DateReader().get_examples())
+    date_examples = ", ".join(f'"{example}"' for example in DateReader().get_examples())
     await message.answer(
         "📅 Укажите дату отправления:\n"
-        "Выберите месяц или введите дату.\n"
-        f"Например: {date_examples}",
+        "можно выбрать целый месяц или прислать мне дату, например:\n"
+        f"{date_examples}",
         reply_markup=choose_month_keyboard(),
     )
     await state.set_state(NewDirection.choosing_departure_date)
@@ -342,9 +342,11 @@ async def show_tickets(
         await state.clear()
         return
 
-    text = print_tickets(tickets, direction)
     await message.answer(
-        text=text,
+        text="✅ Направление добавлено, а вот самые низкие цены на сегодня\n👇👇👇"
+    )
+    await message.answer(
+        text=print_tickets(tickets, direction),
         parse_mode="html",
         disable_web_page_preview=True,
         reply_markup=show_low_prices_calendar_keyboard(direction_id),

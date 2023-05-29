@@ -697,5 +697,6 @@ async def test_correct_formatting(
     bot: TestBot, message_for_answer: TestMessage, test_data
 ):
     await bot.send_message(text=test_data["name"])
-    await show_calendar(message_for_answer, test_data["month"], test_data["tickets"],
-                        [], False, False)
+    await show_calendar(
+        message_for_answer, test_data["month"], test_data["tickets"], [], False, False
+    )

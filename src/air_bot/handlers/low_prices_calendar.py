@@ -134,10 +134,10 @@ async def show_previous_month(
     callback: CallbackQuery, state: FSMContext, aviasales_api: AviasalesAPILayer
 ) -> None:
     user_data = await state.get_data()
-    if "calendar_data" not in user_data:
+    if "low_prices_calendar_data" not in user_data:
         await callback.answer(text="Кнопка устарела")
         return
-    calendar_data = decrease_month(user_data["calendar_data"])
+    calendar_data = decrease_month(user_data["low_prices_calendar_data"])
     calendar_messages = await edit_calendar(aviasales_api, calendar_data, callback)
     calendar_data["calendar_messages"] = calendar_messages
     await state.update_data(low_prices_calendar_data=calendar_data)
@@ -148,10 +148,10 @@ async def show_next_month(
     callback: CallbackQuery, state: FSMContext, aviasales_api: AviasalesAPILayer
 ) -> None:
     user_data = await state.get_data()
-    if "calendar_data" not in user_data:
+    if "low_prices_calendar_data" not in user_data:
         await callback.answer(text="Кнопка устарела")
         return
-    calendar_data = increase_month(user_data["calendar_data"])
+    calendar_data = increase_month(user_data["low_prices_calendar_data"])
     calendar_messages = await edit_calendar(aviasales_api, calendar_data, callback)
     calendar_data["calendar_messages"] = calendar_messages
     await state.update_data(low_prices_calendar_data=calendar_data)

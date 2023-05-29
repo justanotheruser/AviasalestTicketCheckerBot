@@ -10,14 +10,15 @@ logger = logging.getLogger(__name__)
 def print_tickets(tickets: Any, direction: FlightDirection) -> str:
     if not tickets:
         return "Рейсов нет!"
-    text = f"{direction.start_name} - {direction.end_name} - вот текущие цены\n"
+    text = f"<b>{direction.start_name} - {direction.end_name} | текущие цены</b>\n"
     with_or_without_return = (
-        "Туда и обратно ➡️⬅️" if direction.return_at else "В один конец ️➡️"
+        "↔️ туда-обратно" if direction.return_at else "➡️ в одну сторону"
     )
-    direction_type = "🔄 C пересадкой" if direction.with_transfer else "🔄 Прямые"
+    direction_type = "↕️ с пересадками" if direction.with_transfer else "➡️ прямой рейс"
     text += with_or_without_return + "\n" + direction_type + "\n\n"
     for ticket in tickets:
-        text += print_ticket(ticket, direction) + "\n\n\n\n"
+        text += print_ticket(ticket, direction)
+        text += "\n------------------------------------\n"
     return text
 
 
@@ -28,48 +29,40 @@ def print_ticket(ticket: Any, direction: FlightDirection) -> str:
 
 
 def print_one_way_ticket(ticket: Any, direction: FlightDirection) -> str:
-    departure_at = datetime.strptime(
-        str(ticket["departure_at"])[: len(ticket["departure_at"]) - 9], "%Y-%m-%dT%H:%M"
+    departure_at = datetime_from_ticket(ticket["departure_at"])
+    departure_at_str = print_datetime(departure_at)
+    arrival_at_str = print_datetime(
+        departure_at + timedelta(minutes=int(ticket["duration_to"]))
     )
-    datetime_format = "%d.%m.%Y %H:%M"
-    departure_at_str = departure_at.strftime(datetime_format)
-    arrival_at_str = (
-        departure_at + timedelta(minutes=int(ticket["duration"]))
-    ).strftime(datetime_format)
     return (
-        f"{direction.start_name}({direction.start_code}) - {direction.end_name}({direction.end_code})\n"
-        f"🕛 Отправление: {departure_at_str}\n"
-        f"🕞 Прибытие: {arrival_at_str}\n"
-        f'💳 {ticket["price"]} ₽ | {get_ticket_link(ticket, "Купить билет", parse_mode="html")}'
+        f"<b>{direction.start_name} ({direction.start_code}) - {direction.end_name} ({direction.end_code})</b>\n"
+        f"🛫 {departure_at_str}\n"
+        f"🛬 {arrival_at_str}\n"
+        f'💳 {ticket["price"]} ₽ | {get_ticket_link(ticket, "купить билет", parse_mode="html")}'
     )
 
 
 def print_two_way_ticket(ticket: Any, direction: FlightDirection) -> str:
-    departure_at = datetime.strptime(
-        str(ticket["departure_at"])[: len(ticket["departure_at"]) - 9], "%Y-%m-%dT%H:%M"
-    )
-    datetime_format = "%d.%m.%Y %H:%M"
-    departure_at_str = departure_at.strftime(datetime_format)
-    departure_arrival_at_str = (
+    departure_at = datetime_from_ticket(ticket["departure_at"])
+    departure_at_str = print_datetime(departure_at)
+    departure_arrival_at_str = print_datetime(
         departure_at + timedelta(minutes=int(ticket["duration_to"]))
-    ).strftime(datetime_format)
-
-    return_at = datetime.strptime(
-        str(ticket["return_at"])[: len(ticket["return_at"]) - 9], "%Y-%m-%dT%H:%M"
     )
-    return_at_str = return_at.strftime(datetime_format)
-    return_arrival_at_str = (
+
+    return_at = datetime_from_ticket(ticket["return_at"])
+    return_at_str = print_datetime(return_at)
+    return_arrival_at_str = print_datetime(
         return_at + timedelta(minutes=int(ticket["duration_back"]))
-    ).strftime(datetime_format)
+    )
 
     return (
-        f"{direction.start_name}({direction.start_code}) - {direction.end_name}({direction.end_code}) - "
-        f"{direction.start_name}({direction.start_code})\n"
-        f"🕛 Отправление (туда): {departure_at_str}\n"
-        f"🕞 Прибытие (туда): {departure_arrival_at_str}\n"
-        f"🕛 Отправление (обратно): {return_at_str}\n"
-        f"🕞 Прибытие (обратно): {return_arrival_at_str}\n"
-        f'💳 {ticket["price"]} ₽ | {get_ticket_link(ticket, "Купить билет", parse_mode="html")}'
+        f"<b>{direction.start_name} ({direction.start_code}) - {direction.end_name} ({direction.end_code}) - "
+        f"{direction.start_name} ({direction.start_code})</b>\n"
+        f"🛫 {departure_at_str}\n"
+        f"🛬 {departure_arrival_at_str}\n"
+        f"🛫 {return_at_str}\n"
+        f"🛬 {return_arrival_at_str}\n"
+        f'💳 {ticket["price"]} ₽ | {get_ticket_link(ticket, "купить билет", parse_mode="html")}'
     )
 
 
@@ -80,3 +73,15 @@ def get_ticket_link(ticket: dict[str, Any], link_text: str, parse_mode: str) -> 
     elif parse_mode == "Markdownv2":
         return f"[{link_text}]({url})"
     raise RuntimeError(f"Invalid parse_mode option: {parse_mode}")
+
+
+def datetime_from_ticket(datetime_str: str) -> datetime:
+    """Converts datetime from string in Aviasales API response to Python's datetime"""
+    return datetime.strptime(
+        str(datetime_str)[: len(datetime_str) - 9], "%Y-%m-%dT%H:%M"
+    )
+
+
+def print_datetime(ticket_date: datetime) -> str:
+    """Returns string for using in ticket message"""
+    return ticket_date.strftime("%d.%m.%Y <b>·</b> %H:%M")

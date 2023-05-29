@@ -82,7 +82,7 @@ async def test_schedule_check_receive_no_tickets_then_ticket_appears(
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
     await scheduled_fn(*scheduled_fn_args)
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
-    assert bot.send_message.await_count == 2
+    assert bot.send_message.await_count == 1
 
 
 async def schedule_ticket_check(
@@ -141,28 +141,28 @@ async def test_schedule_check_receive_tickets_then_lower_price_below_threshold(
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
-    assert bot_send_message.await_count == 2
+    assert bot_send_message.await_count == 1
 
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 90}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 2
     # New message to user (price went down below threshold)
-    assert bot_send_message.await_count == 4
+    assert bot_send_message.await_count == 2
 
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 110}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 3
     # No message to user
-    assert bot_send_message.await_count == 4
+    assert bot_send_message.await_count == 2
 
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 95}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 4
     # New message to user (price went down below threshold)
-    assert bot_send_message.await_count == 6
+    assert bot_send_message.await_count == 3
 
 
 @pytest.mark.parametrize(
@@ -185,18 +185,18 @@ async def test_schedule_check_then_prise_declines_slowly(
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 100}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
-    assert bot_send_message.await_count == 2
+    assert bot_send_message.await_count == 1
 
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 90}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 2
     # No new messages to user (because 90 > 100*(1-0.2))
-    assert bot_send_message.await_count == 2
+    assert bot_send_message.await_count == 1
 
     aviasales_api.get_cheapest_ticket.return_value = ({"price": 79}, True)
     await scheduled_check()
     aviasales_api.get_cheapest_ticket.assert_awaited_with(direction)
     assert aviasales_api.get_cheapest_ticket.await_count == 3
     # No new messages to user (because 79 > 90*(1-0.2))
-    assert bot_send_message.await_count == 2
+    assert bot_send_message.await_count == 1
