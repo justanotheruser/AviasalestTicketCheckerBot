@@ -21,6 +21,7 @@ class DBManager:
         self.engine = create_async_engine(
             f"mysql+asyncmy://{username}:{password}@{host}/{dbname}",
             echo=True,
+            pool_pre_ping=True,
         )
 
     async def start(self) -> None:

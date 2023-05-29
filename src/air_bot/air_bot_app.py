@@ -53,18 +53,6 @@ class AirBotApp:
         await self._db_manager.start()
         await self._bot.start()
 
-        from air_bot.bot_types import FlightDirection
-        FLIGHT_DIRECTION_NO_RETURN = FlightDirection(
-            start_code="STA",
-            start_name="Start",
-            end_code="END",
-            end_name="End",
-            with_transfer=False,
-            departure_at="2023-05-16",
-            return_at=None,
-        )
-        await self._db_manager.save_or_update_flight_direction(1, FLIGHT_DIRECTION_NO_RETURN, 100)
-
     async def _astop(self) -> None:
         await self._aiohttp_client_session.close()  # type: ignore[union-attr]
         await self._db_manager.stop()  # type: ignore[union-attr]
