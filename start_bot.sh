@@ -4,4 +4,4 @@ if [ "$1" == "-s" ]; then
         exec screen -dm -S screenName /bin/bash "$0";
     fi
 fi
-pipenv run python main.py
+pipenv run python src/air_bot/main.py
