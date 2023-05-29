@@ -54,6 +54,9 @@ async def show_direction_info(
     user_direction = await db_manager.get_users_flight_direction(
         callback.from_user.id, direction_id
     )
+    if not user_direction:
+        await callback.answer("Кнопка устарела")
+        return
     direction = flight_direction_from_db_type(user_direction)
     ticket, success = await aviasales_api.get_cheapest_ticket(direction)
     if not success:
@@ -89,7 +92,15 @@ async def delete_direction(
     user_direction = await db_manager.get_users_flight_direction(
         callback.from_user.id, direction_id
     )
-    await db_manager.delete_users_flight_direction(callback.from_user.id, direction_id)
+    if not user_direction:
+        await callback.answer("Кнопка устарела")
+        return
+    success = await db_manager.delete_users_flight_direction(
+        callback.from_user.id, direction_id
+    )
+    if not success:
+        await callback.answer(text="Что-то пошло не так. Повторите попытку позже")
+        return
     direction = flight_direction_from_db_type(user_direction)
     ticket_price_checker.remove_check(callback.from_user.id, direction)
     await callback.message.answer(  # type: ignore[union-attr]

@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -74,25 +74,32 @@ class DBManager:
     async def update_flight_direction_price(
         self, user_id: int, direction: FlightDirection, price: int
     ) -> None:
-        async_session = async_sessionmaker(self.engine, expire_on_commit=False)
-        async with async_session() as session:
-            async with session.begin():
-                stmt = select(UserFlightDirection)
-                stmt = where_flight_direction_and_user(stmt, direction, user_id)
-                stmt_result = await session.scalars(stmt)
-                users_direction = stmt_result.one()
-                users_direction.price = price
+        try:
+            async_session = async_sessionmaker(self.engine, expire_on_commit=False)
+            async with async_session() as session:
+                async with session.begin():
+                    stmt = select(UserFlightDirection)
+                    stmt = where_flight_direction_and_user(stmt, direction, user_id)
+                    stmt_result = await session.scalars(stmt)
+                    users_direction = stmt_result.one()
+                    users_direction.price = price
+        except Exception as e:
+            logger.error(f"DatabaseError {e}")
 
     async def get_price(
         self, user_id: int, direction: FlightDirection
-    ) -> Optional[int]:
-        async_session = async_sessionmaker(self.engine, expire_on_commit=False)
-        async with async_session() as session:
-            async with session.begin():
-                stmt = select(UserFlightDirection.price)
-                stmt = where_flight_direction_and_user(stmt, direction, user_id)
-                stmt_result = await session.scalars(stmt)
-                return stmt_result.one()
+    ) -> Tuple[Optional[int], bool]:
+        try:
+            async_session = async_sessionmaker(self.engine, expire_on_commit=False)
+            async with async_session() as session:
+                async with session.begin():
+                    stmt = select(UserFlightDirection.price)
+                    stmt = where_flight_direction_and_user(stmt, direction, user_id)
+                    stmt_result = await session.scalars(stmt)
+                    return stmt_result.one(), True
+        except Exception as e:
+            logger.error(f"DatabaseError {e}")
+            return None, False
 
     async def get_users_flight_directions(
         self, user_id: int
@@ -130,20 +137,26 @@ class DBManager:
 
     async def delete_users_flight_direction(
         self, user_id: int, direction_id: int
-    ) -> None:
-        async_session = async_sessionmaker(self.engine, expire_on_commit=False)
-        async with async_session() as session:
-            async with session.begin():
-                stmt = (
-                    delete(UserFlightDirection)
-                    .where(UserFlightDirection.user_id == user_id)
-                    .where(UserFlightDirection.id == direction_id)
-                )
-                result = await session.execute(stmt)
-                if result.rowcount == 0:
-                    logger.warning(
-                        f"Attempt to delete non existing direction for user {user_id}, direction id {direction_id}"
+    ) -> bool:
+        """Returns True on success"""
+        try:
+            async_session = async_sessionmaker(self.engine, expire_on_commit=False)
+            async with async_session() as session:
+                async with session.begin():
+                    stmt = (
+                        delete(UserFlightDirection)
+                        .where(UserFlightDirection.user_id == user_id)
+                        .where(UserFlightDirection.id == direction_id)
                     )
+                    result = await session.execute(stmt)
+                    if result.rowcount == 0:  # type: ignore[attr-defined]
+                        logger.warning(
+                            f"Attempt to delete non existing direction for user {user_id}, direction id {direction_id}"
+                        )
+                    return True
+        except Exception as e:
+            logger.error(f"DatabaseError {e}")
+            return False
 
 
 def where_flight_direction_and_user(stmt, direction: FlightDirection, user_id: int):  # type: ignore[no-untyped-def]

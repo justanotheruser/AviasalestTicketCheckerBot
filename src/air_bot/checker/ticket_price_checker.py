@@ -72,7 +72,10 @@ class TicketPriceChecker:
         ticket, _ = await self.aviasales_api.get_cheapest_ticket(direction)
         if not ticket:
             return
-        last_price = await self.db.get_price(user_id, direction)
+        last_price, success = await self.db.get_price(user_id, direction)
+        if not success:
+            logger.error("Failed to get price from DB for comparison")
+            return
         if not last_price or ticket["price"] <= last_price * (
             1 - self.config.price_reduction_threshold_percents / 100
         ):

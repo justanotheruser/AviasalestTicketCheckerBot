@@ -154,7 +154,7 @@ CALENDAR_TESTS_DATA = [
         },
     },
     {
-        "name": "Превышен лимит символов для одного сообщения",
+        "name": "Календарь разделён на несколько сообщений чтобы избежать превышения лимита сообщений",
         "month": 6,
         "tickets": {
             "2023-07-01": {
@@ -697,4 +697,5 @@ async def test_correct_formatting(
     bot: TestBot, message_for_answer: TestMessage, test_data
 ):
     await bot.send_message(text=test_data["name"])
-    await show_calendar(message_for_answer, test_data["month"], test_data["tickets"])
+    await show_calendar(message_for_answer, test_data["month"], test_data["tickets"],
+                        [], False, False)
