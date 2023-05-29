@@ -37,38 +37,38 @@ class DBManager:
     async def save_or_update_flight_direction(
         self, user_id: int, direction: FlightDirection, price: int
     ) -> Optional[int]:
-        async_session = async_sessionmaker(self.engine, expire_on_commit=False)
-        async with async_session() as session:
-            async with session.begin():
-                stmt = select(UserFlightDirection)
-                stmt = where_flight_direction_and_user(stmt, direction, user_id)
-                stmt_result = await session.scalars(stmt)
-                existing_direction = (
-                    stmt_result.first()
-                )  # type: Optional[UserFlightDirection]
-                if existing_direction:
-                    existing_direction.price = price
-                    return existing_direction.id
+        try:
+            async_session = async_sessionmaker(self.engine, expire_on_commit=False)
+            async with async_session() as session:
+                async with session.begin():
+                    stmt = select(UserFlightDirection)
+                    stmt = where_flight_direction_and_user(stmt, direction, user_id)
+                    stmt_result = await session.scalars(stmt)
+                    existing_direction = (
+                        stmt_result.first()
+                    )  # type: Optional[UserFlightDirection]
+                    if existing_direction:
+                        existing_direction.price = price
+                        return existing_direction.id
 
-                new_direction = UserFlightDirection(
-                    user_id=user_id,
-                    start_code=direction.start_code,
-                    start_name=direction.start_name,
-                    end_code=direction.end_code,
-                    end_name=direction.end_name,
-                    price=price,
-                    with_transfer=direction.with_transfer,
-                    departure_at=direction.departure_at,
-                    return_at=direction.return_at,
-                )
-                try:
+                    new_direction = UserFlightDirection(
+                        user_id=user_id,
+                        start_code=direction.start_code,
+                        start_name=direction.start_name,
+                        end_code=direction.end_code,
+                        end_name=direction.end_name,
+                        price=price,
+                        with_transfer=direction.with_transfer,
+                        departure_at=direction.departure_at,
+                        return_at=direction.return_at,
+                    )
                     session.add(new_direction)
                     await session.flush()
                     await session.refresh(new_direction)
                     return new_direction.id
-                except Exception as e:
-                    logger.error(f"DatabaseError {e}")
-                    return None
+        except Exception as e:
+            logger.error(f"DatabaseError {e}")
+            return None
 
     async def update_flight_direction_price(
         self, user_id: int, direction: FlightDirection, price: int
