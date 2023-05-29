@@ -16,7 +16,8 @@ def print_calendar(month: int, tickets_by_date: dict[str, Any]) -> list[str]:
     calendar_lines = get_calendar_lines(calendar_tickets)
     calendar_tables = get_calendar_tables(calendar_lines)
     table_header = f"📅 {russian_months[month]}"
-    return [f"{table_header}\n" f"{table}" for table in calendar_tables]
+    calendar_tables[0] = f"{table_header}\n{calendar_tables[0]}"
+    return calendar_tables
 
 
 def get_calendar_tables(lines: list[str]) -> list[str]:
