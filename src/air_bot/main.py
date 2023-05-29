@@ -26,6 +26,8 @@ def setup_logging() -> None:
         disable_existing_loggers=False,
         defaults={"logfilename": f"{LOG_DIR}/{timestamp}.log"},
     )
+    schedule_logger = logging.getLogger('schedule')
+    schedule_logger.setLevel(level=logging.WARNING)
 
 
 def main() -> None:
