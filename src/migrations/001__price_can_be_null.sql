@@ -1,1 +1,0 @@
-ALTER TABLE flight_direction MODIFY COLUMN price INT;
