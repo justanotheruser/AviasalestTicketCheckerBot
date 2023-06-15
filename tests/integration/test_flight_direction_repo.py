@@ -1,13 +1,9 @@
 import datetime
 
 import pytest
-import pytest_asyncio
 from data_for_tests import FLIGHT_DIRECTION_NO_RETURN, FLIGHT_DIRECTION_WITH_RETURN
 
-from air_bot.adapters.repository import (
-    SqlAlchemyFlightDirectionRepo,
-    SqlAlchemyUserDirectionRepo,
-)
+from air_bot.adapters.repository import SqlAlchemyFlightDirectionRepo
 
 
 @pytest.mark.asyncio

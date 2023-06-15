@@ -7,7 +7,8 @@ from loguru import logger
 
 from air_bot.bot.handlers import start
 from air_bot.config import BotConfig
-
+from air_bot.bot.i18n import Translator
+from air_bot.bot.middlewares.add_translator_middleware import AddTranslatorMiddleware
 
 class BotService:
     def __init__(
@@ -24,6 +25,8 @@ class BotService:
         # self.dp.include_router(user_profile.router)
         # self.dp.include_router(low_prices_calendar.router)
 
+        translator = Translator(locale='en')
+        self.dp.update.middleware(AddTranslatorMiddleware(translator))
         # scheduler = Scheduler()
         # asyncio.create_task(scheduler.run_loop())
 
