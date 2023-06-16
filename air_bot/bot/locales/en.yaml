@@ -1,2 +1,7 @@
 start_greeting: Hello, $username!
 start_сall_to_action: Give me direction, and I will be tracking the best airfare prices for you. 😉
+new_search: new search
+personal_account: personal account
+add_direction: Add direction
+one_way_ticket: one way
+round_trip_ticket: round-trip

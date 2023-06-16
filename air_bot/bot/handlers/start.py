@@ -10,14 +10,14 @@ router = Router()
 
 
 @router.message(Command(commands=["start"]))
-async def start(message: Message, translator: Translator) -> None:
+async def start(message: Message, i18n: Translator) -> None:
     await message.answer(
-        translator.translate(
+        i18n.translate(
             "start_greeting", username=message.from_user.first_name
         ),  # type: ignore[union-attr]
-        reply_markup=user_home_keyboard(),
+        reply_markup=user_home_keyboard(i18n),
     )
     await message.answer(
-        translator.translate("start_сall_to_action"),
-        reply_markup=add_flight_direction_keyboard(),
+        i18n.translate("start_сall_to_action"),
+        reply_markup=add_flight_direction_keyboard(i18n),
     )

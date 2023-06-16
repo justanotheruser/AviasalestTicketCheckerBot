@@ -3,29 +3,30 @@ from datetime import datetime
 from aiogram import types
 
 from air_bot.domain.model import Location
+from air_bot.bot.i18n import Translator
 
 
-def add_flight_direction_keyboard() -> types.InlineKeyboardMarkup:
+def add_flight_direction_keyboard(i18n: Translator) -> types.InlineKeyboardMarkup:
     kb = [
         [
             types.InlineKeyboardButton(
-                text="Добавить направление", callback_data="add_flight_direction"
+                text=i18n.translate("add_direction"), callback_data="add_flight_direction"
             )
         ]
     ]
     return types.InlineKeyboardMarkup(inline_keyboard=kb)
 
 
-def with_or_without_return_keyboard() -> types.InlineKeyboardMarkup:
+def with_or_without_return_keyboard(i18n: Translator) -> types.InlineKeyboardMarkup:
     kb = [
         [
             types.InlineKeyboardButton(
-                text="➡️ в одну сторону", callback_data="without_return"
+                text=f"➡️ {i18n.translate('one_way_ticket')}", callback_data="without_return"
             )
         ],
         [
             types.InlineKeyboardButton(
-                text="↔️ туда-обратно", callback_data="with_return"
+                text=f"↔️ {i18n.translate('round_trip_ticket')}", callback_data="with_return"
             )
         ],
     ]

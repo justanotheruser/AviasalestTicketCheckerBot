@@ -4,7 +4,7 @@ import aiohttp
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from air_bot.bot.handlers import start
+from air_bot.bot.handlers import start, add_flight_direction
 from air_bot.bot.i18n import Translator
 from air_bot.bot.middlewares.add_translator_middleware import AddTranslatorMiddleware
 from air_bot.config import BotConfig
@@ -21,7 +21,7 @@ class BotService:
         self.bot = Bot(token=config.bot_token.get_secret_value())
 
         self.dp.include_router(start.router)
-        # self.dp.include_router(add_flight_direction.router)
+        self.dp.include_router(add_flight_direction.router)
         # self.dp.include_router(user_profile.router)
         # self.dp.include_router(low_prices_calendar.router)
 

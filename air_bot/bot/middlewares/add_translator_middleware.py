@@ -7,9 +7,9 @@ from air_bot.bot.i18n import Translator
 
 
 class AddTranslatorMiddleware(BaseMiddleware):
-    def __init__(self, translator: Translator):
+    def __init__(self, i18n: Translator):
         super().__init__()
-        self.translator = translator
+        self.i18n = i18n
 
     async def __call__(
         self,
@@ -17,5 +17,5 @@ class AddTranslatorMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Any:
-        data["translator"] = self.translator
+        data["i18n"] = self.i18n
         return await handler(event, data)
