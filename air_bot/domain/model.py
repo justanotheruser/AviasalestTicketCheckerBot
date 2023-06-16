@@ -28,9 +28,9 @@ class FlightDirection:
         return datetime.datetime.strptime(self.return_at, "%Y-%m-%d")
 
 
-@dataclass
+@dataclass(kw_only=True)
 class FlightDirectionInfo:
-    id: int
+    id: int | None = None
     start_code: str
     start_name: str
     end_code: str

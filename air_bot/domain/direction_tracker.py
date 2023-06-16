@@ -1,6 +1,6 @@
 from air_bot.adapters.repository import AbstractFlightDirectionRepo
 from air_bot.adapters.tickets_api import AbstractTicketsApi
-from air_bot.model import FlightDirection, FlightDirectionInfo
+from air_bot.domain.model import FlightDirection
 
 
 class DirectionTracker:

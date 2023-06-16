@@ -1,10 +1,7 @@
-from typing import Any, Tuple
+from typing import Tuple
 
-from air_bot.adapters.repository import (
-    AbstractTicketRepo,
-    AbstractUserFlightDirectionRepo,
-)
-from air_bot.model import FlightDirection, FlightDirectionInfo, Ticket
+from air_bot.adapters.repository import AbstractTicketRepo, AbstractUserDirectionRepo
+from air_bot.domain.model import FlightDirection, FlightDirectionInfo, Ticket
 
 
 class FakeTicketsApi(list):
@@ -30,7 +27,7 @@ class FakeFlightDirectionRepo(list):
         return None
 
 
-class FakeUserFlightDirectionRepo(AbstractUserFlightDirectionRepo):
+class FakeUserFlightDirectionRepo(AbstractUserDirectionRepo):
     def __init__(self, users_directions: list[Tuple[int, int]] = None):
         if users_directions is None:
             users_directions = []

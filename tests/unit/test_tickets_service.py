@@ -1,6 +1,3 @@
-import random
-import string
-
 import pytest
 from fakes import (
     FakeFlightDirectionRepo,
@@ -69,4 +66,4 @@ async def test_add_new_direction(direction):
     )
     user_id = 1
     tickets = await tickets_service.track(user_id, direction)
-    assert tickets == # TODO: FakeTicketsAPI
+    # assert tickets == # TODO: FakeTicketsAPI

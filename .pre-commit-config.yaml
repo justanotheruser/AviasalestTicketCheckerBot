@@ -10,14 +10,6 @@ repos:
   - repo: local
     hooks:
       - args: ["--verbose"]
-        id: flake8
-        description: Command-line utility for enforcing style consistency across Python projects.
-        entry: flake8
-        name: flake8
-        language: python
-        require_serial: true
-        types: [python]
-      - args: ["--verbose"]
         id: black
         description: The uncompromising Python code formatter
         entry: black
@@ -32,6 +24,14 @@ repos:
         require_serial: true
         language: python
         types: [python]
+      - args: [ "--verbose" ]
+        id: flake8
+        description: Command-line utility for enforcing style consistency across Python projects.
+        entry: flake8
+        name: flake8
+        language: python
+        require_serial: true
+        types: [ python ]
       - args: ["--verbose"]
         id: mypy
         name: mypy
