@@ -23,13 +23,13 @@ class DirectOrTransferKb:
             [
                 types.InlineKeyboardButton(
                     text=self.direct_flights_btn_text,
-                    callback_data=self.direct_flights_cb_data
+                    callback_data=self.direct_flights_cb_data,
                 )
             ],
             [
                 types.InlineKeyboardButton(
                     text=self.transfer_flights_btn_text,
-                    callback_data=self.transfer_flights_cb_data
+                    callback_data=self.transfer_flights_cb_data,
                 )
             ],
         ]

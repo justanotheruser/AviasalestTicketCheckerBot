@@ -1,4 +1,5 @@
 import datetime
+from abc import ABC, abstractmethod
 
 from air_bot.adapters.repository import (
     AbstractFlightDirectionRepo,
@@ -12,7 +13,13 @@ from air_bot.domain.model import FlightDirection, Ticket
 N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION = 3
 
 
-class TicketsService:
+class AbstractTicketsService(ABC):
+    @abstractmethod
+    async def track(self, user_id: int, direction: FlightDirection):
+        raise NotImplementedError
+
+
+class TicketsService(AbstractTicketsService):
     def __init__(
         self,
         flight_direction_repo: AbstractFlightDirectionRepo,

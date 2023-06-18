@@ -7,7 +7,9 @@ from async_timeout import timeout
 from loguru import logger
 
 from air_bot.domain.exceptions import (
-    LocationsApiConnectionError, LocationsApiRespondedWithError)
+    LocationsApiConnectionError,
+    LocationsApiRespondedWithError,
+)
 from air_bot.domain.model import Location
 
 
@@ -23,11 +25,15 @@ class TravelPayoutsLocationsApi(AbstractLocationsApi):
         self.locale = locale
 
     async def get_locations(self, airport_or_city: str) -> list[Location]:
-        response = await get_locations_response(self.session, self.locale, airport_or_city)
+        response = await get_locations_response(
+            self.session, self.locale, airport_or_city
+        )
         json_response = json.loads(response)
         if "error" in response:
-            logger.error(f'Location API responded with error {json_response["error"]}, '
-                         f'airport_or_city {airport_or_city}')
+            logger.error(
+                f'Location API responded with error {json_response["error"]}, '
+                f"airport_or_city {airport_or_city}"
+            )
             raise LocationsApiRespondedWithError()
         return parse_locations(json_response)
 
@@ -36,7 +42,9 @@ PLACES_ENDPOINT_URL = "https://autocomplete.travelpayouts.com/places2"
 REQUEST_TIMEOUT = 10
 
 
-async def get_locations_response(session: ClientSession, locale: str, airport_or_city: str) -> str:
+async def get_locations_response(
+    session: ClientSession, locale: str, airport_or_city: str
+) -> str:
     params = {"locale": locale, "types[]": ["airport", "city"], "term": airport_or_city}
     try:
         async with timeout(REQUEST_TIMEOUT):
@@ -46,8 +54,10 @@ async def get_locations_response(session: ClientSession, locale: str, airport_or
         logger.error(f"ClientConnectionError: {e}, params={params}")
         raise LocationsApiConnectionError()
     except asyncio.TimeoutError:
-        logger.error(f'Locations endpoint did not respond in {REQUEST_TIMEOUT} seconds, '
-                     f'params={params}')
+        logger.error(
+            f"Locations endpoint did not respond in {REQUEST_TIMEOUT} seconds, "
+            f"params={params}"
+        )
         raise LocationsApiConnectionError()
 
 

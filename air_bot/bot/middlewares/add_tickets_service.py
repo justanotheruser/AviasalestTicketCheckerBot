@@ -3,13 +3,13 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from air_bot.adapters.locations_api import TravelPayoutsLocationsApi
+from air_bot.service_layer.tickets_service import AbstractTicketsService
 
 
-class AddLocationsApiMiddleware(BaseMiddleware):
-    def __init__(self, locations_api: TravelPayoutsLocationsApi):
+class AddTicketsServiceMiddleware(BaseMiddleware):
+    def __init__(self, tickets_service: AbstractTicketsService):
         super().__init__()
-        self.locations_api = locations_api
+        self.tickets_service = tickets_service
 
     async def __call__(
         self,
@@ -17,5 +17,5 @@ class AddLocationsApiMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Any:
-        data["locations_api"] = self.locations_api
+        data["tickets_service"] = self.tickets_service
         return await handler(event, data)

@@ -16,3 +16,19 @@ try_again: Попробуйте еще раз.
 no_such_location: Такого пункта нет.
 choose_arrival_point: Укажите пункт прибытия
 specify_exact_location: Уточните, что именно нужно
+choose_departure_date: Укажите дату отправления
+choose_month_or_specific_date: можно выбрать целый месяц или прислать мне дату, например
+january: январь
+february: февраль
+march: март
+april: апрель
+may: май
+june: июнь
+july: июль
+august: август
+september: сентябрь
+october: октябрь
+november: ноябрь
+december: декабрь
+cant_recognize_date_try_again: Failed to recognize the date, please try again
+choose_arrival_date: Укажите дату отправления

@@ -16,3 +16,19 @@ try_again: Try again.
 no_such_location: No such location.
 choose_arrival_point: Choose point of arrival
 specify_exact_location: Specify exactly what you need
+choose_departure_date: Choose departure date
+choose_month_or_specific_date: you can choose whole month or send me a date, for example
+january: january
+february: february
+march: march
+april: april
+may: may
+june: june
+july: july
+august: august
+september: september
+october: october
+november: november
+december: december
+cant_recognize_date_try_again:
+choose_arrival_date: Choose arrival date
