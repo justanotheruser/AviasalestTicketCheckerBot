@@ -1,3 +1,15 @@
+class LocationsApiError(Exception):
+    pass
+
+
+class LocationsApiConnectionError(LocationsApiError):
+    pass
+
+
+class LocationsApiRespondedWithError(LocationsApiError):
+    pass
+
+
 class TicketsError(Exception):
     pass
 

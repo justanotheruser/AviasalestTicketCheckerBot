@@ -1,6 +1,5 @@
 import datetime
 from dataclasses import dataclass
-from enum import Enum
 from functools import cached_property
 from typing import Optional
 
@@ -64,14 +63,8 @@ class Ticket:
     link: str
 
 
-class LocationType(Enum):
-    AIRPORT = 1
-    CITY = 2
-
-
 @dataclass
 class Location:
-    type_: LocationType
     code: str
     name: str
     country_code: Optional[str]

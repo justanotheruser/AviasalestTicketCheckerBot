@@ -5,7 +5,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from air_bot.bot.handlers import start, add_flight_direction
+from air_bot.bot.middlewares.add_locations_api import AddLocationsApiMiddleware
 from air_bot.config import BotConfig
+from air_bot.adapters.locations_api import TravelPayoutsLocationsApi
 
 
 class BotService:
@@ -28,8 +30,8 @@ class BotService:
 
         # self.dp.update.middleware(AddDBManager(db_manager))
 
-        # aviasales_api = AviasalesAPILayer(aiohttp_session, config.aviasales_api_token)
-        # self.dp.update.middleware(AddAviasalesAPILayerMiddleware(aviasales_api))
+        locations_api = TravelPayoutsLocationsApi(aiohttp_session, config.locale)
+        self.dp.update.middleware(AddLocationsApiMiddleware(locations_api))
         # self.ticket_price_checker = TicketPriceChecker(
         #     self.bot,
         #     aviasales_api,

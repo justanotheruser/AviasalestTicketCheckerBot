@@ -11,3 +11,8 @@ choose_direct_or_transfer: Direct flights
 direct_flights: direct flights
 transfer_flights: transfer flights
 choose_departure_point: Choose point of departure
+smth_went_wrong: Something went wrong.
+try_again: Try again.
+no_such_location: No such location.
+choose_arrival_point: Choose point of arrival
+specify_exact_location: Specify exactly what you need

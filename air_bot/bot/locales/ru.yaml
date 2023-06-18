@@ -11,3 +11,8 @@ choose_direct_or_transfer: Прямые рейсы
 direct_flights: прямые рейсы
 transfer_flights: с пересадками
 choose_departure_point: Укажите пункт отправления
+smth_went_wrong: Что-то пошло не так.
+try_again: Попробуйте еще раз.
+no_such_location: Такого пункта нет.
+choose_arrival_point: Укажите пункт прибытия
+specify_exact_location: Уточните, что именно нужно
