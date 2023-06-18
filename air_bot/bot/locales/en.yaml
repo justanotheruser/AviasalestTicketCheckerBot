@@ -3,5 +3,11 @@ start_сall_to_action: Give me direction, and I will be tracking the best airfar
 new_search: new search
 personal_account: personal account
 add_direction: Add direction
+cancel: cancel
+choose_search_type: Choose search type
 one_way_ticket: one way
 round_trip_ticket: round-trip
+choose_direct_or_transfer: Direct flights
+direct_flights: direct flights
+transfer_flights: transfer flights
+choose_departure_point: Choose point of departure

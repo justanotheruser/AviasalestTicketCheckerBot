@@ -7,6 +7,8 @@ import yaml
 from babel.dates import format_datetime
 from loguru import logger
 
+from air_bot.config import config
+
 
 class Translator:
     def __init__(
@@ -40,6 +42,9 @@ class Translator:
         if len(kwargs) == 0:
             return text
         return Template(text).safe_substitute(**kwargs)
+
+
+i18n = Translator(locale=config.locale)
 
 
 def str_to_datetime(dt_str, datetime_format="%Y-%m-%d"):

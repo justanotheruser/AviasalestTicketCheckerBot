@@ -3,5 +3,11 @@ start_сall_to_action: Укажи направление, и я буду отс�
 new_search: новый поиск
 personal_account: личный кабинет
 add_direction: Добавить направление
+cancel: отмена
+choose_search_type: Выберите тип поиска
 one_way_ticket: в одну сторону
 round_trip_ticket: туда-обратно
+choose_direct_or_transfer: Прямые рейсы
+direct_flights: прямые рейсы
+transfer_flights: с пересадками
+choose_departure_point: Укажите пункт отправления
