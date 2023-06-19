@@ -2,7 +2,7 @@ import pytest
 
 from air_bot.adapters.tickets_api import AviasalesTicketsApi
 from air_bot.domain.model import FlightDirection
-
+from air_bot.domain.exceptions import TicketsAPIError
 
 def moscow_spb_direction(with_transfer: bool, departure_at: str, return_at: str | None):
     return FlightDirection(
@@ -27,8 +27,7 @@ async def test_get_tickets_success(
     direction = moscow_spb_direction(
         with_transfer=with_transfer, departure_at=this_month, return_at=return_at
     )
-    tickets, success = await api.get_tickets(direction, limit=2)
-    assert success
+    tickets = await api.get_tickets(direction, limit=2)
     assert len(tickets) == 2
     if with_return:
         for ticket in tickets:
@@ -43,8 +42,8 @@ async def test_diff_between_max_depart_date_and_min_return_date_exceeds_supporte
     direction = moscow_spb_direction(
         with_transfer=True, departure_at=this_month, return_at=next_next_month
     )
-    tickets, success = await api.get_tickets(direction)
-    assert not success
+    with pytest.raises(TicketsAPIError):
+        await api.get_tickets(direction)
     assert len(caplog.messages) == 1
     assert (
         "diff between max depart date and min return date exceeds supported maximum of 30"
