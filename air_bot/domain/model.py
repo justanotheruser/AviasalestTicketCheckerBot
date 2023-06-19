@@ -74,3 +74,20 @@ class Location:
 class UserDirection:
     user_id: int
     direction_id: int
+
+
+@dataclass(kw_only=True)
+class HistoricFlightDirection:
+    id: int | None = None
+    user_id: int
+    start_code: str
+    start_name: str
+    end_code: str
+    end_name: str
+    with_transfer: bool
+    departure_at: str
+    return_at: Optional[str]
+    price: float | None
+    last_update: datetime.datetime
+    deleted_at: datetime.datetime
+    deleted_by_user: bool

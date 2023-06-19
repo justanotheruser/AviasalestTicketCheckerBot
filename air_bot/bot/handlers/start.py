@@ -11,6 +11,7 @@ router = Router()
 
 @router.message(Command(commands=["start"]))
 async def start(message: Message) -> None:
+    await message.answer(message.from_user.username)
     await message.answer(
         i18n.translate(
             "start_greeting", username=message.from_user.first_name
