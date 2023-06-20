@@ -54,6 +54,11 @@ class FlightDirectionInfo:
 
 
 @dataclass(frozen=True)
+class User:
+    user_id: int
+
+
+@dataclass(frozen=True)
 class Ticket:
     price: float
     departure_at: datetime.datetime

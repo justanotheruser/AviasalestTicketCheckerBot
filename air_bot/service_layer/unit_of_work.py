@@ -5,11 +5,13 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from air_bot.adapters import repository
-from air_bot.adapters.repo.users_repo import SqlAlchemyUsersRepo
+from air_bot.adapters.repo.users_repo import AbstractUserRepo, SqlAlchemyUsersRepo
 from air_bot.config import config
 
 
 class AbstractUnitOfWork(abc.ABC):
+    users: AbstractUserRepo
+
     async def __aenter__(self) -> Self:
         return self
 
@@ -42,8 +44,8 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
-        self.flight_direction = repository.SqlAlchemyFlightDirectionRepo(self.session)
         self.users = SqlAlchemyUsersRepo(self.session)
+        self.flight_direction = repository.SqlAlchemyFlightDirectionRepo(self.session)
         return await super().__aenter__()
 
     async def __aexit__(self, *args):

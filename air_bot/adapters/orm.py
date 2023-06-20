@@ -47,6 +47,12 @@ flight_direction_info_table = Table(
     ),
 )
 
+user_table = Table(
+    "user",
+    metadata,
+    Column("user_id", Integer, primary_key=True),
+)
+
 users_directions_table = Table(
     "users_directions",
     metadata,
@@ -80,5 +86,6 @@ historic_flight_direction_info_table = Table(
 )
 
 mapper_registry.map_imperatively(model.FlightDirectionInfo, flight_direction_info_table)
+mapper_registry.map_imperatively(model.User, user_table)
 mapper_registry.map_imperatively(model.UserDirection, users_directions_table)
 mapper_registry.map_imperatively(model.HistoricFlightDirection, historic_flight_direction_info_table)

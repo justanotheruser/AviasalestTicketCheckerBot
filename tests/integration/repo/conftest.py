@@ -26,6 +26,7 @@ async def mysql_db_engine():
         async with async_session() as session:
             async with session.begin():
                 await session.execute(text("DELETE FROM flight_direction"))
+                await session.execute(text("DELETE FROM user"))
                 await session.execute(text("DELETE FROM users_directions"))
 
     await delete_all()
