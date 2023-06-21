@@ -1,7 +1,7 @@
+from adapters.repo import orm
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from adapters.repo import orm
 from air_bot.domain import model
 from air_bot.domain.repository import AbstractUserDirectionRepo
 

@@ -1,8 +1,9 @@
 import pytest
 
 from air_bot.adapters.tickets_api import AviasalesTicketsApi
-from air_bot.domain.model import FlightDirection
 from air_bot.domain.exceptions import TicketsAPIError
+from air_bot.domain.model import FlightDirection
+
 
 def moscow_spb_direction(with_transfer: bool, departure_at: str, return_at: str | None):
     return FlightDirection(

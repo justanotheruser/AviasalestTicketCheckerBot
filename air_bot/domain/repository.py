@@ -7,10 +7,10 @@ from air_bot.domain import model
 class AbstractFlightDirectionRepo(ABC):
     @abstractmethod
     async def add_direction_info(
-            self,
-            direction: model.FlightDirection,
-            price: float | None,
-            last_update: datetime.datetime,
+        self,
+        direction: model.FlightDirection,
+        price: float | None,
+        last_update: datetime.datetime,
     ):
         raise NotImplementedError
 
@@ -21,7 +21,7 @@ class AbstractFlightDirectionRepo(ABC):
 
     @abstractmethod
     async def get_direction_info(
-            self, direction: model.FlightDirection
+        self, direction: model.FlightDirection
     ) -> model.FlightDirectionInfo:
         raise NotImplementedError
 

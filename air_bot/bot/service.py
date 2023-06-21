@@ -5,13 +5,13 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from air_bot.adapters.locations_api import TravelPayoutsLocationsApi
+from air_bot.adapters.repo.session_maker import SessionMaker
 from air_bot.bot.handlers import add_flight_direction, start
 from air_bot.bot.middlewares.add_locations_api import AddLocationsApiMiddleware
-from air_bot.bot.middlewares.add_tickets_service import AddTicketsServiceMiddleware
 from air_bot.bot.middlewares.add_session_maker import AddSessionMakerMiddleware
+from air_bot.bot.middlewares.add_tickets_service import AddTicketsServiceMiddleware
 from air_bot.config import BotConfig
 from air_bot.service.tickets_service import TicketsService
-from air_bot.adapters.repo.session_maker import SessionMaker
 
 
 class BotService:
@@ -19,7 +19,7 @@ class BotService:
         self,
         config: BotConfig,
         aiohttp_session: aiohttp.ClientSession,
-        session_maker: SessionMaker
+        session_maker: SessionMaker,
     ):
         self.dp = Dispatcher(storage=MemoryStorage())
         self.bot = Bot(token=config.bot_token.get_secret_value())

@@ -3,7 +3,10 @@ from typing import Self
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from air_bot.adapters.repo.flight_direction import AbstractFlightDirectionRepo, SqlAlchemyFlightDirectionRepo
+from air_bot.adapters.repo.flight_direction import (
+    AbstractFlightDirectionRepo,
+    SqlAlchemyFlightDirectionRepo,
+)
 from air_bot.adapters.repo.session_maker import AbstractSessionMaker
 from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
 

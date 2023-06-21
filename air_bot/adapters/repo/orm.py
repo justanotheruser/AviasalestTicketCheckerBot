@@ -1,13 +1,13 @@
 import logging
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     Column,
     DateTime,
     Float,
     ForeignKeyConstraint,
     Integer,
-    BigInteger,
     MetaData,
     PrimaryKeyConstraint,
     String,
@@ -83,10 +83,12 @@ historic_flight_direction_info_table = Table(
     Column("price", Float, nullable=True),
     Column("last_update", DateTime, nullable=False),
     Column("deleted_at", DateTime, nullable=False),
-    Column("deleted_by_user", DateTime, nullable=False)
+    Column("deleted_by_user", DateTime, nullable=False),
 )
 
 mapper_registry.map_imperatively(model.FlightDirectionInfo, flight_direction_info_table)
 mapper_registry.map_imperatively(model.User, user_table)
 mapper_registry.map_imperatively(model.UserDirection, users_directions_table)
-mapper_registry.map_imperatively(model.HistoricFlightDirection, historic_flight_direction_info_table)
+mapper_registry.map_imperatively(
+    model.HistoricFlightDirection, historic_flight_direction_info_table
+)

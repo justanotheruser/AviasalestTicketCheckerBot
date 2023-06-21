@@ -65,7 +65,7 @@ def make_parser(strptime_pattern: str) -> Any:
 
 
 def parse_two_digits_couples(
-        user_date: str,
+    user_date: str,
 ) -> tuple[Optional[int], Optional[int], Optional[int]]:
     year, month, day = None, None, None
     two_numbers_regex = re.compile(r"(\d\d)(\.|-|\s)(\d\d)")

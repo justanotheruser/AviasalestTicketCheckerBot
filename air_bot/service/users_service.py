@@ -1,7 +1,6 @@
 import asyncmy.errors
-from loguru import logger
-
 from adapters.repo.uow import AbstractUnitOfWork
+from loguru import logger
 
 
 async def add_user(user_id: int, uow: AbstractUnitOfWork):
@@ -14,4 +13,3 @@ async def add_user(user_id: int, uow: AbstractUnitOfWork):
             pass
         except Exception as e:
             logger.error(e)
-

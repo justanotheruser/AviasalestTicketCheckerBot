@@ -5,8 +5,8 @@ import pytest
 from data_for_tests import FLIGHT_DIRECTION_NO_RETURN, FLIGHT_DIRECTION_WITH_RETURN
 from sqlalchemy import text
 
-from air_bot.domain.model import FlightDirection
 from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
+from air_bot.domain.model import FlightDirection
 
 
 @pytest.mark.asyncio

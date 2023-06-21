@@ -14,10 +14,10 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         self.session = session
 
     async def add_direction_info(
-            self,
-            direction: model.FlightDirection,
-            price: float | None,
-            last_update: datetime.datetime,
+        self,
+        direction: model.FlightDirection,
+        price: float | None,
+        last_update: datetime.datetime,
     ):
         stmt = text(
             "INSERT INTO flight_direction (start_code, start_name, end_code, end_name, "
@@ -45,7 +45,7 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         return row[0].id
 
     async def get_direction_info(
-            self, direction: model.FlightDirection
+        self, direction: model.FlightDirection
     ) -> model.FlightDirectionInfo:
         stmt = select(model.FlightDirectionInfo)
         stmt.filter_by(

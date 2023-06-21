@@ -1,14 +1,14 @@
 import datetime
 from abc import ABC, abstractmethod
 
+from air_bot.adapters.tickets_api import AbstractTicketsApi
+from air_bot.domain.exceptions import InternalError, TicketsError, TicketsParsingError
+from air_bot.domain.model import FlightDirection, Ticket
 from air_bot.domain.repository import (
     AbstractFlightDirectionRepo,
     AbstractTicketRepo,
     AbstractUserDirectionRepo,
 )
-from air_bot.adapters.tickets_api import AbstractTicketsApi
-from air_bot.domain.exceptions import InternalError, TicketsError, TicketsParsingError
-from air_bot.domain.model import FlightDirection, Ticket
 
 N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION = 3
 

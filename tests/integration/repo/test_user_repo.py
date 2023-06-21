@@ -7,7 +7,7 @@ from air_bot.domain.model import User
 
 @pytest.mark.asyncio
 async def test_can_add_user(mysql_session_factory):
-    user_tg_id = 2**32+1
+    user_tg_id = 2**32 + 1
     async with mysql_session_factory() as session:
         users = SqlAlchemyUsersRepo(session)
         await users.add(user_tg_id)
@@ -18,4 +18,3 @@ async def test_can_add_user(mysql_session_factory):
         result = await session.execute(stmt)
         user = result.one()[0]
         assert user == User(user_tg_id)
-

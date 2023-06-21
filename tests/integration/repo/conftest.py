@@ -1,11 +1,10 @@
 import logging
 
 import pytest_asyncio
+from adapters.repo.orm import metadata
 from dotenv import load_dotenv
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-
-from adapters.repo.orm import metadata
 
 
 @pytest_asyncio.fixture
@@ -17,6 +16,9 @@ async def mysql_db_engine():
 
     logging.basicConfig()
     logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+
+    async with engine.begin() as conn:
+        await conn.run_sync(metadata.create_all)
 
     async def delete_all():
         async_session = async_sessionmaker(engine)
