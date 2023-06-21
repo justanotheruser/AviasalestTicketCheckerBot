@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from air_bot.adapters import repository
-from air_bot.adapters.repo.users_repo import AbstractUserRepo, SqlAlchemyUsersRepo
+from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
 from air_bot.config import config
 
 

@@ -1,12 +1,11 @@
-from abc import ABC, abstractmethod
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from air_bot.domain.repository import AbstractUserRepo
 
 
-class AbstractUserRepo(ABC):
-    @abstractmethod
-    async def add(self, user_id: int):
-        raise NotImplementedError
+class DuplicatedUserIdError(Exception):
+    pass
 
 
 class SqlAlchemyUsersRepo(AbstractUserRepo):

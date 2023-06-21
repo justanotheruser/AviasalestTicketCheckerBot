@@ -7,7 +7,7 @@ from fakes import (
 )
 
 from air_bot.domain.model import FlightDirection
-from air_bot.service_layer.tickets_service import TicketsService
+from air_bot.service.tickets_service import TicketsService
 
 """
 def random_flight_direction(with_return: bool = False) -> FlightDirection:

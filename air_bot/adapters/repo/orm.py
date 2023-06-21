@@ -7,6 +7,7 @@ from sqlalchemy import (
     Float,
     ForeignKeyConstraint,
     Integer,
+    BigInteger,
     MetaData,
     PrimaryKeyConstraint,
     String,
@@ -50,13 +51,13 @@ flight_direction_info_table = Table(
 user_table = Table(
     "user",
     metadata,
-    Column("user_id", Integer, primary_key=True),
+    Column("user_id", BigInteger, primary_key=True),
 )
 
 users_directions_table = Table(
     "users_directions",
     metadata,
-    Column("user_id", Integer, nullable=False),
+    Column("user_id", BigInteger, nullable=False),
     Column("direction_id", Integer, nullable=False),
     PrimaryKeyConstraint("user_id", "direction_id", name="users_directions_pk"),
     ForeignKeyConstraint(
@@ -71,7 +72,7 @@ historic_flight_direction_info_table = Table(
     "historic_flight_direction",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("user_id", Integer, nullable=False),
+    Column("user_id", BigInteger, nullable=False),
     Column("start_code", String(3), nullable=False),
     Column("start_name", Text, nullable=False),
     Column("end_code", String(3), nullable=False),

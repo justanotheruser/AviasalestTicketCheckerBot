@@ -6,7 +6,7 @@ from data_for_tests import FLIGHT_DIRECTION_NO_RETURN, FLIGHT_DIRECTION_WITH_RET
 from sqlalchemy import text
 
 from air_bot.domain.model import FlightDirection
-from air_bot.service_layer import unit_of_work
+from air_bot.service import unit_of_work
 
 
 @pytest.mark.asyncio

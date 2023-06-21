@@ -9,7 +9,7 @@ from air_bot.bot.handlers import add_flight_direction, start
 from air_bot.bot.middlewares.add_locations_api import AddLocationsApiMiddleware
 from air_bot.bot.middlewares.add_tickets_service import AddTicketsServiceMiddleware
 from air_bot.config import BotConfig
-from air_bot.service_layer.tickets_service import TicketsService
+from air_bot.service.tickets_service import TicketsService
 
 
 class BotService:

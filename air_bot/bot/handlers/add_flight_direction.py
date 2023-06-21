@@ -13,7 +13,7 @@ from air_bot.bot.keyboards.direct_or_transfer_kb import direct_or_transfer_kb
 from air_bot.bot.keyboards.user_home_kb import user_home_kb
 from air_bot.bot.keyboards.with_or_without_return_kb import with_or_without_return_kb
 from air_bot.bot.utils.date import date_reader
-from air_bot.service_layer.tickets_service import TicketsService
+from air_bot.service.tickets_service import TicketsService
 
 # from air_bot.bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_keyboard
 # from air_bot.bot.utils.tickets import print_tickets

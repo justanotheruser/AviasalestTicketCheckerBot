@@ -53,7 +53,7 @@ class FlightDirectionInfo:
         )
 
 
-@dataclass(frozen=True)
+@dataclass
 class User:
     user_id: int
 

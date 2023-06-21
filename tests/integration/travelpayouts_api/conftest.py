@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Tuple
 
 import pytest
+import pytest_asyncio
 from aiohttp import ClientSession
 from dotenv import load_dotenv
 from pydantic import SecretStr
@@ -14,8 +15,8 @@ def token():
     return SecretStr(os.getenv("AIR_BOT_AVIASALES_API_TOKEN"))
 
 
-@pytest.fixture
-def http_session():
+@pytest_asyncio.fixture
+async def http_session():
     return ClientSession()
 
 
