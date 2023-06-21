@@ -6,7 +6,7 @@ from data_for_tests import FLIGHT_DIRECTION_NO_RETURN, FLIGHT_DIRECTION_WITH_RET
 from sqlalchemy import text
 
 from air_bot.domain.model import FlightDirection
-from air_bot.service import unit_of_work
+from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
 
 
 @pytest.mark.asyncio
@@ -45,7 +45,7 @@ async def test_uow_can_retrieve_flight_direction_info(mysql_session_factory, dir
         await insert_flight_direction(session, direction, 220.5, last_update)
         await session.commit()
 
-    uow = unit_of_work.SqlAlchemyUnitOfWork(mysql_session_factory)
+    uow = SqlAlchemyUnitOfWork(mysql_session_factory)
     async with uow:
         direction_info = await uow.flight_direction.get_direction_info(direction)
         assert direction_info.direction == direction

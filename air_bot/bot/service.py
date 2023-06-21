@@ -8,16 +8,18 @@ from air_bot.adapters.locations_api import TravelPayoutsLocationsApi
 from air_bot.bot.handlers import add_flight_direction, start
 from air_bot.bot.middlewares.add_locations_api import AddLocationsApiMiddleware
 from air_bot.bot.middlewares.add_tickets_service import AddTicketsServiceMiddleware
+from air_bot.bot.middlewares.add_session_maker import AddSessionMakerMiddleware
 from air_bot.config import BotConfig
 from air_bot.service.tickets_service import TicketsService
+from air_bot.adapters.repo.session_maker import SessionMaker
 
 
 class BotService:
     def __init__(
         self,
         config: BotConfig,
-        # db_manager: DBManager,
         aiohttp_session: aiohttp.ClientSession,
+        session_maker: SessionMaker
     ):
         self.dp = Dispatcher(storage=MemoryStorage())
         self.bot = Bot(token=config.bot_token.get_secret_value())
@@ -30,8 +32,7 @@ class BotService:
         # scheduler = Scheduler()
         # asyncio.create_task(scheduler.run_loop())
 
-        # self.dp.update.middleware(AddDBManager(db_manager))
-
+        self.dp.update.middleware(AddSessionMakerMiddleware(session_maker))
         locations_api = TravelPayoutsLocationsApi(aiohttp_session, config.locale)
         self.dp.update.middleware(AddLocationsApiMiddleware(locations_api))
         tickets_service = TicketsService(None, None, None, None)

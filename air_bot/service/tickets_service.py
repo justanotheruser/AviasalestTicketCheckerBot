@@ -1,7 +1,7 @@
 import datetime
 from abc import ABC, abstractmethod
 
-from air_bot.adapters.repository import (
+from air_bot.domain.repository import (
     AbstractFlightDirectionRepo,
     AbstractTicketRepo,
     AbstractUserDirectionRepo,

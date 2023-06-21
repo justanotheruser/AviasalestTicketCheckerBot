@@ -1,16 +1,19 @@
 import abc
 from typing import Self
 
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from air_bot.adapters import repository
+from air_bot.adapters.repo.flight_direction import AbstractFlightDirectionRepo, SqlAlchemyFlightDirectionRepo
+from air_bot.adapters.repo.session_maker import AbstractSessionMaker
 from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
-from air_bot.config import config
 
 
 class AbstractUnitOfWork(abc.ABC):
     users: AbstractUserRepo
+    flight_directions: AbstractFlightDirectionRepo
+
+    def __init__(self, session_factory: AbstractSessionMaker):
+        self.session_factory = session_factory
 
     async def __aenter__(self) -> Self:
         return self
@@ -30,22 +33,11 @@ class AbstractUnitOfWork(abc.ABC):
         raise NotImplementedError
 
 
-DEFAULT_SESSION_FACTORY = async_sessionmaker(
-    bind=create_async_engine(
-        config.get_mysql_uri(),
-        isolation_level="REPEATABLE READ",
-    )
-)
-
-
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, session_factory=DEFAULT_SESSION_FACTORY):
-        self.session_factory = session_factory
-
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
         self.users = SqlAlchemyUsersRepo(self.session)
-        self.flight_direction = repository.SqlAlchemyFlightDirectionRepo(self.session)
+        self.flight_direction = SqlAlchemyFlightDirectionRepo(self.session)
         return await super().__aenter__()
 
     async def __aexit__(self, *args):
