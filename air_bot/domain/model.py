@@ -58,17 +58,18 @@ class User:
     user_id: int
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class Ticket:
+    id: int | None = None
     price: float
     departure_at: datetime.datetime
     duration_to: datetime.timedelta
-    return_at: datetime.datetime | None
-    duration_back: datetime.timedelta | None
+    return_at: datetime.datetime | None = None
+    duration_back: datetime.timedelta | None = None
     link: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class Location:
     code: str
     name: str

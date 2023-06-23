@@ -7,6 +7,10 @@ from air_bot.adapters.repo.flight_direction import (
     AbstractFlightDirectionRepo,
     SqlAlchemyFlightDirectionRepo,
 )
+from air_bot.adapters.repo.users_directions import (
+    AbstractUserDirectionRepo,
+    SqlAlchemyUserDirectionRepo
+)
 from air_bot.adapters.repo.session_maker import AbstractSessionMaker
 from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
 
@@ -14,6 +18,7 @@ from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
 class AbstractUnitOfWork(abc.ABC):
     users: AbstractUserRepo
     flight_directions: AbstractFlightDirectionRepo
+    users_directions: AbstractUserDirectionRepo
 
     def __init__(self, session_factory: AbstractSessionMaker):
         self.session_factory = session_factory
@@ -41,6 +46,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session: AsyncSession = self.session_factory()
         self.users = SqlAlchemyUsersRepo(self.session)
         self.flight_direction = SqlAlchemyFlightDirectionRepo(self.session)
+        self.users_directions = SqlAlchemyUserDirectionRepo(self.session)
         return await super().__aenter__()
 
     async def __aexit__(self, *args):

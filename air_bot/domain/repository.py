@@ -44,7 +44,7 @@ class AbstractUserDirectionRepo(ABC):
 
 class AbstractTicketRepo(ABC):
     @abstractmethod
-    async def add(self, direction_id: int, tickets: list[model.Ticket]) -> bool:
+    async def add(self, tickets: list[model.Ticket], direction_id: int):
         raise NotImplementedError
 
     @abstractmethod

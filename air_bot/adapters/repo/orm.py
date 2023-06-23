@@ -18,6 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import registry
 
 from air_bot.domain import model
+from air_bot.adapters.repo.tickets import TicketDB
 
 mapper_registry = registry()
 
@@ -68,6 +69,25 @@ users_directions_table = Table(
     ),
 )
 
+tickets_table = Table(
+    "tickets",
+    metadata,
+    Column("id", BigInteger, primary_key=True, autoincrement=True),
+    Column("direction_id", Integer, nullable=False),
+    Column("price", Float, nullable=False),
+    Column("departure_at", DateTime, nullable=False),
+    Column("duration_to", Integer, nullable=False),
+    Column("return_at", DateTime, nullable=True),
+    Column("duration_back", DateTime, nullable=True),
+    Column("link", Text, nullable=False),
+    ForeignKeyConstraint(
+        columns=["direction_id"],
+        refcolumns=["flight_direction.id"],
+        name="tickets_fk__flight_direction",
+        ondelete="CASCADE",
+    ),
+)
+
 historic_flight_direction_info_table = Table(
     "historic_flight_direction",
     metadata,
@@ -89,6 +109,7 @@ historic_flight_direction_info_table = Table(
 mapper_registry.map_imperatively(model.FlightDirectionInfo, flight_direction_info_table)
 mapper_registry.map_imperatively(model.User, user_table)
 mapper_registry.map_imperatively(model.UserDirection, users_directions_table)
+mapper_registry.map_imperatively(TicketDB, tickets_table)
 mapper_registry.map_imperatively(
     model.HistoricFlightDirection, historic_flight_direction_info_table
 )

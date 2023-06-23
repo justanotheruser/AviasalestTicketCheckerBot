@@ -1314,6 +1314,20 @@ docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
 testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy (>=0.931)", "pytest-trio (>=0.7.0)"]
 
 [[package]]
+name = "pytest-unordered"
+version = "0.5.2"
+description = "Test equality of unordered collections in pytest"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pytest-unordered-0.5.2.tar.gz", hash = "sha256:8187e6d68a7d54e5447e88c229cbeafa38205e55baf7da7ae57cc965c1ecdbb3"},
+    {file = "pytest_unordered-0.5.2-py3-none-any.whl", hash = "sha256:b01bb0e8ba80db6dd8c840fe24ad1804c8672919303dc9302688221390a7dc29"},
+]
+
+[package.dependencies]
+pytest = ">=6.0.0"
+
+[[package]]
 name = "python-dotenv"
 version = "1.0.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -1575,4 +1589,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "fe3b7947ccb93778b80dde146a6d223a44ef87e85c33df9a7fbb864cfd4dd052"
+content-hash = "16ec291bc509700dc86be85c51fe344491c384202d3efa85217a9eb595f68d02"

@@ -18,10 +18,10 @@ async def track(user_id: int, direction: FlightDirection, uow: AbstractUnitOfWor
     if direction_id:
         # TODO: make this foreign keys in real DB schema; also make sure you check this table
         # for presence of direction_id and delete from it in single transaction
-        success = await uow.users_directions_repo.add(user_id, direction_id)
+        success = await uow.users_directions.add(user_id, direction_id)
         if not success:
             return []
-        tickets, success = await self.ticket_repo.get_direction_tickets(
+        tickets, success = await uow.tickets.get_direction_tickets(
             direction_id
         )
         if not tickets or not success:

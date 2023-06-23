@@ -1,10 +1,15 @@
+import datetime
 import logging
 
+import pytest
 import pytest_asyncio
-from air_bot.adapters.repo.orm import metadata
 from dotenv import load_dotenv
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+from air_bot.adapters.repo.flight_direction import SqlAlchemyFlightDirectionRepo
+from air_bot.adapters.repo.orm import metadata
+from data_for_tests import FLIGHT_DIRECTION_NO_RETURN
 
 
 @pytest_asyncio.fixture
@@ -36,3 +41,24 @@ async def mysql_db_engine():
 @pytest_asyncio.fixture
 async def mysql_session_factory(mysql_db_engine):
     yield async_sessionmaker(bind=mysql_db_engine)
+
+
+@pytest_asyncio.fixture
+async def direction_id(mysql_session_factory):
+    direction = FLIGHT_DIRECTION_NO_RETURN
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        last_update = datetime.datetime.now().replace(microsecond=0)
+        await repo.add_direction_info(direction, price=100, last_update=last_update)
+        await session.commit()
+        return await repo.get_direction_id(direction)
+
+
+@pytest.fixture
+def today():
+    return datetime.datetime.now()
+
+
+@pytest.fixture
+def two_hours():
+    return datetime.timedelta(hours=2)
