@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from air_bot.adapters.repository import AbstractTicketRepo, AbstractUserDirectionRepo
+from air_bot.domain.repository import AbstractTicketRepo, AbstractUserDirectionRepo
 from air_bot.domain.model import FlightDirection, FlightDirectionInfo, Ticket
 
 

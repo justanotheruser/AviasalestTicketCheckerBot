@@ -1,7 +1,7 @@
 import logging
 
 import pytest_asyncio
-from adapters.repo.orm import metadata
+from air_bot.adapters.repo.orm import metadata
 from dotenv import load_dotenv
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine

@@ -1,4 +1,4 @@
-from adapters.repo import orm
+from air_bot.adapters.repo import orm
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 

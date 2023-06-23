@@ -5,10 +5,8 @@ import pytest_asyncio
 from data_for_tests import FLIGHT_DIRECTION_NO_RETURN
 from sqlalchemy.exc import IntegrityError
 
-from air_bot.adapters.repository import (
-    SqlAlchemyFlightDirectionRepo,
-    SqlAlchemyUserDirectionRepo,
-)
+from air_bot.adapters.repo.flight_direction import SqlAlchemyFlightDirectionRepo
+from air_bot.adapters.repo.users_directions import SqlAlchemyUserDirectionRepo
 
 
 @pytest_asyncio.fixture
