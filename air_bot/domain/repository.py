@@ -11,7 +11,8 @@ class AbstractFlightDirectionRepo(ABC):
         direction: model.FlightDirection,
         price: float | None,
         last_update: datetime.datetime,
-    ):
+    ) -> int:
+        """Return id of inserted row"""
         raise NotImplementedError
 
     @abstractmethod
@@ -38,7 +39,7 @@ class AbstractUserDirectionRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_users_direction(self, user_id: int, direction: model.FlightDirection):
+    async def get_user_directions(self, user_id: int) -> list[int]:
         raise NotImplementedError
 
 

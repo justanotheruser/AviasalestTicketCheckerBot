@@ -10,7 +10,7 @@ from air_bot.adapters.repo.uow import AbstractUnitOfWork
 N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION = 3
 
 
-async def track(user_id: int, direction: FlightDirection, uow: AbstractUnitOfWork) -> list[Ticket] | None:
+async def track(user_id: int, direction: FlightDirection, tickets_api: AbstractTicketsApi, uow: AbstractUnitOfWork) -> list[Ticket] | None:
     """Adds new direction to directions tracked by user with user_id. Returns list of cheapest
     tickets for this direction or None if request to Aviasales API failed for some reason.
     If direction is already in DB, returns tickets from DB."""
@@ -28,25 +28,21 @@ async def track(user_id: int, direction: FlightDirection, uow: AbstractUnitOfWor
             return []
 
     try:
-        tickets = await self.tickets_api.get_tickets(direction, limit=3)
+        tickets = await tickets_api.get_tickets(direction, limit=3)
     except TicketsParsingError:
         raise InternalError()
     except TicketsError:
         tickets = None
 
     cheapest_price = tickets[0].price if tickets else None
-    # Start transaction
-    success = await self.flight_direction_repo.add_direction_info(
-        direction, cheapest_price, datetime.datetime.now()
-    )
-    if not success:
-        return [], False
-    success = await self.users_directions_repo.add(user_id, direction_id)
-    if not success:
-        return [], False
-    # End transaction
-    if tickets:
-        await self.ticket_repo.add(direction_id, tickets)
+    async with uow:
+        await uow.flight_directions.add_direction_info(
+            direction, cheapest_price, datetime.datetime.now()
+        )
+        await uow.users_directions.add(user_id, direction_id)
+        if tickets:
+            await uow.tickets.add(tickets, direction_id)
+        await uow.commit()
 
     return tickets
 

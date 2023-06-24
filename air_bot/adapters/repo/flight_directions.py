@@ -18,7 +18,7 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         direction: model.FlightDirection,
         price: float | None,
         last_update: datetime.datetime,
-    ):
+    ) -> int:
         stmt = text(
             "INSERT INTO flight_directions (start_code, start_name, end_code, end_name, "
             "with_transfer, departure_at, return_at, price, last_update) VALUES (:start_code, :start_name,"
@@ -27,7 +27,8 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         stmt = stmt.bindparams(
             **asdict(direction), price=price, last_update=last_update
         )
-        await self.session.execute(stmt)
+        result = await self.session.execute(stmt)
+        return result.lastrowid
 
     async def get_direction_id(self, direction: model.FlightDirection) -> int | None:
         """Returns id of row with direction info if exists or None otherwise"""

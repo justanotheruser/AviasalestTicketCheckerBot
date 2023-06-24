@@ -18,7 +18,7 @@ class SqlAlchemyUserDirectionRepo(AbstractUserDirectionRepo):
         stmt = stmt.bindparams(user_id=user_id, direction_id=direction_id)
         await self.session.execute(stmt)
 
-    async def get_users_direction(self, user_id: int, direction_id: int):
+    async def get_user_directions(self, user_id: int, direction_id: int):
         stmt = select(model.UserDirection).where(
             orm.users_directions_table.c.user_id == user_id
         )

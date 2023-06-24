@@ -1,13 +1,8 @@
 import pytest
-from fakes import (
-    FakeFlightDirectionRepo,
-    FakeTicketRepo,
-    FakeTicketsApi,
-    FakeUserFlightDirectionRepo,
-)
+from fakes import FakeTicketsApi, FakeUnitOfWork
 
 from air_bot.domain.model import FlightDirection
-# from air_bot.service.tickets_service import TicketsService
+from air_bot.service.tickets_service import track
 
 """
 def random_flight_direction(with_return: bool = False) -> FlightDirection:
@@ -49,22 +44,18 @@ FLIGHT_DIRECTION_WITH_RETURN = FlightDirection(
 )
 
 
-@pytest.mark.skip()
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "direction", [FLIGHT_DIRECTION_NO_RETURN, FLIGHT_DIRECTION_WITH_RETURN]
 )
-async def test_add_new_direction(direction):
-    fake_flight_direction_repo = FakeFlightDirectionRepo()
-    fake_user_flight_direction_repo = FakeUserFlightDirectionRepo()
-    fake_ticket_repo = FakeTicketRepo()
-    fake_tickets_api = FakeTicketsApi()
-    tickets_service = TicketsService(
-        fake_flight_direction_repo,
-        fake_user_flight_direction_repo,
-        fake_ticket_repo,
-        fake_tickets_api,
-    )
+async def test_add_new_direction_with_no_tickets_available(direction):
+    tickets_api = FakeTicketsApi()
+    uow = FakeUnitOfWork()
     user_id = 1
-    tickets = await tickets_service.track(user_id, direction)
-    # assert tickets == # TODO: FakeTicketsAPI
+    await track(user_id, direction, tickets_api, uow)
+    async with uow:
+        direction_info = await uow.flight_directions.get_direction_info(direction)
+        users_directions = await uow.users_directions.get_user_directions(user_id)
+    assert direction_info.direction == direction
+
+
