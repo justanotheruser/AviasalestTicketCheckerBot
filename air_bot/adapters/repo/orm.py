@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 metadata = MetaData()
 
 flight_direction_info_table = Table(
-    "flight_direction",
+    "flight_directions",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("start_code", String(3), nullable=False),
@@ -45,12 +45,12 @@ flight_direction_info_table = Table(
         "with_transfer",
         "departure_at",
         "return_at",
-        name="flight_direction_uc",
+        name="flight_directions_uc",
     ),
 )
 
 user_table = Table(
-    "user",
+    "users",
     metadata,
     Column("user_id", BigInteger, primary_key=True),
 )
@@ -63,7 +63,7 @@ users_directions_table = Table(
     PrimaryKeyConstraint("user_id", "direction_id", name="users_directions_pk"),
     ForeignKeyConstraint(
         columns=["direction_id"],
-        refcolumns=["flight_direction.id"],
+        refcolumns=["flight_directions.id"],
         name="users_directions_fk__flight_direction",
         ondelete="CASCADE",
     ),
@@ -82,14 +82,14 @@ tickets_table = Table(
     Column("link", Text, nullable=False),
     ForeignKeyConstraint(
         columns=["direction_id"],
-        refcolumns=["flight_direction.id"],
+        refcolumns=["flight_directions.id"],
         name="tickets_fk__flight_direction",
         ondelete="CASCADE",
     ),
 )
 
 historic_flight_direction_info_table = Table(
-    "historic_flight_direction",
+    "historic_flight_directions",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("user_id", BigInteger, nullable=False),

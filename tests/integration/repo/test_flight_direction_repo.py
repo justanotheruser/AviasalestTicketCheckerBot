@@ -3,7 +3,7 @@ import datetime
 import pytest
 from data_for_tests import FLIGHT_DIRECTION_NO_RETURN, FLIGHT_DIRECTION_WITH_RETURN
 
-from air_bot.adapters.repo.flight_direction import SqlAlchemyFlightDirectionRepo
+from air_bot.adapters.repo.flight_directions import SqlAlchemyFlightDirectionRepo
 
 
 @pytest.mark.asyncio

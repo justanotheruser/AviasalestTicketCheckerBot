@@ -17,7 +17,7 @@ async def insert_flight_direction(
     last_update: datetime.datetime,
 ):
     query = text(
-        "INSERT INTO flight_direction (start_code, start_name, end_code, end_name, "
+        "INSERT INTO flight_directions (start_code, start_name, end_code, end_name, "
         "with_transfer, departure_at, return_at, price, last_update) VALUES (:start_code, :start_name,"
         ":end_code, :end_name, :with_transfer, :departure_at, :return_at, :price, :last_update)"
     ).bindparams(

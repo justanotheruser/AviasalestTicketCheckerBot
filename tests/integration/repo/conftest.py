@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from air_bot.adapters.repo.flight_direction import SqlAlchemyFlightDirectionRepo
+from air_bot.adapters.repo.flight_directions import SqlAlchemyFlightDirectionRepo
 from air_bot.adapters.repo.orm import metadata
 from data_for_tests import FLIGHT_DIRECTION_NO_RETURN
 
@@ -29,8 +29,10 @@ async def mysql_db_engine():
         async_session = async_sessionmaker(engine)
         async with async_session() as session:
             async with session.begin():
-                await session.execute(text("DELETE FROM flight_direction"))
-                await session.execute(text("DELETE FROM user"))
+                await session.execute(text("DELETE FROM historic_flight_directions"))
+                await session.execute(text("DELETE FROM tickets"))
+                await session.execute(text("DELETE FROM flight_directions"))
+                await session.execute(text("DELETE FROM users"))
                 await session.execute(text("DELETE FROM users_directions"))
 
     await delete_all()

@@ -15,6 +15,7 @@ async def test_cant_add_same_direction_for_user_twice(
     async with mysql_session_factory() as session:
         repo = SqlAlchemyTicketRepo(session)
         await repo.add(inserted_tickets, direction_id)
+        await session.commit()
 
     async with mysql_session_factory() as session:
         repo = SqlAlchemyTicketRepo(session)

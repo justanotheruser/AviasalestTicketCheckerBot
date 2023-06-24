@@ -41,15 +41,30 @@ class SqlAlchemyTicketRepo(AbstractTicketRepo):
     async def add(self, tickets: list[model.Ticket], direction_id: int):
         for ticket in tickets:
             ticket_db = TicketDB.from_ticket(ticket, direction_id)
+            ticket_db.departure_at = ticket_db.departure_at.replace(microsecond=0)
+            if ticket_db.return_at:
+                ticket_db.return_at = ticket_db.return_at.replace(microsecond=0)
             stmt = text(
                 "INSERT INTO tickets (direction_id, price, departure_at, duration_to, return_at, "
                 "duration_back, link) VALUES (:direction_id, :price, :departure_at, :duration_to, "
                 ":return_at, :duration_back, :link)"
             )
             ticket_db_dict = asdict(ticket_db)
-            del ticket_db_dict['id']
             stmt = stmt.bindparams(**ticket_db_dict)
             await self.session.execute(stmt)
 
     async def get_direction_tickets(self, direction_id: int) -> list[model.Ticket]:
-        pass
+        stmt = select(TicketDB).filter_by(direction_id=direction_id)
+        result = await self.session.execute(stmt)
+        tickets = []
+        for row in result:
+            ticket_db: TicketDB = row[0]
+            duration_to = datetime.timedelta(minutes=ticket_db.duration_to)
+            duration_back = None
+            if ticket_db.duration_back:
+                duration_back = datetime.timedelta(minutes=ticket_db.duration_back)
+            ticket = model.Ticket(price=ticket_db.price, departure_at=ticket_db.departure_at,
+                                  duration_to=duration_to, return_at=ticket_db.return_at,
+                                  duration_back=duration_back, link=ticket_db.link)
+            tickets.append(ticket)
+        return tickets

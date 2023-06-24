@@ -60,7 +60,6 @@ class User:
 
 @dataclass(frozen=True, kw_only=True)
 class Ticket:
-    id: int | None = None
     price: float
     departure_at: datetime.datetime
     duration_to: datetime.timedelta

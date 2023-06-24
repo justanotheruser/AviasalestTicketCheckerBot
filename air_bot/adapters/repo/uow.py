@@ -3,7 +3,7 @@ from typing import Self
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from air_bot.adapters.repo.flight_direction import (
+from air_bot.adapters.repo.flight_directions import (
     AbstractFlightDirectionRepo,
     SqlAlchemyFlightDirectionRepo,
 )
