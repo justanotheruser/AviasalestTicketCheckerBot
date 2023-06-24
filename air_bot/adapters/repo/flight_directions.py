@@ -56,4 +56,6 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
             return_at=direction.return_at,
         )
         result = await self.session.execute(stmt)
-        return result.first()[0]
+        row = result.first()
+        if row is not None:
+            return row[0]

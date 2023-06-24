@@ -41,15 +41,13 @@ class SqlAlchemyTicketRepo(AbstractTicketRepo):
     async def add(self, tickets: list[model.Ticket], direction_id: int):
         for ticket in tickets:
             ticket_db = TicketDB.from_ticket(ticket, direction_id)
-            ticket_db.departure_at = ticket_db.departure_at.replace(microsecond=0)
-            if ticket_db.return_at:
-                ticket_db.return_at = ticket_db.return_at.replace(microsecond=0)
             stmt = text(
                 "INSERT INTO tickets (direction_id, price, departure_at, duration_to, return_at, "
                 "duration_back, link) VALUES (:direction_id, :price, :departure_at, :duration_to, "
                 ":return_at, :duration_back, :link)"
             )
             ticket_db_dict = asdict(ticket_db)
+            del ticket_db_dict['id']
             stmt = stmt.bindparams(**ticket_db_dict)
             await self.session.execute(stmt)
 

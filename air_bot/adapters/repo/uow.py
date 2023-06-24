@@ -22,6 +22,7 @@ class AbstractUnitOfWork(abc.ABC):
 
     def __init__(self, session_factory: AbstractSessionMaker):
         self.session_factory = session_factory
+        self._is_commited = False
 
     async def __aenter__(self) -> Self:
         return self
@@ -31,13 +32,18 @@ class AbstractUnitOfWork(abc.ABC):
 
     async def commit(self):
         await self._commit()
+        self._is_commited = True
 
     @abc.abstractmethod
     async def _commit(self):
         raise NotImplementedError
 
-    @abc.abstractmethod
     async def rollback(self):
+        if not self._is_commited:
+            await self._rollback()
+
+    @abc.abstractmethod
+    async def _rollback(self):
         raise NotImplementedError
 
 
@@ -45,7 +51,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
     async def __aenter__(self):
         self.session: AsyncSession = self.session_factory()
         self.users = SqlAlchemyUsersRepo(self.session)
-        self.flight_direction = SqlAlchemyFlightDirectionRepo(self.session)
+        self.flight_directions = SqlAlchemyFlightDirectionRepo(self.session)
         self.users_directions = SqlAlchemyUserDirectionRepo(self.session)
         return await super().__aenter__()
 
@@ -56,5 +62,5 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
     async def _commit(self):
         await self.session.commit()
 
-    async def rollback(self):
+    async def _rollback(self):
         await self.session.rollback()
