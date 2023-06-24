@@ -1,10 +1,11 @@
 import datetime
 from dataclasses import asdict, dataclass
 
-from sqlalchemy import select, text
+from sqlalchemy import select, text, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.domain import model
+from air_bot.adapters.repo import orm
 from air_bot.domain.repository import AbstractTicketRepo
 
 
@@ -75,3 +76,7 @@ class SqlAlchemyTicketRepo(AbstractTicketRepo):
             )
             tickets.append(ticket)
         return tickets
+
+    async def remove_for_direction(self, direction_id: int):
+        stmt = delete(TicketDB).where(orm.tickets_table.c.direction_id == direction_id)
+        await self.session.execute(stmt)

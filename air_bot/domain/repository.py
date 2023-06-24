@@ -27,6 +27,10 @@ class AbstractFlightDirectionRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def update_price(self, direction_id: int, price: float, last_update: datetime.datetime):
+        raise NotImplementedError
+
+    @abstractmethod
     async def delete_directions(self, direction_ids: list[int]):
         raise NotImplementedError
 
@@ -55,4 +59,8 @@ class AbstractTicketRepo(ABC):
 
     @abstractmethod
     async def get_direction_tickets(self, direction_id: int) -> list[model.Ticket]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def remove_for_direction(self, direction_id: int):
         raise NotImplementedError

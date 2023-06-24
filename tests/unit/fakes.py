@@ -6,13 +6,6 @@ from air_bot.adapters.repo.uow import AbstractUnitOfWork
 from air_bot.domain import model, repository
 
 
-class FakeTicketsApi(list):
-    async def get_tickets(
-        self, direction: model.FlightDirection, limit: int
-    ) -> list[model.Ticket]:
-        return self
-
-
 class FakeUserRepo(repository.AbstractUserRepo):
     def __init__(self, users: list[model.User] = None):
         if users is None:
@@ -33,7 +26,7 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
         direction: model.FlightDirection,
         price: float | None,
         last_update: datetime.datetime,
-    ):
+    ) -> int:
         self.directions.append(
             model.FlightDirectionInfo(
                 id=self._next_id,
@@ -60,6 +53,12 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
             if direction_info.id in direction_ids:
                 result.append(direction_info)
         return result
+
+    async def update_price(self, direction_id: int, price: float, last_update: datetime.datetime):
+        for i in range(len(self.directions)):
+            if self.directions[i].id == direction_id:
+                self.directions[i].price = price
+                self.directions[i].last_update = last_update
 
     async def delete_directions(self, direction_ids: list[int]):
         self.directions = [
@@ -95,6 +94,9 @@ class FakeTicketRepo(repository.AbstractTicketRepo):
 
     async def get_direction_tickets(self, direction_id: int) -> list[model.Ticket]:
         return [row[0] for row in self.ticket_rows if row[1] == direction_id]
+
+    async def remove_for_direction(self, direction_id: int):
+        self.ticket_rows = [row for row in self.ticket_rows if row[1] != direction_id]
 
 
 class FakeUnitOfWork(AbstractUnitOfWork):

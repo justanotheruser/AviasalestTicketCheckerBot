@@ -1,7 +1,7 @@
 import datetime
 from dataclasses import asdict
 
-from sqlalchemy import delete, select, text
+from sqlalchemy import delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
@@ -53,6 +53,14 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         stmt = stmt.where(orm.flight_direction_info_table.c.id.in_(direction_ids))
         result = await self.session.execute(stmt)
         return [row[0] for row in result.all()]
+
+    async def update_price(self, direction_id: int, price: float, last_update: datetime.datetime):
+        stmt = (
+            update(model.FlightDirectionInfo).
+            where(orm.flight_direction_info_table.c.id == direction_id).
+            values(price=price, last_update=last_update)
+        )
+        await self.session.execute(stmt)
 
     async def delete_directions(self, direction_ids: list[int]):
         stmt = delete(model.FlightDirectionInfo)
