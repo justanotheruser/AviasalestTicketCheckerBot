@@ -19,7 +19,9 @@ async def test_add_direction_and_get_direction_id(
             moscow2antalya_roundtrip_direction,
         ]:
             last_update = datetime.datetime.now().replace(microsecond=0)
-            direction_id = await repo.add_direction_info(direction, price=100, last_update=last_update)
+            direction_id = await repo.add_direction_info(
+                direction, price=100, last_update=last_update
+            )
             inserted_direction_ids.append(direction_id)
         await session.commit()
 
@@ -37,20 +39,23 @@ async def test_add_direction_and_get_direction_id(
 
 
 @pytest.mark.asyncio
-async def test_get_directions_by_ids(mysql_session_factory,
+async def test_get_directions_by_ids(
+    mysql_session_factory,
     moscow2spb_one_way_direction,
     moscow2antalya_roundtrip_direction,
 ):
     directions = [
-            moscow2spb_one_way_direction,
-            moscow2antalya_roundtrip_direction,
-        ]
+        moscow2spb_one_way_direction,
+        moscow2antalya_roundtrip_direction,
+    ]
     inserted_direction_ids = []
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         for direction in directions:
             last_update = datetime.datetime.now().replace(microsecond=0)
-            direction_id = await repo.add_direction_info(direction, price=100, last_update=last_update)
+            direction_id = await repo.add_direction_info(
+                direction, price=100, last_update=last_update
+            )
             inserted_direction_ids.append(direction_id)
         await session.commit()
 
@@ -58,7 +63,9 @@ async def test_get_directions_by_ids(mysql_session_factory,
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         for i in range(len(directions)):
-            direction_infos = await repo.get_directions_info([inserted_direction_ids[i]])
+            direction_infos = await repo.get_directions_info(
+                [inserted_direction_ids[i]]
+            )
             assert len(direction_infos) == 1
             assert direction_infos[0].direction == directions[i]
 

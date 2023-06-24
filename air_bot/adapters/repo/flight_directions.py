@@ -1,12 +1,12 @@
 import datetime
 from dataclasses import asdict
 
-from sqlalchemy import select, text
+from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from air_bot.adapters.repo import orm
 from air_bot.domain import model
 from air_bot.domain.repository import AbstractFlightDirectionRepo
-from air_bot.adapters.repo.orm import flight_direction_info_table
 
 
 class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
@@ -46,8 +46,15 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
             return None
         return row[0].id
 
-    async def get_directions_info(self, direction_ids: list[int]) -> list[model.FlightDirectionInfo]:
+    async def get_directions_info(
+        self, direction_ids: list[int]
+    ) -> list[model.FlightDirectionInfo]:
         stmt = select(model.FlightDirectionInfo)
-        stmt = stmt.where(flight_direction_info_table.c.id.in_(direction_ids))
+        stmt = stmt.where(orm.flight_direction_info_table.c.id.in_(direction_ids))
         result = await self.session.execute(stmt)
         return [row[0] for row in result.all()]
+
+    async def delete_directions(self, direction_ids: list[int]):
+        stmt = delete(model.FlightDirectionInfo)
+        stmt = stmt.where(orm.flight_direction_info_table.c.id.in_(direction_ids))
+        await self.session.execute(stmt)

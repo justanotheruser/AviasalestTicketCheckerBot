@@ -75,12 +75,6 @@ class Location:
     country_code: Optional[str]
 
 
-@dataclass(frozen=True)
-class UserDirection:
-    user_id: int
-    direction_id: int
-
-
 @dataclass(kw_only=True)
 class HistoricFlightDirection:
     id: int | None = None

@@ -1,12 +1,11 @@
 import datetime
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.domain import model
 from air_bot.domain.repository import AbstractTicketRepo
-from dataclasses import dataclass
 
 
 @dataclass(kw_only=True)
@@ -27,10 +26,15 @@ class TicketDB:
             duration_back = ticket.duration_back // 60
         else:
             duration_back = None
-        return TicketDB(direction_id=direction_id, price=ticket.price,
-                        departure_at=ticket.departure_at, duration_to=duration_to,
-                        return_at=ticket.return_at, duration_back=duration_back,
-                        link=ticket.link)
+        return TicketDB(
+            direction_id=direction_id,
+            price=ticket.price,
+            departure_at=ticket.departure_at,
+            duration_to=duration_to,
+            return_at=ticket.return_at,
+            duration_back=duration_back,
+            link=ticket.link,
+        )
 
 
 class SqlAlchemyTicketRepo(AbstractTicketRepo):
@@ -47,7 +51,7 @@ class SqlAlchemyTicketRepo(AbstractTicketRepo):
                 ":return_at, :duration_back, :link)"
             )
             ticket_db_dict = asdict(ticket_db)
-            del ticket_db_dict['id']
+            del ticket_db_dict["id"]
             stmt = stmt.bindparams(**ticket_db_dict)
             await self.session.execute(stmt)
 
@@ -61,8 +65,13 @@ class SqlAlchemyTicketRepo(AbstractTicketRepo):
             duration_back = None
             if ticket_db.duration_back:
                 duration_back = datetime.timedelta(minutes=ticket_db.duration_back)
-            ticket = model.Ticket(price=ticket_db.price, departure_at=ticket_db.departure_at,
-                                  duration_to=duration_to, return_at=ticket_db.return_at,
-                                  duration_back=duration_back, link=ticket_db.link)
+            ticket = model.Ticket(
+                price=ticket_db.price,
+                departure_at=ticket_db.departure_at,
+                duration_to=duration_to,
+                return_at=ticket_db.return_at,
+                duration_back=duration_back,
+                link=ticket_db.link,
+            )
             tickets.append(ticket)
         return tickets

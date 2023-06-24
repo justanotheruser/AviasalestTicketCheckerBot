@@ -7,13 +7,13 @@ from air_bot.adapters.repo.flight_directions import (
     AbstractFlightDirectionRepo,
     SqlAlchemyFlightDirectionRepo,
 )
+from air_bot.adapters.repo.session_maker import AbstractSessionMaker
+from air_bot.adapters.repo.tickets import AbstractTicketRepo, SqlAlchemyTicketRepo
+from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
 from air_bot.adapters.repo.users_directions import (
     AbstractUserDirectionRepo,
-    SqlAlchemyUserDirectionRepo
+    SqlAlchemyUserDirectionRepo,
 )
-from air_bot.adapters.repo.session_maker import AbstractSessionMaker
-from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
-from air_bot.adapters.repo.tickets import AbstractTicketRepo, SqlAlchemyTicketRepo
 
 
 class AbstractUnitOfWork(abc.ABC):

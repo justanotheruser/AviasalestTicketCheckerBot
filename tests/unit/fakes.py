@@ -1,14 +1,15 @@
 import datetime
-from typing import Tuple
 from dataclasses import asdict
+from typing import Tuple
 
-from air_bot.domain import repository
-from air_bot.domain import model
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
+from air_bot.domain import model, repository
 
 
 class FakeTicketsApi(list):
-    async def get_tickets(self, direction: model.FlightDirection, limit: int) -> list[model.Ticket]:
+    async def get_tickets(
+        self, direction: model.FlightDirection, limit: int
+    ) -> list[model.Ticket]:
         return self
 
 
@@ -33,9 +34,14 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
         price: float | None,
         last_update: datetime.datetime,
     ):
-
-        self.directions.append(model.FlightDirectionInfo(id=self._next_id, **asdict(direction),
-                                              price=price, last_update=last_update))
+        self.directions.append(
+            model.FlightDirectionInfo(
+                id=self._next_id,
+                **asdict(direction),
+                price=price,
+                last_update=last_update
+            )
+        )
         row_id = self._next_id
         self._next_id += 1
         return row_id
@@ -46,12 +52,21 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
                 return direction_info.id
         return None
 
-    async def get_directions_info(self, direction_ids: list[int]) -> list[model.FlightDirectionInfo]:
+    async def get_directions_info(
+        self, direction_ids: list[int]
+    ) -> list[model.FlightDirectionInfo]:
         result = []
         for direction_info in self.directions:
             if direction_info.id in direction_ids:
                 result.append(direction_info)
         return result
+
+    async def delete_directions(self, direction_ids: list[int]):
+        self.directions = [
+            direction_info
+            for direction_info in self.directions
+            if direction_info.id not in direction_ids
+        ]
 
 
 class FakeUserFlightDirectionRepo(repository.AbstractUserDirectionRepo):

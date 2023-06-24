@@ -1,8 +1,8 @@
 import pytest
 from fakes import FakeTicketsApi, FakeUnitOfWork
+from service import track
 
 from air_bot.domain.model import FlightDirection
-from service import track
 
 """
 def random_flight_direction(with_return: bool = False) -> FlightDirection:
@@ -57,5 +57,3 @@ async def test_add_new_direction_with_no_tickets_available(direction):
         direction_info = await uow.flight_directions.get_direction_info(direction)
         users_directions = await uow.users_directions.get_user_directions(user_id)
     assert direction_info.direction == direction
-
-

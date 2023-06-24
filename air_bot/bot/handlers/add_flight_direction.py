@@ -195,9 +195,7 @@ async def ask_for_departure_date(message: Message, state: FSMContext) -> None:
 
 
 @router.message(NewDirection.choosing_departure_date, F.text)
-async def got_departure_date_as_text(
-    message: Message, state: FSMContext
-):
+async def got_departure_date_as_text(message: Message, state: FSMContext):
     departure_date = date_reader.read_date(message.text)  # type: ignore[arg-type]
     if not departure_date:
         await message.answer(
@@ -252,9 +250,7 @@ async def ask_for_return_date(message: Message, state: FSMContext) -> None:
 
 
 @router.message(NewDirection.choosing_return_date, F.text)
-async def got_return_date_as_text(
-    message: Message, state: FSMContext
-):
+async def got_return_date_as_text(message: Message, state: FSMContext):
     return_date = date_reader.read_date(message.text)  # type: ignore[arg-type]
     if not return_date:
         await message.answer(
@@ -262,20 +258,14 @@ async def got_return_date_as_text(
         )
         return
     await state.update_data(return_date=return_date)
-    await add_direction_and_show_result(
-        message.from_user.id, state, message
-    )
+    await add_direction_and_show_result(message.from_user.id, state, message)
 
 
 @router.callback_query(NewDirection.choosing_return_date)
-async def got_return_date_from_button(
-    callback: CallbackQuery, state: FSMContext
-):
+async def got_return_date_from_button(callback: CallbackQuery, state: FSMContext):
     return_date: str = callback.data  # type: ignore[assignment]
     await state.update_data(return_date=return_date)
-    await add_direction_and_show_result(
-        callback.from_user.id, state, callback.message
-    )
+    await add_direction_and_show_result(callback.from_user.id, state, callback.message)
     await callback.answer()
 
 

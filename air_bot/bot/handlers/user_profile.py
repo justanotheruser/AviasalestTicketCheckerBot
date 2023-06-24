@@ -1,23 +1,27 @@
-from loguru import logger
-
 from aiogram import Router
 from aiogram.filters import Text
 from aiogram.types import CallbackQuery, Message
-from air_bot.bot.keyboards.user_home_kb import user_home_kb
+from loguru import logger
 
+from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
+from air_bot.bot.i18n import i18n
+from air_bot.bot.keyboards.user_home_kb import user_home_kb
+from air_bot.service import get_user_directions
 
 router = Router()
 
 
-@router.message(Text(text=user_home_kb.new_search_btn_text))
+@router.message(Text(text=user_home_kb.personal_account_btn_text))
 @router.message(commands=["settings", "настройки"])
 async def show_user_flight_directions(message: Message, session_maker) -> None:
+    await message.answer(f"{i18n.translate('tracked_directions')} 👇:")
     user_id = message.from_user.id  # type: ignore[union-attr]
-    await message.answer("Отслеживаемые направления 👇:")
-    session = session_maker()
+    uow = SqlAlchemyUnitOfWork(session_maker)
+    directions_info = await get_user_directions(user_id, uow)
+    await message.answer(str(directions_info))
 
 
-'''
+"""
 @router.message(Text(text="⚙️ личный кабинет"))
 @router.message(commands=["settings", "настройки"])
 async def show_user_flight_directions(message: Message) -> None:
@@ -108,4 +112,4 @@ async def delete_direction(
         reply_markup=user_home_keyboard(),
     )
     await callback.answer()
-'''
+"""

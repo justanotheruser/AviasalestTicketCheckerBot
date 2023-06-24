@@ -21,7 +21,13 @@ class AbstractFlightDirectionRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_directions_info(self, direction_ids: list[int]) -> list[model.FlightDirectionInfo]:
+    async def get_directions_info(
+        self, direction_ids: list[int]
+    ) -> list[model.FlightDirectionInfo]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete_directions(self, direction_ids: list[int]):
         raise NotImplementedError
 
 
@@ -38,6 +44,7 @@ class AbstractUserDirectionRepo(ABC):
 
     @abstractmethod
     async def get_user_directions(self, user_id: int) -> list[int]:
+        """Returns list of direction ids tracked by this user"""
         raise NotImplementedError
 
 

@@ -17,8 +17,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import registry
 
-from air_bot.domain import model
 from air_bot.adapters.repo.tickets import TicketDB
+from air_bot.adapters.repo.users_directions import UserDirectionDB
+from air_bot.domain import model
 
 mapper_registry = registry()
 
@@ -108,7 +109,7 @@ historic_flight_direction_info_table = Table(
 
 mapper_registry.map_imperatively(model.FlightDirectionInfo, flight_direction_info_table)
 mapper_registry.map_imperatively(model.User, user_table)
-mapper_registry.map_imperatively(model.UserDirection, users_directions_table)
+mapper_registry.map_imperatively(UserDirectionDB, users_directions_table)
 mapper_registry.map_imperatively(TicketDB, tickets_table)
 mapper_registry.map_imperatively(
     model.HistoricFlightDirection, historic_flight_direction_info_table

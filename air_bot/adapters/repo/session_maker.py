@@ -19,7 +19,9 @@ class SessionMaker(AbstractSessionMaker):
         self.engine = create_async_engine(config.get_mysql_uri())
 
     async def start(self):
-        self.session_maker = async_sessionmaker(bind=self.engine)
+        self.session_maker = async_sessionmaker(
+            bind=self.engine, expire_on_commit=False
+        )
 
     def __call__(self):
         return self.session_maker()

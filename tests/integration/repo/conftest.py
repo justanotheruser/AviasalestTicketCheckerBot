@@ -41,8 +41,8 @@ async def mysql_db_engine():
 
 
 @pytest_asyncio.fixture
-async def mysql_session_factory(mysql_db_engine):
-    yield async_sessionmaker(bind=mysql_db_engine, expire_on_commit=False)
+async def mysql_session_factory(mysql_db_engine) -> async_sessionmaker:
+    return async_sessionmaker(bind=mysql_db_engine, expire_on_commit=False)
 
 
 @pytest_asyncio.fixture
