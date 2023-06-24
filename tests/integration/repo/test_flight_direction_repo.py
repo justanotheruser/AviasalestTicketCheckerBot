@@ -89,7 +89,8 @@ async def test_update_price(mysql_session_factory, moscow2spb_one_way_direction)
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         direction_id = await repo.add_direction_info(
-            moscow2spb_one_way_direction, 100, datetime.datetime.now())
+            moscow2spb_one_way_direction, 100, datetime.datetime.now()
+        )
         await session.commit()
 
     async with mysql_session_factory() as session:

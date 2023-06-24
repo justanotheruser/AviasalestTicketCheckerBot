@@ -1,11 +1,11 @@
 import datetime
 from dataclasses import asdict, dataclass
 
-from sqlalchemy import select, text, delete
+from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from air_bot.domain import model
 from air_bot.adapters.repo import orm
+from air_bot.domain import model
 from air_bot.domain.repository import AbstractTicketRepo
 
 

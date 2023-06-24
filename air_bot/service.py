@@ -70,7 +70,9 @@ async def track(
                 )
                 await uow.users_directions.add(user_id, direction_id)
             else:
-                await uow.flight_directions.update_price(direction_id, cheapest_price, datetime.datetime.now())
+                await uow.flight_directions.update_price(
+                    direction_id, cheapest_price, datetime.datetime.now()
+                )
             await uow.tickets.remove_for_direction(direction_id)
             await uow.tickets.add(tickets, direction_id)
             await uow.commit()

@@ -54,7 +54,9 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
                 result.append(direction_info)
         return result
 
-    async def update_price(self, direction_id: int, price: float, last_update: datetime.datetime):
+    async def update_price(
+        self, direction_id: int, price: float, last_update: datetime.datetime
+    ):
         for i in range(len(self.directions)):
             if self.directions[i].id == direction_id:
                 self.directions[i].price = price

@@ -54,11 +54,13 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         result = await self.session.execute(stmt)
         return [row[0] for row in result.all()]
 
-    async def update_price(self, direction_id: int, price: float, last_update: datetime.datetime):
+    async def update_price(
+        self, direction_id: int, price: float, last_update: datetime.datetime
+    ):
         stmt = (
-            update(model.FlightDirectionInfo).
-            where(orm.flight_direction_info_table.c.id == direction_id).
-            values(price=price, last_update=last_update)
+            update(model.FlightDirectionInfo)
+            .where(orm.flight_direction_info_table.c.id == direction_id)
+            .values(price=price, last_update=last_update)
         )
         await self.session.execute(stmt)
 
