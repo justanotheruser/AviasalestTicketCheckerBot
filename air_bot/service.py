@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from air_bot.adapters.tickets_api import AbstractTicketsApi
 from air_bot.domain.exceptions import InternalError, TicketsError, TicketsParsingError
-from air_bot.domain.model import FlightDirection, Ticket
+from air_bot.domain.model import FlightDirection, Ticket, FlightDirectionInfo
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
 
 
@@ -47,7 +47,9 @@ async def track(user_id: int, direction: FlightDirection, tickets_api: AbstractT
     return tickets
 
 
-class AbstractTicketsService(ABC):
-    @abstractmethod
-    async def track(self, user_id: int, direction: FlightDirection):
-        raise NotImplementedError
+async def get_user_directions(user_id: int, uow: AbstractUnitOfWork) -> list[FlightDirectionInfo]:
+    async with uow:
+        direction_ids = await uow.users_directions.get_user_directions(user_id)
+        if not direction_ids:
+            return []
+        return await uow.flight_directions.get_directions_info(direction_ids)

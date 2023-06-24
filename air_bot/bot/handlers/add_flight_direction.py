@@ -13,7 +13,6 @@ from air_bot.bot.keyboards.direct_or_transfer_kb import direct_or_transfer_kb
 from air_bot.bot.keyboards.user_home_kb import user_home_kb
 from air_bot.bot.keyboards.with_or_without_return_kb import with_or_without_return_kb
 from air_bot.bot.utils.date import date_reader
-from air_bot.service.tickets_service import TicketsService
 
 # from air_bot.bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_keyboard
 # from air_bot.bot.utils.tickets import print_tickets
@@ -197,7 +196,7 @@ async def ask_for_departure_date(message: Message, state: FSMContext) -> None:
 
 @router.message(NewDirection.choosing_departure_date, F.text)
 async def got_departure_date_as_text(
-    message: Message, state: FSMContext, tickets_service: TicketsService
+    message: Message, state: FSMContext
 ):
     departure_date = date_reader.read_date(message.text)  # type: ignore[arg-type]
     if not departure_date:
@@ -210,7 +209,6 @@ async def got_departure_date_as_text(
         message.from_user.id,  # type: ignore[union-attr]
         message,
         state,
-        tickets_service,
     )
 
 
@@ -218,7 +216,6 @@ async def got_departure_date_as_text(
 async def got_departure_date_from_button(
     callback: CallbackQuery,
     state: FSMContext,
-    tickets_service: TicketsService,
 ) -> None:
     departure_date: str = callback.data  # type: ignore[assignment]
     await got_departure_date(
@@ -226,7 +223,6 @@ async def got_departure_date_from_button(
         callback.from_user.id,
         callback.message,  # type: ignore[arg-type]
         state,
-        tickets_service,
     )
     await callback.answer()
 
@@ -236,14 +232,13 @@ async def got_departure_date(
     user_id: int,
     message: Message,
     state: FSMContext,
-    tickets_service: TicketsService,
 ) -> None:
     await state.update_data(departure_date=departure_date)
     user_data = await state.get_data()
     if user_data["with_return"]:
         await ask_for_return_date(message, state)
         return
-    await add_direction_and_show_result(user_id, user_data, tickets_service, message)
+    await add_direction_and_show_result(user_id, user_data, message)
 
 
 async def ask_for_return_date(message: Message, state: FSMContext) -> None:
@@ -258,7 +253,7 @@ async def ask_for_return_date(message: Message, state: FSMContext) -> None:
 
 @router.message(NewDirection.choosing_return_date, F.text)
 async def got_return_date_as_text(
-    message: Message, state: FSMContext, tickets_service: TicketsService
+    message: Message, state: FSMContext
 ):
     return_date = date_reader.read_date(message.text)  # type: ignore[arg-type]
     if not return_date:
@@ -268,24 +263,24 @@ async def got_return_date_as_text(
         return
     await state.update_data(return_date=return_date)
     await add_direction_and_show_result(
-        message.from_user.id, state, tickets_service, message
+        message.from_user.id, state, message
     )
 
 
 @router.callback_query(NewDirection.choosing_return_date)
 async def got_return_date_from_button(
-    callback: CallbackQuery, state: FSMContext, tickets_service: TicketsService
+    callback: CallbackQuery, state: FSMContext
 ):
     return_date: str = callback.data  # type: ignore[assignment]
     await state.update_data(return_date=return_date)
     await add_direction_and_show_result(
-        callback.from_user.id, state, tickets_service, callback.message
+        callback.from_user.id, state, callback.message
     )
     await callback.answer()
 
 
 async def add_direction_and_show_result(
-    user_id: int, state: FSMContext, tickets_service: TicketsService, message: Message
+    user_id: int, state: FSMContext, message: Message
 ):
     user_data = await state.get_data()
     if not validate_user_data_for_direction(user_data):

@@ -3,7 +3,7 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from air_bot.service.tickets_service import AbstractTicketsService
+from service import AbstractTicketsService
 
 
 class AddTicketsServiceMiddleware(BaseMiddleware):

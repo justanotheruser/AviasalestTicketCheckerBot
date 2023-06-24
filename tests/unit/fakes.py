@@ -46,13 +46,12 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
                 return direction_info.id
         return None
 
-    async def get_direction_info(
-        self, direction: model.FlightDirection
-    ) -> model.FlightDirectionInfo:
+    async def get_directions_info(self, direction_ids: list[int]) -> list[model.FlightDirectionInfo]:
+        result = []
         for direction_info in self.directions:
-            if direction_info.direction == direction:
-                return direction_info
-        return None
+            if direction_info.id in direction_ids:
+                result.append(direction_info)
+        return result
 
 
 class FakeUserFlightDirectionRepo(repository.AbstractUserDirectionRepo):

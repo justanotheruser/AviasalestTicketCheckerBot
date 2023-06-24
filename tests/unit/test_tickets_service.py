@@ -2,7 +2,7 @@ import pytest
 from fakes import FakeTicketsApi, FakeUnitOfWork
 
 from air_bot.domain.model import FlightDirection
-from air_bot.service.tickets_service import track
+from service import track
 
 """
 def random_flight_direction(with_return: bool = False) -> FlightDirection:

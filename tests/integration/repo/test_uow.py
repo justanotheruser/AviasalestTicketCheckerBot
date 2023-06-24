@@ -11,17 +11,17 @@ async def test_uow_commit(mysql_session_factory, moscow2spb_one_way_direction):
 
     uow = SqlAlchemyUnitOfWork(mysql_session_factory)
     async with uow:
-        await uow.flight_directions.add_direction_info(
+        direction_id = await uow.flight_directions.add_direction_info(
             moscow2spb_one_way_direction, 220.5, last_update
         )
         await uow.commit()
 
     uow = SqlAlchemyUnitOfWork(mysql_session_factory)
     async with uow:
-        direction_info = await uow.flight_directions.get_direction_info(
-            moscow2spb_one_way_direction
-        )
+        result = await uow.flight_directions.get_directions_info([direction_id])
         await uow.commit()
+    assert len(result) == 1
+    direction_info = result[0]
     assert direction_info.direction == moscow2spb_one_way_direction
     assert direction_info.price == 220.5
     assert direction_info.last_update == last_update
@@ -33,14 +33,12 @@ async def test_uow_rollback(mysql_session_factory, moscow2spb_one_way_direction)
 
     uow = SqlAlchemyUnitOfWork(mysql_session_factory)
     async with uow:
-        await uow.flight_directions.add_direction_info(
+        direction_id = await uow.flight_directions.add_direction_info(
             moscow2spb_one_way_direction, 220.5, last_update
         )
 
     uow = SqlAlchemyUnitOfWork(mysql_session_factory)
     async with uow:
-        direction_info = await uow.flight_directions.get_direction_info(
-            moscow2spb_one_way_direction
-        )
+        direction_info = await uow.flight_directions.get_directions_info([direction_id])
         await uow.commit()
-    assert direction_info is None
+    assert direction_info == []

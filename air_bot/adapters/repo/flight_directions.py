@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.domain import model
 from air_bot.domain.repository import AbstractFlightDirectionRepo
+from air_bot.adapters.repo.orm import flight_direction_info_table
 
 
 class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
@@ -45,18 +46,8 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
             return None
         return row[0].id
 
-    async def get_direction_info(
-        self, direction: model.FlightDirection
-    ) -> model.FlightDirectionInfo:
+    async def get_directions_info(self, direction_ids: list[int]) -> list[model.FlightDirectionInfo]:
         stmt = select(model.FlightDirectionInfo)
-        stmt.filter_by(
-            start_code=direction.start_code,
-            end_code=direction.end_code,
-            with_transfer=direction.with_transfer,
-            departure_at=direction.departure_at,
-            return_at=direction.return_at,
-        )
+        stmt = stmt.where(flight_direction_info_table.c.id.in_(direction_ids))
         result = await self.session.execute(stmt)
-        row = result.first()
-        if row is not None:
-            return row[0]
+        return [row[0] for row in result.all()]

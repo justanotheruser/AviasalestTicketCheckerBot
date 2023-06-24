@@ -21,9 +21,7 @@ class AbstractFlightDirectionRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_direction_info(
-        self, direction: model.FlightDirection
-    ) -> model.FlightDirectionInfo:
+    async def get_directions_info(self, direction_ids: list[int]) -> list[model.FlightDirectionInfo]:
         raise NotImplementedError
 
 
