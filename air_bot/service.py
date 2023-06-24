@@ -52,7 +52,7 @@ async def track(
 
     cheapest_price = tickets[0].price if tickets else None
     async with uow:
-        await uow.flight_directions.add_direction_info(
+        direction_id = await uow.flight_directions.add_direction_info(
             direction, cheapest_price, datetime.datetime.now()
         )
         await uow.users_directions.add(user_id, direction_id)
@@ -67,7 +67,7 @@ async def get_user_directions(
     user_id: int, uow: AbstractUnitOfWork
 ) -> list[FlightDirectionInfo]:
     async with uow:
-        direction_ids = await uow.users_directions.get_user_directions(user_id)
+        direction_ids = await uow.users_directions.get_directions(user_id)
         if not direction_ids:
             return []
         return await uow.flight_directions.get_directions_info(direction_ids)

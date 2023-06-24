@@ -78,23 +78,23 @@ class FakeUserFlightDirectionRepo(repository.AbstractUserDirectionRepo):
     async def add(self, user_id: int, direction_id: int):
         self.users_directions.append((user_id, direction_id))
 
-    async def get_user_directions(self, user_id: int, direction: model.FlightDirection):
-        return None
+    async def get_directions(self, user_id: int):
+        return [ud[1] for ud in self.users_directions if ud[0] == user_id]
 
 
 class FakeTicketRepo(repository.AbstractTicketRepo):
-    def __init__(self, tickets: list[Tuple[int, model.Ticket]] = None):
+    def __init__(self, tickets: list[Tuple[model.Ticket, int]] = None):
         if tickets is None:
             tickets = []
         self.ticket_rows = tickets
 
-    async def add(self, direction_id: int, tickets: list[model.Ticket]) -> bool:
+    async def add(self, tickets: list[model.Ticket], direction_id: int) -> bool:
         for ticket in tickets:
-            self.ticket_rows.append((direction_id, ticket))
+            self.ticket_rows.append((ticket, direction_id))
         return True
 
     async def get_direction_tickets(self, direction_id: int) -> list[model.Ticket]:
-        return [row[1] for row in self.ticket_rows if row[0] == direction_id]
+        return [row[0] for row in self.ticket_rows if row[1] == direction_id]
 
 
 class FakeUnitOfWork(AbstractUnitOfWork):

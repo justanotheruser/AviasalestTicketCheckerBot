@@ -43,7 +43,7 @@ class AbstractUserDirectionRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_user_directions(self, user_id: int) -> list[int]:
+    async def get_directions(self, user_id: int) -> list[int]:
         """Returns list of direction ids tracked by this user"""
         raise NotImplementedError
 
