@@ -12,7 +12,7 @@ class FlightDirection:
     end_name: str
     with_transfer: bool
     departure_at: str
-    return_at: Optional[str]
+    return_at: str | None = None
 
     def departure_date(self) -> datetime.date:
         if len(self.departure_at) == 7:

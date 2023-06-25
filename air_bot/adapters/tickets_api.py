@@ -9,10 +9,9 @@ from loguru import logger
 from pydantic import SecretStr
 
 from air_bot.domain.exceptions import (
+    TicketsAPIConnectionError,
     TicketsAPIError,
-    TicketsConnectionError,
     TicketsParsingError,
-    TicketsTimeoutError,
 )
 from air_bot.domain.model import FlightDirection, Ticket
 
@@ -48,11 +47,11 @@ class AviasalesTicketsApi(AbstractTicketsApi):
                     self.currency,
                 )
         except asyncio.TimeoutError:
-            # TODO: logging
-            raise TicketsTimeoutError()
+            logger.error(f"Request for tickets timed out")
+            raise TicketsAPIConnectionError()
         except ClientConnectionError as e:
             logger.error(e)
-            raise TicketsConnectionError()
+            raise TicketsAPIConnectionError()
 
         json_response = json.loads(response)
         if "error" in response:

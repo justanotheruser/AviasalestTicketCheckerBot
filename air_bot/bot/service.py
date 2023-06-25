@@ -7,6 +7,8 @@ from air_bot.adapters.repo.session_maker import SessionMaker
 from air_bot.bot.handlers import add_flight_direction, start, user_profile
 from air_bot.bot.middlewares.add_http_session_maker import AddHttpSessionMakerMiddleware
 from air_bot.bot.middlewares.add_session_maker import AddSessionMakerMiddleware
+from air_bot.bot.middlewares.add_ticket_view import AddTicketViewMiddleware
+from air_bot.bot.presentation.tickets import TicketView
 from air_bot.config import BotConfig
 from air_bot.http_session import HttpSessionMaker
 
@@ -31,6 +33,7 @@ class BotService:
 
         self.dp.update.middleware(AddSessionMakerMiddleware(session_maker))
         self.dp.update.middleware(AddHttpSessionMakerMiddleware(http_session_maker))
+        self.dp.update.middleware(AddTicketViewMiddleware(TicketView(config.currency)))
 
     def start(self) -> None:
         # await self.ticket_price_checker.start()

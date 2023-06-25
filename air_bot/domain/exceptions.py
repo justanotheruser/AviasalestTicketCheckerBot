@@ -14,11 +14,7 @@ class TicketsError(Exception):
     pass
 
 
-class TicketsTimeoutError(TicketsError):
-    pass
-
-
-class TicketsConnectionError(TicketsError):
+class TicketsAPIConnectionError(TicketsError):
     pass
 
 
@@ -28,9 +24,9 @@ class TicketsAPIError(TicketsError):
     pass
 
 
-class TicketsParsingError(TicketsError):
+class InternalError(Exception):
     pass
 
 
-class InternalError(Exception):
+class TicketsParsingError(InternalError):
     pass

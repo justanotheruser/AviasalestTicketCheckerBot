@@ -33,3 +33,9 @@ december: декабрь
 cant_recognize_date_try_again: Failed to recognize the date, please try again
 choose_arrival_date: Укажите дату отправления
 tracked_directions: Отслеживаемые направления
+try_search_again: Попробуйте задать поиск заного.
+we_fixing_this: Мы уже работаем над исправлением этой ошибки.
+direction_added_here_are_tickets: Направление добавлено, а вот самые низкие цены на сегодня
+no_flights: Рейсов нет!
+current_prices: текущие цены
+buy_ticket: купить билет

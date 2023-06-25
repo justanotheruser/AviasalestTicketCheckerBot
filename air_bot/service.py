@@ -5,7 +5,7 @@ from loguru import logger
 
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
 from air_bot.adapters.tickets_api import AbstractTicketsApi
-from air_bot.domain.exceptions import InternalError, TicketsError, TicketsParsingError
+from air_bot.domain.exceptions import TicketsAPIConnectionError
 from air_bot.domain.model import FlightDirection, FlightDirectionInfo, Ticket
 
 N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION = 3
@@ -42,14 +42,11 @@ async def track(
         await uow.commit()
 
     if not tickets:
-        try:
-            tickets = await tickets_api.get_tickets(direction, limit=3)
-            if tickets:
-                got_tickets_from_api = True
-        except TicketsParsingError:
-            raise InternalError()
-        except TicketsError:
-            tickets = None
+        tickets = await tickets_api.get_tickets(
+            direction, limit=N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION
+        )
+        if tickets:
+            got_tickets_from_api = True
 
     if not tickets:
         if direction_id is None:

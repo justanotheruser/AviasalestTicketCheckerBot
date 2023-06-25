@@ -14,14 +14,15 @@ from air_bot.bot.keyboards.choose_month_kb import choose_month_kb
 from air_bot.bot.keyboards.direct_or_transfer_kb import direct_or_transfer_kb
 from air_bot.bot.keyboards.user_home_kb import user_home_kb
 from air_bot.bot.keyboards.with_or_without_return_kb import with_or_without_return_kb
+from air_bot.bot.presentation.tickets import TicketView
 from air_bot.bot.utils.date import date_reader
 from air_bot.bot.utils.validation import validate_user_data_for_direction
 from air_bot.config import config
+from air_bot.domain.exceptions import InternalError, TicketsAPIConnectionError
 from air_bot.domain.model import FlightDirection
 from air_bot.service import track
 
 # from air_bot.bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_keyboard
-# from air_bot.bot.utils.tickets import print_tickets
 
 
 router = Router()
@@ -205,7 +206,11 @@ async def ask_for_departure_date(message: Message, state: FSMContext) -> None:
 
 @router.message(NewDirection.choosing_departure_date, F.text)
 async def got_departure_date_as_text(
-    message: Message, state: FSMContext, session_maker, http_session_maker
+    message: Message,
+    state: FSMContext,
+    session_maker,
+    http_session_maker,
+    ticket_view: TicketView,
 ):
     departure_date = date_reader.read_date(message.text)  # type: ignore[arg-type]
     if not departure_date:
@@ -220,12 +225,17 @@ async def got_departure_date_as_text(
         state,
         session_maker,
         http_session_maker,
+        ticket_view,
     )
 
 
 @router.callback_query(NewDirection.choosing_departure_date)
 async def got_departure_date_from_button(
-    callback: CallbackQuery, state: FSMContext, session_maker, http_session_maker
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_maker,
+    http_session_maker,
+    ticket_view: TicketView,
 ) -> None:
     departure_date: str = callback.data  # type: ignore[assignment]
     await got_departure_date(
@@ -235,6 +245,7 @@ async def got_departure_date_from_button(
         state,
         session_maker,
         http_session_maker,
+        ticket_view,
     )
     await callback.answer()
 
@@ -246,14 +257,15 @@ async def got_departure_date(
     state: FSMContext,
     session_maker,
     http_session_maker,
+    ticket_view: TicketView,
 ) -> None:
-    await state.update_data(departure_date=departure_date)
+    await state.update_data(departure_at=departure_date)
     user_data = await state.get_data()
     if user_data["with_return"]:
         await ask_for_return_date(message, state)
         return
     await add_direction_and_show_result(
-        user_id, state, message, session_maker, http_session_maker
+        user_id, state, message, session_maker, http_session_maker, ticket_view
     )
 
 
@@ -269,7 +281,11 @@ async def ask_for_return_date(message: Message, state: FSMContext) -> None:
 
 @router.message(NewDirection.choosing_return_date, F.text)
 async def got_return_date_as_text(
-    message: Message, state: FSMContext, session_maker, http_session_maker
+    message: Message,
+    state: FSMContext,
+    session_maker,
+    http_session_maker,
+    ticket_view: TicketView,
 ):
     return_date = date_reader.read_date(message.text)  # type: ignore[arg-type]
     if not return_date:
@@ -277,30 +293,45 @@ async def got_return_date_as_text(
             text=f"{i18n.translate('cant_recognize_date_try_again')}. 🔄"
         )
         return
-    await state.update_data(return_date=return_date)
+    await state.update_data(return_at=return_date)
     await add_direction_and_show_result(
-        message.from_user.id, state, message, session_maker, http_session_maker
+        message.from_user.id,
+        state,
+        message,
+        session_maker,
+        http_session_maker,
+        ticket_view,
     )
 
 
 @router.callback_query(NewDirection.choosing_return_date)
 async def got_return_date_from_button(
-    callback: CallbackQuery, state: FSMContext, session_maker, http_session_maker
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_maker,
+    http_session_maker,
+    ticket_view: TicketView,
 ):
     return_date: str = callback.data  # type: ignore[assignment]
-    await state.update_data(return_date=return_date)
+    await state.update_data(return_at=return_date)
     await add_direction_and_show_result(
         callback.from_user.id,
         state,
         callback.message,
         session_maker,
         http_session_maker,
+        ticket_view,
     )
     await callback.answer()
 
 
 async def add_direction_and_show_result(
-    user_id: int, state: FSMContext, message: Message, session_maker, http_session_maker
+    user_id: int,
+    state: FSMContext,
+    message: Message,
+    session_maker,
+    http_session_maker,
+    ticket_view: TicketView,
 ):
     user_data = await state.get_data()
     if not validate_user_data_for_direction(user_data):
@@ -309,18 +340,34 @@ async def add_direction_and_show_result(
         await state.clear()
         return
 
-    direction = FlightDirection(
-        start_code=user_data["start_code"],
-        start_name=user_data["start_name"],
-        end_code=user_data["end_code"],
-        end_name=user_data["end_name"],
-        with_transfer=user_data["with_transfer"],
-        departure_at=user_data["departure_date"],
-        return_at=user_data.get("return_date", None),
-    )
+    del user_data["with_return"]
+    direction = FlightDirection(**user_data)
     tickets_api = AviasalesTicketsApi(
         http_session_maker, config.aviasales_api_token, config.currency
     )
     uow = SqlAlchemyUnitOfWork(session_maker)
-    tickets = await track(user_id, direction, tickets_api, uow)
-    await message.answer(text=str(tickets))
+    try:
+        tickets = await track(user_id, direction, tickets_api, uow)
+    except TicketsAPIConnectionError:
+        text = f'{i18n.translate("smth_went_wrong")} 😔 \n {i18n.translate("try_search_again")} 🔄'
+        await message.answer(text, reply_markup=user_home_kb.keyboard)
+        await state.clear()
+        return
+    except Exception as e:
+        if not isinstance(e, InternalError):
+            logger.error(e)
+        text = f'{i18n.translate("smth_went_wrong")} 😔 \n {i18n.translate("we_fixing_this")} 🔄'
+        await message.answer(text, reply_markup=user_home_kb.keyboard)
+        await state.clear()
+        return
+
+    await message.answer(
+        text=f"✅ {i18n.translate('direction_added_here_are_tickets')}\n👇👇👇"
+    )
+    await message.answer(
+        text=ticket_view.print_tickets(tickets, direction),
+        parse_mode="html",
+        disable_web_page_preview=True,
+        # reply_markup=show_low_prices_calendar_keyboard(direction_id),
+    )
+    await state.clear()

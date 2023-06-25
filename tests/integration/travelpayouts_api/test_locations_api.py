@@ -15,8 +15,8 @@ heathrow_en = Location(code="LHR", name="London Heathrow Airport", country_code=
 @pytest.mark.parametrize(
     "query, location", [("москва", moscow_ru), ("NYC", nyc_ru), ("внукаво", vnukovo_ru)]
 )
-async def test_ru_locale(http_session, query: str, location: Location):
-    locations_api = TravelPayoutsLocationsApi(http_session, "ru")
+async def test_ru_locale(http_session_maker, query: str, location: Location):
+    locations_api = TravelPayoutsLocationsApi(http_session_maker, "ru")
     result = await locations_api.get_locations(query)
     assert result[0] == location
 

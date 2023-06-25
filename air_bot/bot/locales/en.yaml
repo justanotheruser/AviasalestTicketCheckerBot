@@ -33,3 +33,9 @@ december: december
 cant_recognize_date_try_again:
 choose_arrival_date: Choose arrival date
 tracked_directions: Tracked directions
+try_search_again: Try search again.
+we_fixing_this: We are already working on a fix.
+direction_added_here_are_tickets: Direction added, and here are the lowest prices for today
+no_flights: No flights!
+current_prices: current prices
+buy_ticket: buy ticket
