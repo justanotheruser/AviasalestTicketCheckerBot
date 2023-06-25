@@ -54,6 +54,14 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
                 result.append(direction_info)
         return result
 
+    async def get_directions_with_last_update_before(
+        self, last_update: datetime.datetime, limit: int
+    ) -> list[model.FlightDirectionInfo]:
+        sorted_directions = sorted(
+            self.directions, key=lambda direction: direction.last_update
+        )
+        return sorted_directions[: min(limit, len(sorted_directions))]
+
     async def update_price(
         self, direction_id: int, price: float, last_update: datetime.datetime
     ):

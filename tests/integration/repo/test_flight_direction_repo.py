@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -18,7 +18,7 @@ async def test_add_direction_and_get_direction_id(
             moscow2spb_one_way_direction,
             moscow2antalya_roundtrip_direction,
         ]:
-            last_update = datetime.datetime.now().replace(microsecond=0)
+            last_update = datetime.now().replace(microsecond=0)
             direction_id = await repo.add_direction_info(
                 direction, price=100, last_update=last_update
             )
@@ -52,7 +52,7 @@ async def test_get_directions_by_ids(
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         for direction in directions:
-            last_update = datetime.datetime.now().replace(microsecond=0)
+            last_update = datetime.now().replace(microsecond=0)
             direction_id = await repo.add_direction_info(
                 direction, price=100, last_update=last_update
             )
@@ -85,17 +85,62 @@ async def test_get_non_existing_direction_by_ids(mysql_session_factory):
 
 
 @pytest.mark.asyncio
+async def test_get_most_outdated_directions(
+    mysql_session_factory, moscow2spb_one_way_direction
+):
+    direction = moscow2spb_one_way_direction
+    earliest_direction_last_update = datetime.now()
+    time_step = 5
+    last_updates = [
+        earliest_direction_last_update + timedelta(minutes=m)
+        for m in range(0, 30, time_step)
+    ]
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        for last_update in last_updates:
+            await repo.add_direction_info(direction, 100, last_update)
+        await session.commit()
+
+    # Time stamp between 1 and 2 place
+    last_update = last_updates[-1] - timedelta(minutes=time_step // 2)
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        directions = await repo.get_directions_with_last_update_before(
+            last_update, limit=100
+        )
+    assert len(directions) == len(last_updates) - 1
+    selected_update_times = [d.last_update for d in directions]
+    assert selected_update_times == sorted(selected_update_times)
+    assert all(selected_lu < last_update for selected_lu in selected_update_times)
+
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        directions = await repo.get_directions_with_last_update_before(
+            last_update, limit=1
+        )
+    assert len(directions) == 1
+
+    last_update = earliest_direction_last_update - timedelta(seconds=1)
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        directions = await repo.get_directions_with_last_update_before(
+            last_update, limit=100
+        )
+    assert directions == []
+
+
+@pytest.mark.asyncio
 async def test_update_price(mysql_session_factory, moscow2spb_one_way_direction):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         direction_id = await repo.add_direction_info(
-            moscow2spb_one_way_direction, 100, datetime.datetime.now()
+            moscow2spb_one_way_direction, 100, datetime.now()
         )
         await session.commit()
 
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
-        last_update = datetime.datetime.now().replace(microsecond=0)
+        last_update = datetime.now().replace(microsecond=0)
         await repo.update_price(direction_id, 200, last_update)
         await session.commit()
 

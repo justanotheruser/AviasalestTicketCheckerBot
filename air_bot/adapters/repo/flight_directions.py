@@ -54,6 +54,18 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         result = await self.session.execute(stmt)
         return [row[0] for row in result.all()]
 
+    async def get_directions_with_last_update_before(
+        self, last_update: datetime.datetime, limit: int
+    ) -> list[model.FlightDirectionInfo]:
+        stmt = (
+            select(model.FlightDirectionInfo)
+            .where(orm.flight_direction_info_table.c.last_update < last_update)
+            .order_by(orm.flight_direction_info_table.c.last_update)
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        return [row[0] for row in result.all()]
+
     async def update_price(
         self, direction_id: int, price: float, last_update: datetime.datetime
     ):
