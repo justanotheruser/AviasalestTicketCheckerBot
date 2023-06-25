@@ -9,8 +9,10 @@ class TicketView:
     def __init__(self, currency: str):
         if currency == "rub":
             self.currency_symbol = "₽"
+            self.domain = "ru"
         elif currency == "usd":
             self.currency_symbol = "$"
+            self.domain = "com"
         else:
             raise InternalError(f"Unexpected currency: {currency}")
 
@@ -18,13 +20,15 @@ class TicketView:
         if not tickets:
             return i18n.translate("no_flights")
         text = f"<b>{direction.start_name} - {direction.end_name} | {i18n.translate('current_prices')}</b>\n"
-        with_or_without_return = (
-            "↔️ туда-обратно" if direction.return_at else "➡️ в одну сторону"
-        )
-        direction_type = (
-            "↕️ с пересадками" if direction.with_transfer else "➡️ прямой рейс"
-        )
-        text += with_or_without_return + "\n" + direction_type + "\n\n"
+        if direction.return_at:
+            with_or_without_return = f"↔️ {i18n.translate('round_trip_ticket')}"
+        else:
+            with_or_without_return = f"➡️ {i18n.translate('one_way_ticket')}"
+        if direction.with_transfer:
+            direct_or_with_transfer = f"↕️ {i18n.translate('transfer_flight')}"
+        else:
+            direct_or_with_transfer = f"➡️ {i18n.translate('direct_flight')}"
+        text += with_or_without_return + "\n" + direct_or_with_transfer + "\n\n"
         for ticket in tickets:
             text += self.print_ticket(ticket, direction)
             text += "\n------------------------------------\n"
@@ -38,7 +42,7 @@ class TicketView:
     def _print_one_way_ticket(self, ticket: Ticket, direction: FlightDirection) -> str:
         departure_at_str = print_datetime(ticket.departure_at)
         arrival_at_str = print_datetime(ticket.departure_at + ticket.duration_to)
-        ticket_link = get_ticket_link(
+        ticket_link = self._get_ticket_link(
             ticket, i18n.translate("buy_ticket"), parse_mode="html"
         )
         return (
@@ -55,7 +59,7 @@ class TicketView:
         )
         return_at_str = print_datetime(ticket.return_at)
         return_arrival_at_str = print_datetime(ticket.return_at + ticket.duration_back)
-        ticket_link = get_ticket_link(
+        ticket_link = self._get_ticket_link(
             ticket, i18n.translate("buy_ticket"), parse_mode="html"
         )
         return (
@@ -68,14 +72,13 @@ class TicketView:
             f"💳 {ticket.price} {self.currency_symbol} | {ticket_link}"
         )
 
-
-def get_ticket_link(ticket: Ticket, link_text: str, parse_mode: str) -> str:
-    url = f"https://www.aviasales.ru{ticket.link}&marker=18946"
-    if parse_mode == "html":
-        return f'<a href="{url}">{link_text}</a>'
-    elif parse_mode == "Markdownv2":
-        return f"[{link_text}]({url})"
-    raise RuntimeError(f"Invalid parse_mode option: {parse_mode}")
+    def _get_ticket_link(self, ticket: Ticket, link_text: str, parse_mode: str) -> str:
+        url = f"https://www.aviasales.{self.domain}{ticket.link}&marker=18946"
+        if parse_mode == "html":
+            return f'<a href="{url}">{link_text}</a>'
+        elif parse_mode == "Markdownv2":
+            return f"[{link_text}]({url})"
+        raise RuntimeError(f"Invalid parse_mode option: {parse_mode}")
 
 
 def print_datetime(ticket_date: datetime) -> str:

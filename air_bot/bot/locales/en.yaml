@@ -39,3 +39,5 @@ direction_added_here_are_tickets: Direction added, and here are the lowest price
 no_flights: No flights!
 current_prices: current prices
 buy_ticket: buy ticket
+direct_flight: direct flight
+transfer_flight: transfer flight
