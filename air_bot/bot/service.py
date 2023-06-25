@@ -18,13 +18,8 @@ class BotService:
         http_session_maker: HttpSessionMaker,
         session_maker: SessionMaker,
     ):
-        self.config = config
-        self.http_session_maker = http_session_maker
-        self.session_maker = session_maker
-
-    async def start(self) -> None:
         self.dp = Dispatcher(storage=MemoryStorage())
-        self.bot = Bot(token=self.config.bot_token.get_secret_value())
+        self.bot = Bot(token=config.bot_token.get_secret_value())
 
         self.dp.include_router(start.router)
         self.dp.include_router(add_flight_direction.router)
@@ -34,9 +29,9 @@ class BotService:
         # scheduler = Scheduler()
         # asyncio.create_task(scheduler.run_loop())
 
-        self.dp.update.middleware(AddSessionMakerMiddleware(self.session_maker))
-        self.dp.update.middleware(
-            AddHttpSessionMakerMiddleware(self.http_session_maker)
-        )
+        self.dp.update.middleware(AddSessionMakerMiddleware(session_maker))
+        self.dp.update.middleware(AddHttpSessionMakerMiddleware(http_session_maker))
+
+    def start(self) -> None:
         # await self.ticket_price_checker.start()
-        await self.dp.start_polling(self.bot)
+        asyncio.create_task(self.dp.start_polling(self.bot))

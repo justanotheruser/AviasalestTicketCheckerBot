@@ -14,7 +14,7 @@ class App(ServiceWithGracefulShutdown):
 
     async def start(self):
         await self._session_maker.start()
-        await self._bot.start()
+        self._bot.start()
 
     async def stop(self):
         self._http_session_maker.close()
