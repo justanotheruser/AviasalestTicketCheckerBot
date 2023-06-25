@@ -20,8 +20,8 @@ class AbstractLocationsApi(ABC):
 
 
 class TravelPayoutsLocationsApi(AbstractLocationsApi):
-    def __init__(self, session: ClientSession, locale: str):
-        self.session = session
+    def __init__(self, session_maker, locale: str):
+        self.session = session_maker()
         self.locale = locale
 
     async def get_locations(self, airport_or_city: str) -> list[Location]:

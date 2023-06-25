@@ -13,6 +13,7 @@ class BotConfig(BaseSettings):
     db_pass: SecretStr
     db_name: str
     locale: str
+    currency: str
     settings_file_path: str
 
     class Config:

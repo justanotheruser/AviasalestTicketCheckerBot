@@ -4,9 +4,10 @@ from typing import Tuple
 
 import pytest
 import pytest_asyncio
-from aiohttp import ClientSession
 from dotenv import load_dotenv
 from pydantic import SecretStr
+
+from air_bot.http_session import HttpSessionMaker
 
 
 @pytest.fixture
@@ -16,8 +17,8 @@ def token():
 
 
 @pytest_asyncio.fixture
-async def http_session():
-    return ClientSession()
+async def http_session_maker():
+    return HttpSessionMaker()
 
 
 def increment_month(year: int, month: int) -> Tuple[int, int]:

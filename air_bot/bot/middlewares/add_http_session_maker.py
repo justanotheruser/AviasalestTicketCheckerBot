@@ -3,13 +3,13 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from air_bot.adapters.locations_api import TravelPayoutsLocationsApi
+from air_bot.http_session import HttpSessionMaker
 
 
-class AddLocationsApiMiddleware(BaseMiddleware):
-    def __init__(self, locations_api: TravelPayoutsLocationsApi):
+class AddHttpSessionMakerMiddleware(BaseMiddleware):
+    def __init__(self, http_session_maker: HttpSessionMaker):
         super().__init__()
-        self.locations_api = locations_api
+        self.http_session_maker = http_session_maker
 
     async def __call__(
         self,
@@ -17,5 +17,5 @@ class AddLocationsApiMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Any:
-        data["locations_api"] = self.locations_api
+        data["http_session_maker"] = self.http_session_maker
         return await handler(event, data)

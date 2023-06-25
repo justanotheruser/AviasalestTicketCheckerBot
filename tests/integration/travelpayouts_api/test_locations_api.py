@@ -26,15 +26,15 @@ async def test_ru_locale(http_session, query: str, location: Location):
     "query, location",
     [("москва", moscow_en), ("NYC", nyc_en), ("heatrow", heathrow_en)],
 )
-async def test_en_locale(http_session, query: str, location: Location):
-    locations_api = TravelPayoutsLocationsApi(http_session, "en")
+async def test_en_locale(http_session_maker, query: str, location: Location):
+    locations_api = TravelPayoutsLocationsApi(http_session_maker, "en")
     result = await locations_api.get_locations(query)
     assert result[0] == location
 
 
 @pytest.mark.asyncio
-async def test_return_empty_list_for_unknown_location(http_session):
-    locations_api = TravelPayoutsLocationsApi(http_session, "ru")
+async def test_return_empty_list_for_unknown_location(http_session_maker):
+    locations_api = TravelPayoutsLocationsApi(http_session_maker, "ru")
     result = await locations_api.get_locations("город которого нет")
     assert isinstance(result, list)
     assert len(result) == 0

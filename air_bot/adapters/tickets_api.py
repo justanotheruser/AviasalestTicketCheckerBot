@@ -25,8 +25,8 @@ class AbstractTicketsApi(ABC):
 
 
 class AviasalesTicketsApi(AbstractTicketsApi):
-    def __init__(self, session: ClientSession, token: SecretStr, currency: str):
-        self.session = session
+    def __init__(self, http_session_maker, token: SecretStr, currency: str):
+        self.session = http_session_maker()
         self.token = token
         self.currency = currency
 
