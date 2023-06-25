@@ -6,7 +6,7 @@ import pytest
 from fakes import FakeUnitOfWork
 
 from air_bot.domain.model import FlightDirection, Ticket
-from air_bot.service import track
+from air_bot.service.user import track
 
 FLIGHT_DIRECTION_NO_RETURN = FlightDirection(
     start_code="STA",

@@ -1,3 +1,4 @@
+"""This module is for settings that don't change at runtime"""
 import os
 
 from dotenv import load_dotenv
@@ -15,6 +16,7 @@ class BotConfig(BaseSettings):
     locale: str
     currency: str
     settings_file_path: str
+    env: str
 
     class Config:
         env_prefix = "AIR_BOT_"

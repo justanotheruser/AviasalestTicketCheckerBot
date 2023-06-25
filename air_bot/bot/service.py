@@ -35,6 +35,5 @@ class BotService:
         self.dp.update.middleware(AddHttpSessionMakerMiddleware(http_session_maker))
         self.dp.update.middleware(AddTicketViewMiddleware(TicketView(config.currency)))
 
-    def start(self) -> None:
-        # await self.ticket_price_checker.start()
-        asyncio.create_task(self.dp.start_polling(self.bot))
+    async def start(self) -> None:
+        await self.dp.start_polling(self.bot)

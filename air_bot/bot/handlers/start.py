@@ -7,7 +7,7 @@ from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
 from air_bot.bot.i18n import i18n
 from air_bot.bot.keyboards.add_flight_direction_kb import add_flight_direction_kb
 from air_bot.bot.keyboards.user_home_kb import user_home_kb
-from air_bot.service import add_user
+from air_bot.service.user import add_user
 
 router = Router()
 

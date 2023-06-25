@@ -20,7 +20,7 @@ from air_bot.bot.utils.validation import validate_user_data_for_direction
 from air_bot.config import config
 from air_bot.domain.exceptions import InternalError, TicketsAPIConnectionError
 from air_bot.domain.model import FlightDirection
-from air_bot.service import track
+from air_bot.service.user import track
 
 # from air_bot.bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_keyboard
 

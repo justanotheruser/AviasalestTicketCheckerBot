@@ -1,12 +1,11 @@
 from aiogram import Router
 from aiogram.filters import Text
-from aiogram.types import CallbackQuery, Message
-from loguru import logger
+from aiogram.types import Message
 
 from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
 from air_bot.bot.i18n import i18n
 from air_bot.bot.keyboards.user_home_kb import user_home_kb
-from air_bot.service import get_user_directions
+from air_bot.service.user import get_user_directions
 
 router = Router()
 
