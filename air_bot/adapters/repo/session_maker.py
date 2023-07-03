@@ -16,7 +16,8 @@ class SessionMaker(AbstractSessionMaker):
     def __init__(self):
         logging.basicConfig()
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
-        self.engine = create_async_engine(config.get_mysql_uri())
+        self.engine = create_async_engine(config.get_mysql_uri(),
+                                          pool_pre_ping=True)
 
     async def start(self):
         self.session_maker = async_sessionmaker(
