@@ -21,9 +21,9 @@ def moscow_spb_direction(with_transfer: bool, departure_at: str, return_at: str 
 @pytest.mark.parametrize("with_transfer", [False, True])
 @pytest.mark.parametrize("with_return", [False, True])
 async def test_get_tickets_success(
-    http_session_maker, token, this_month, next_month, with_transfer, with_return
+    http_session_maker, this_month, next_month, with_transfer, with_return
 ):
-    api = AviasalesTicketsApi(http_session_maker, token, "rub")
+    api = AviasalesTicketsApi(http_session_maker)
     return_at = next_month if with_return else None
     direction = moscow_spb_direction(
         with_transfer=with_transfer, departure_at=this_month, return_at=return_at
@@ -37,9 +37,9 @@ async def test_get_tickets_success(
 
 @pytest.mark.asyncio
 async def test_diff_between_max_depart_date_and_min_return_date_exceeds_supported_minimum(
-    http_session_maker, token, this_month, next_next_month, caplog
+    http_session_maker, this_month, next_next_month, caplog
 ):
-    api = AviasalesTicketsApi(http_session_maker, token, "rub")
+    api = AviasalesTicketsApi(http_session_maker)
     direction = moscow_spb_direction(
         with_transfer=True, departure_at=this_month, return_at=next_next_month
     )

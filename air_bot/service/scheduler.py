@@ -32,9 +32,9 @@ class ServiceScheduler:
     async def _schedule(self):
         if self.direction_updater_schedule:
             await self.scheduler.remove_schedule(self.direction_updater_schedule)
-        scheduler_settings = self.setting_storage.settings.scheduler
-        interval = scheduler_settings.directions_update_interval
-        if scheduler_settings.directions_update_interval_units == Interval.MINUTES:
+        settings = self.setting_storage.settings.scheduler
+        interval = settings.directions_update_interval
+        if settings.directions_update_interval_units == Interval.MINUTES:
             trigger = IntervalTrigger(minutes=interval)
         else:
             trigger = IntervalTrigger(seconds=interval)

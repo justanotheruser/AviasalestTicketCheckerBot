@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 from aiohttp import ClientConnectionError, ClientSession
 from async_timeout import timeout
 from loguru import logger
-from pydantic import SecretStr
 
+from air_bot.config import config
 from air_bot.domain.exceptions import (
     TicketsAPIConnectionError,
     TicketsAPIError,
@@ -24,10 +24,10 @@ class AbstractTicketsApi(ABC):
 
 
 class AviasalesTicketsApi(AbstractTicketsApi):
-    def __init__(self, http_session_maker, token: SecretStr, currency: str):
+    def __init__(self, http_session_maker):
         self.session = http_session_maker()
-        self.token = token
-        self.currency = currency
+        self.token = config.aviasales_api_token
+        self.currency = config.currency
 
     async def get_tickets(
         self, direction: FlightDirection, limit: int = 3

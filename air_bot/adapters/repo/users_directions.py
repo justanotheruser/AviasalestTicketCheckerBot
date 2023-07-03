@@ -32,3 +32,10 @@ class SqlAlchemyUserDirectionRepo(AbstractUserDirectionRepo):
         )
         result = await self.session.execute(stmt)
         return [row[0].direction_id for row in result.all()]
+
+    async def get_users(self, direction_id: int) -> list[int]:
+        stmt = select(UserDirectionDB).where(
+            orm.users_directions_table.c.direction_id == direction_id
+        )
+        result = await self.session.execute(stmt)
+        return [row[0].user_id for row in result.all()]

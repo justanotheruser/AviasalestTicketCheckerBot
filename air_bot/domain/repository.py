@@ -59,6 +59,11 @@ class AbstractUserDirectionRepo(ABC):
         """Returns list of direction ids tracked by this user"""
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_users(self, direction_id: int) -> list[int]:
+        """Returns list of users that track this direction"""
+        raise NotImplementedError
+
 
 class AbstractTicketRepo(ABC):
     @abstractmethod

@@ -1,19 +1,10 @@
-import os
 from datetime import datetime
 from typing import Tuple
 
 import pytest
 import pytest_asyncio
-from dotenv import load_dotenv
-from pydantic import SecretStr
 
 from air_bot.http_session import HttpSessionMaker
-
-
-@pytest.fixture
-def token():
-    load_dotenv()
-    return SecretStr(os.getenv("AIR_BOT_AVIASALES_API_TOKEN"))
 
 
 @pytest_asyncio.fixture

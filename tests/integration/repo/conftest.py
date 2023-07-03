@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from air_bot.adapters.repo.flight_directions import SqlAlchemyFlightDirectionRepo
 from air_bot.adapters.repo.orm import metadata
-from air_bot.domain.model import FlightDirection
 
 
 @pytest_asyncio.fixture
@@ -43,32 +42,6 @@ async def mysql_db_engine():
 @pytest_asyncio.fixture
 async def mysql_session_factory(mysql_db_engine) -> async_sessionmaker:
     return async_sessionmaker(bind=mysql_db_engine, expire_on_commit=False)
-
-
-@pytest_asyncio.fixture
-def moscow2spb_one_way_direction():
-    return FlightDirection(
-        start_code="MOS",
-        start_name="Moscow",
-        end_code="LEN",
-        end_name="Saint-Petersburg",
-        with_transfer=False,
-        departure_at="2023-05-16",
-        return_at=None,
-    )
-
-
-@pytest_asyncio.fixture
-def moscow2antalya_roundtrip_direction():
-    return FlightDirection(
-        start_code="MOS",
-        start_name="Moscow",
-        end_code="END",
-        end_name="End",
-        with_transfer=False,
-        departure_at="2023-05-16",
-        return_at="2023-06",
-    )
 
 
 @pytest_asyncio.fixture

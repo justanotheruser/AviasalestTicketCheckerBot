@@ -90,6 +90,9 @@ class FakeUserFlightDirectionRepo(repository.AbstractUserDirectionRepo):
     async def get_directions(self, user_id: int):
         return [ud[1] for ud in self.users_directions if ud[0] == user_id]
 
+    async def get_users(self, direction_id: int) -> list[int]:
+        return [ud[0] for ud in self.users_directions if ud[1] == direction_id]
+
 
 class FakeTicketRepo(repository.AbstractTicketRepo):
     def __init__(self, tickets: list[Tuple[model.Ticket, int]] = None):

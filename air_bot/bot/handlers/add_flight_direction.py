@@ -342,9 +342,7 @@ async def add_direction_and_show_result(
 
     del user_data["with_return"]
     direction = FlightDirection(**user_data)
-    tickets_api = AviasalesTicketsApi(
-        http_session_maker, config.aviasales_api_token, config.currency
-    )
+    tickets_api = AviasalesTicketsApi(http_session_maker)
     uow = SqlAlchemyUnitOfWork(session_maker)
     try:
         tickets = await track(user_id, direction, tickets_api, uow)
