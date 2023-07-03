@@ -93,6 +93,13 @@ class FakeUserFlightDirectionRepo(repository.AbstractUserDirectionRepo):
     async def get_users(self, direction_id: int) -> list[int]:
         return [ud[0] for ud in self.users_directions if ud[1] == direction_id]
 
+    async def remove(self, user_id: int, direction_id: int):
+        self.users_directions = [
+            ud
+            for ud in self.users_directions
+            if not (ud[0] == user_id and ud[1] == direction_id)
+        ]
+
 
 class FakeTicketRepo(repository.AbstractTicketRepo):
     def __init__(self, tickets: list[Tuple[model.Ticket, int]] = None):
@@ -105,8 +112,13 @@ class FakeTicketRepo(repository.AbstractTicketRepo):
             self.ticket_rows.append((ticket, direction_id))
         return True
 
-    async def get_direction_tickets(self, direction_id: int) -> list[model.Ticket]:
-        return [row[0] for row in self.ticket_rows if row[1] == direction_id]
+    async def get_direction_tickets(
+        self, direction_id: int, limit: int | None = None
+    ) -> list[model.Ticket]:
+        tickets = [row[0] for row in self.ticket_rows if row[1] == direction_id]
+        if limit:
+            tickets = tickets[: min(len(tickets), limit)]
+        return tickets
 
     async def remove_for_direction(self, direction_id: int):
         self.ticket_rows = [row for row in self.ticket_rows if row[1] != direction_id]

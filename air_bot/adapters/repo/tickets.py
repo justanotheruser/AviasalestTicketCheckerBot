@@ -56,8 +56,16 @@ class SqlAlchemyTicketRepo(AbstractTicketRepo):
             stmt = stmt.bindparams(**ticket_db_dict)
             await self.session.execute(stmt)
 
-    async def get_direction_tickets(self, direction_id: int) -> list[model.Ticket]:
-        stmt = select(TicketDB).filter_by(direction_id=direction_id)
+    async def get_direction_tickets(
+        self, direction_id: int, limit: int | None = None
+    ) -> list[model.Ticket]:
+        stmt = (
+            select(TicketDB)
+            .filter_by(direction_id=direction_id)
+            .order_by(orm.tickets_table.c.price)
+        )
+        if limit:
+            stmt = stmt.limit(limit)
         result = await self.session.execute(stmt)
         tickets = []
         for row in result:

@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 
-from sqlalchemy import select, text
+from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
-from air_bot.domain import model
 from air_bot.domain.repository import AbstractUserDirectionRepo
 
 
@@ -39,3 +38,11 @@ class SqlAlchemyUserDirectionRepo(AbstractUserDirectionRepo):
         )
         result = await self.session.execute(stmt)
         return [row[0].user_id for row in result.all()]
+
+    async def remove(self, user_id: int, direction_id: int):
+        stmt = (
+            delete(UserDirectionDB)
+            .where(orm.users_directions_table.c.user_id == user_id)
+            .where(orm.users_directions_table.c.direction_id == direction_id)
+        )
+        await self.session.execute(stmt)

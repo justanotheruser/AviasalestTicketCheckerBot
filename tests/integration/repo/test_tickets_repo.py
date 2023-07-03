@@ -47,5 +47,13 @@ async def test_add_tickets_for_direction_and_get_them_back(
         selected_tickets = await repo.get_direction_tickets(
             moscow2spb_one_way_direction_id
         )
-
+        await session.commit()
     assert moscow2spb_tickets == unordered(selected_tickets)
+
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyTicketRepo(session)
+        selected_tickets = await repo.get_direction_tickets(
+            moscow2spb_one_way_direction_id, limit=1
+        )
+        await session.commit()
+    assert selected_tickets == [moscow2spb_tickets[0]]

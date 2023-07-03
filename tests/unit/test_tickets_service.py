@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 from fakes import FakeUnitOfWork
+from pytest_unordered import unordered
 
 from air_bot.domain.model import FlightDirection, Ticket
 from air_bot.service.user import track
@@ -90,6 +91,8 @@ async def test_add_new_direction_and_get_tickets():
     user_directions = await uow.users_directions.get_directions(user_id)
     assert directions_info[0].direction == FLIGHT_DIRECTION_WITH_RETURN
     assert user_directions == [direction_id]
+    tickets_in_db = await uow.tickets.get_direction_tickets(direction_id)
+    assert tickets_in_db == unordered(tickets)
 
 
 @pytest.mark.asyncio

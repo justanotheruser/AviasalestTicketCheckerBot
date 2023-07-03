@@ -48,14 +48,13 @@ async def track(
         if tickets:
             got_tickets_from_api = True
 
-    if not tickets:
-        if direction_id is None:
-            async with uow:
-                direction_id = await uow.flight_directions.add_direction_info(
-                    direction, None, datetime.datetime.now()
-                )
-                await uow.users_directions.add(user_id, direction_id)
-                await uow.commit()
+    if direction_id is None and not tickets:
+        async with uow:
+            direction_id = await uow.flight_directions.add_direction_info(
+                direction, None, datetime.datetime.now()
+            )
+            await uow.users_directions.add(user_id, direction_id)
+            await uow.commit()
         return []
 
     if got_tickets_from_api:
@@ -84,4 +83,6 @@ async def get_user_directions(
         direction_ids = await uow.users_directions.get_directions(user_id)
         if not direction_ids:
             return []
-        return await uow.flight_directions.get_directions_info(direction_ids)
+        directions = await uow.flight_directions.get_directions_info(direction_ids)
+        await uow.commit()
+    return directions

@@ -26,6 +26,10 @@ class AbstractFlightDirectionRepo(ABC):
     ) -> list[model.FlightDirectionInfo]:
         raise NotImplementedError
 
+    async def get_direction_info(self, direction_id: int) -> model.FlightDirectionInfo:
+        directions = await self.get_directions_info([direction_id])
+        return directions[0]
+
     @abstractmethod
     async def get_directions_with_last_update_before(
         self, last_update: datetime.datetime, limit: int
@@ -64,6 +68,10 @@ class AbstractUserDirectionRepo(ABC):
         """Returns list of users that track this direction"""
         raise NotImplementedError
 
+    @abstractmethod
+    async def remove(self, user_id: int, direction_id: int):
+        raise NotImplementedError
+
 
 class AbstractTicketRepo(ABC):
     @abstractmethod
@@ -71,7 +79,9 @@ class AbstractTicketRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_direction_tickets(self, direction_id: int) -> list[model.Ticket]:
+    async def get_direction_tickets(
+        self, direction_id: int, limit: int | None = None
+    ) -> list[model.Ticket]:
         raise NotImplementedError
 
     @abstractmethod

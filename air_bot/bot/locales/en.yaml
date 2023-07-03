@@ -41,3 +41,9 @@ current_prices: current prices
 buy_ticket: buy ticket
 direct_flight: direct flight
 transfer_flight: transfer flight
+track_by_period: Track by period
+departure_to: departure to
+departure_back: departure back
+detailed_information: Detailed information
+delete_direction: Delete
+direction_deleted: Direction deleted

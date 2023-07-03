@@ -41,3 +41,9 @@ current_prices: текущие цены
 buy_ticket: купить билет
 direct_flight: прямой рейс
 transfer_flight: с пересадками
+track_by_period: Отслеживать за период
+departure_to: отправление туда
+departure_back: отправление обратно
+detailed_information: Подробная информация
+delete_direction: Удалить
+direction_deleted: Направление удалено

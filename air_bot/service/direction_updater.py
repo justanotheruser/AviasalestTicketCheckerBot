@@ -33,6 +33,10 @@ class DirectionUpdater:
         aviasales_api = AviasalesTicketsApi(self.http_session_maker)
         await update(uow, aviasales_api, self.bot, self.settings_storage.settings)
 
+    async def remove_outdated(self):
+        """Removes directions with either passed departure dates or not tracked by anyone"""
+        pass
+
 
 async def update(
     uow: AbstractUnitOfWork, aviasales_api: AbstractTicketsApi, bot, settings: Settings
