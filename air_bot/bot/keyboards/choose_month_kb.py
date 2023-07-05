@@ -2,26 +2,10 @@ from datetime import datetime
 
 from aiogram import types
 
-from air_bot.bot.i18n import i18n
+from air_bot.bot.presentation.utils import NUMBER2MONTH_NAME
 
 
 class ChooseMonthKb:
-    def __init__(self):
-        self.month_number2name = {
-            1: i18n.translate("january"),
-            2: i18n.translate("february"),
-            3: i18n.translate("march"),
-            4: i18n.translate("april"),
-            5: i18n.translate("may"),
-            6: i18n.translate("june"),
-            7: i18n.translate("july"),
-            8: i18n.translate("august"),
-            9: i18n.translate("september"),
-            10: i18n.translate("october"),
-            11: i18n.translate("november"),
-            12: i18n.translate("december"),
-        }
-
     def keyboard(self) -> types.InlineKeyboardMarkup:
         current_month = datetime.now().month
         current_year = datetime.now().year
@@ -39,7 +23,7 @@ class ChooseMonthKb:
                 year_month = f"{year}-{month:02}"
                 row.append(
                     types.InlineKeyboardButton(
-                        text=self.month_number2name[month], callback_data=year_month
+                        text=NUMBER2MONTH_NAME[month], callback_data=year_month
                     )
                 )
                 if months[month_idx] == 12:

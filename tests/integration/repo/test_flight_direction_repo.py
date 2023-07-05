@@ -77,11 +77,19 @@ async def test_get_directions_by_ids(
 
 
 @pytest.mark.asyncio
-async def test_get_non_existing_direction_by_ids(mysql_session_factory):
+async def test_get_non_existing_directions_by_ids(mysql_session_factory):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         directions = await repo.get_directions_info([-1])
         assert directions == []
+
+
+@pytest.mark.asyncio
+async def test_get_non_existing_direction_by_id(mysql_session_factory):
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        direction = await repo.get_direction_info(-1)
+        assert direction is None
 
 
 @pytest.mark.asyncio

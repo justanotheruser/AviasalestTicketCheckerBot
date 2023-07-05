@@ -4,6 +4,9 @@ from aiogram.types import CallbackQuery, Message
 
 from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
 from air_bot.bot.i18n import i18n
+from air_bot.bot.keyboards.low_prices_calendar_kb import (
+    show_low_prices_calendar_keyboard,
+)
 from air_bot.bot.keyboards.user_home_kb import user_home_kb
 from air_bot.bot.keyboards.user_profile_kb import flight_direction_actions
 from air_bot.bot.presentation.directions import print_direction
@@ -43,8 +46,8 @@ async def show_direction_info(
         await uow.commit()
     if not tickets:
         await callback.message.answer(  # type: ignore[union-attr]
-            "Рейсов нет!",
-            # reply_markup=show_low_prices_calendar_keyboard(direction_id)
+            i18n.translate("no_flights"),
+            reply_markup=show_low_prices_calendar_keyboard(direction_id),
         )
         await callback.answer()
         return
@@ -59,7 +62,7 @@ async def show_direction_info(
         text=text,
         parse_mode="html",
         disable_web_page_preview=True,
-        # reply_markup=show_low_prices_calendar_keyboard(direction_id),
+        reply_markup=show_low_prices_calendar_keyboard(direction_id),
     )
     await callback.answer()
 

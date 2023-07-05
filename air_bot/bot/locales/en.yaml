@@ -13,6 +13,7 @@ transfer_flights: transfer flights
 choose_departure_point: Choose point of departure
 smth_went_wrong: Something went wrong.
 try_again: Try again.
+try_again_later: Try again later.
 no_such_location: No such location.
 choose_arrival_point: Choose point of arrival
 specify_exact_location: Specify exactly what you need
@@ -47,3 +48,5 @@ departure_back: departure back
 detailed_information: Detailed information
 delete_direction: Delete
 direction_deleted: Direction deleted
+low_price_calendar: low price calendar
+button_is_outdated: Button is outdated

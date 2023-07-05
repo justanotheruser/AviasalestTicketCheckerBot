@@ -13,6 +13,7 @@ transfer_flights: с пересадками
 choose_departure_point: Укажите пункт отправления
 smth_went_wrong: Что-то пошло не так.
 try_again: Попробуйте еще раз.
+try_again_later: Повторите попытку позже.
 no_such_location: Такого пункта нет.
 choose_arrival_point: Укажите пункт прибытия
 specify_exact_location: Уточните, что именно нужно
@@ -47,3 +48,5 @@ departure_back: отправление обратно
 detailed_information: Подробная информация
 delete_direction: Удалить
 direction_deleted: Направление удалено
+low_price_calendar: календарь низких цен
+button_is_outdated: Кнопка устарела

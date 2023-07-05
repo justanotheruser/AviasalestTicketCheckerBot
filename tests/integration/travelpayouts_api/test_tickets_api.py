@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 
 from air_bot.adapters.tickets_api import AviasalesTicketsApi
@@ -50,3 +52,13 @@ async def test_diff_between_max_depart_date_and_min_return_date_exceeds_supporte
         "diff between max depart date and min return date exceeds supported maximum of 30"
         in caplog.messages[0]
     )
+
+
+@pytest.mark.asyncio
+async def test_get_cheapest_tickets_for_month(http_session_maker, next_month):
+    api = AviasalesTicketsApi(http_session_maker)
+    direction = moscow_spb_direction(
+        with_transfer=True, departure_at=next_month, return_at=None
+    )
+    now = datetime.now()
+    await api.get_cheapest_tickets_for_month(direction, now.year, now.month)
