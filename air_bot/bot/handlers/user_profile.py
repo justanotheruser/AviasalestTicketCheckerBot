@@ -11,7 +11,10 @@ from air_bot.bot.keyboards.user_home_kb import user_home_kb
 from air_bot.bot.keyboards.user_profile_kb import flight_direction_actions
 from air_bot.bot.presentation.directions import print_direction
 from air_bot.bot.presentation.tickets import TicketView
-from air_bot.service.user import get_user_directions
+from air_bot.service.user import (
+    delete_direction_if_no_longer_tracked,
+    get_user_directions,
+)
 
 router = Router()
 
@@ -83,3 +86,4 @@ async def delete_direction(
         reply_markup=user_home_kb.keyboard,
     )
     await callback.answer()
+    await delete_direction_if_no_longer_tracked(uow, direction_id)

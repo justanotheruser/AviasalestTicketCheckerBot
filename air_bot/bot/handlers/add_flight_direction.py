@@ -12,6 +12,9 @@ from air_bot.bot.i18n import i18n
 from air_bot.bot.keyboards.choose_location_kb import choose_location_keyboard
 from air_bot.bot.keyboards.choose_month_kb import choose_month_kb
 from air_bot.bot.keyboards.direct_or_transfer_kb import direct_or_transfer_kb
+from air_bot.bot.keyboards.low_prices_calendar_kb import (
+    show_low_prices_calendar_keyboard,
+)
 from air_bot.bot.keyboards.user_home_kb import user_home_kb
 from air_bot.bot.keyboards.with_or_without_return_kb import with_or_without_return_kb
 from air_bot.bot.presentation.tickets import TicketView
@@ -21,9 +24,6 @@ from air_bot.config import config
 from air_bot.domain.exceptions import InternalError, TicketsAPIConnectionError
 from air_bot.domain.model import FlightDirection
 from air_bot.service.user import track
-
-# from air_bot.bot.keyboards.low_prices_calendar_kb import show_low_prices_calendar_keyboard
-
 
 router = Router()
 
@@ -345,7 +345,7 @@ async def add_direction_and_show_result(
     tickets_api = AviasalesTicketsApi(http_session_maker)
     uow = SqlAlchemyUnitOfWork(session_maker)
     try:
-        tickets = await track(user_id, direction, tickets_api, uow)
+        tickets, direction_id = await track(user_id, direction, tickets_api, uow)
     except TicketsAPIConnectionError:
         text = f'{i18n.translate("smth_went_wrong")} 😔 \n {i18n.translate("try_search_again")} 🔄'
         await message.answer(text, reply_markup=user_home_kb.keyboard)
@@ -366,6 +366,6 @@ async def add_direction_and_show_result(
         text=ticket_view.print_tickets(tickets, direction),
         parse_mode="html",
         disable_web_page_preview=True,
-        # reply_markup=show_low_prices_calendar_keyboard(direction_id),
+        reply_markup=show_low_prices_calendar_keyboard(direction_id),
     )
     await state.clear()

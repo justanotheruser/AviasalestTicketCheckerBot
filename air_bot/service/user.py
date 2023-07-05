@@ -1,11 +1,11 @@
 import datetime
+from typing import Tuple
 
 import asyncmy.errors
 from loguru import logger
 
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
 from air_bot.adapters.tickets_api import AbstractTicketsApi
-from air_bot.domain.exceptions import TicketsAPIConnectionError
 from air_bot.domain.model import FlightDirection, FlightDirectionInfo, Ticket
 
 N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION = 3
@@ -28,7 +28,7 @@ async def track(
     direction: FlightDirection,
     tickets_api: AbstractTicketsApi,
     uow: AbstractUnitOfWork,
-) -> list[Ticket] | None:
+) -> Tuple[list[Ticket] | None, int]:
     """Adds new direction to directions tracked by user with user_id. Returns list of cheapest
     tickets for this direction or None if request to Aviasales API failed for some reason.
     If direction is already in DB, returns tickets from DB."""
@@ -55,7 +55,7 @@ async def track(
             )
             await uow.users_directions.add(user_id, direction_id)
             await uow.commit()
-        return []
+        return [], direction_id
 
     if got_tickets_from_api:
         cheapest_price = tickets[0].price
@@ -73,7 +73,7 @@ async def track(
             await uow.tickets.add(tickets, direction_id)
             await uow.commit()
 
-    return tickets
+    return tickets, direction_id
 
 
 async def get_user_directions(
@@ -86,3 +86,13 @@ async def get_user_directions(
         directions = await uow.flight_directions.get_directions_info(direction_ids)
         await uow.commit()
     return directions
+
+
+async def delete_direction_if_no_longer_tracked(
+    uow: AbstractUnitOfWork, direction_id: int
+):
+    async with uow:
+        users = await uow.users_directions.get_users(direction_id)
+        if not users:
+            await uow.flight_directions.delete_directions([direction_id])
+        await uow.commit()

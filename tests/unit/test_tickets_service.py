@@ -38,9 +38,8 @@ async def test_add_new_direction_with_no_tickets_available(direction):
     tickets_api = Mock(get_tickets=AsyncMock(return_value=[]))
     uow = FakeUnitOfWork()
     user_id = 1
-    tickets = await track(user_id, direction, tickets_api, uow)
+    tickets, direction_id = await track(user_id, direction, tickets_api, uow)
     assert tickets == []
-    direction_id = await uow.flight_directions.get_direction_id(direction)
     directions_info = await uow.flight_directions.get_directions_info([direction_id])
     user_directions = await uow.users_directions.get_directions(user_id)
     assert directions_info[0].direction == direction
@@ -80,13 +79,10 @@ async def test_add_new_direction_and_get_tickets():
     tickets_api = Mock(get_tickets=AsyncMock(return_value=tickets))
     uow = FakeUnitOfWork()
     user_id = 1
-    received_tickets = await track(
+    received_tickets, direction_id = await track(
         user_id, FLIGHT_DIRECTION_WITH_RETURN, tickets_api, uow
     )
     assert received_tickets == tickets
-    direction_id = await uow.flight_directions.get_direction_id(
-        FLIGHT_DIRECTION_WITH_RETURN
-    )
     directions_info = await uow.flight_directions.get_directions_info([direction_id])
     user_directions = await uow.users_directions.get_directions(user_id)
     assert directions_info[0].direction == FLIGHT_DIRECTION_WITH_RETURN
@@ -105,9 +101,10 @@ async def test_get_tickets_from_repo_for_existing_direction():
     )
     await uow.tickets.add(tickets, direction_id)
     user_id = 1
-    received_tickets = await track(
+    received_tickets, tracked_direction_id = await track(
         user_id, FLIGHT_DIRECTION_NO_RETURN, tickets_api, uow
     )
+    assert tracked_direction_id == direction_id
     assert received_tickets == tickets
 
 
@@ -120,9 +117,10 @@ async def test_get_tickets_from_api_for_existing_direction_with_no_tickets():
     direction_id = await uow.flight_directions.add_direction_info(
         FLIGHT_DIRECTION_WITH_RETURN, 1000, datetime.datetime.now()
     )
-    received_tickets = await track(
+    received_tickets, tracked_direction_id = await track(
         user_id, FLIGHT_DIRECTION_WITH_RETURN, tickets_api, uow
     )
     assert received_tickets == tickets
+    assert tracked_direction_id == direction_id
     tickets_in_repo = await uow.tickets.get_direction_tickets(direction_id)
     assert tickets_in_repo == tickets

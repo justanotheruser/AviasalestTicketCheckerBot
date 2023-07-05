@@ -3,12 +3,12 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from air_bot.bot.i18n import i18n
 
 
-def show_low_prices_calendar_keyboard(flight_direction_id: int) -> InlineKeyboardMarkup:
+def show_low_prices_calendar_keyboard(direction_id: int) -> InlineKeyboardMarkup:
     kb = [
         [
             InlineKeyboardButton(
                 text=f"📅 {i18n.translate('low_price_calendar')}",
-                callback_data=f"show_low_prices_calendar|{flight_direction_id}",
+                callback_data=f"show_low_prices_calendar|{direction_id}",
             )
         ]
     ]
