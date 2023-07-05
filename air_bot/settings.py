@@ -27,7 +27,8 @@ class DirectionUpdaterSettings:
 
 
 @dataclass(frozen=True)
-class NotificationsSettings:
+class UsersSettings:
+    max_directions_per_user: int
     price_reduction_threshold_percents: int
 
 
@@ -35,7 +36,7 @@ class NotificationsSettings:
 class Settings:
     scheduler: SchedulerSetting
     direction_updater: DirectionUpdaterSettings
-    notifications: NotificationsSettings
+    users: UsersSettings
 
 
 class SettingsStorage:
@@ -73,11 +74,11 @@ def read_config(filepath: str) -> Settings:
     direction_updater = _parse_direction_updater_settings(
         raw_config["direction_updater"]
     )
-    notifications = _parse_notifications_settings(raw_config["notifications"])
+    users = _parse_users_settings(raw_config["users"])
     return Settings(
         scheduler=scheduler,
         direction_updater=direction_updater,
-        notifications=notifications,
+        users=users,
     )
 
 
@@ -106,9 +107,10 @@ def _parse_direction_updater_settings(config):
     )
 
 
-def _parse_notifications_settings(config):
-    return NotificationsSettings(
+def _parse_users_settings(config):
+    return UsersSettings(
+        max_directions_per_user=int(config["max_directions_per_user"]),
         price_reduction_threshold_percents=int(
             config["price_reduction_threshold_percents"]
-        )
+        ),
     )

@@ -4,10 +4,10 @@ import textwrap
 from air_bot.settings import (
     DirectionUpdaterSettings,
     Interval,
-    NotificationsSettings,
     SchedulerSetting,
     Settings,
     SettingsStorage,
+    UsersSettings,
 )
 
 
@@ -24,8 +24,9 @@ def test_read_settings(tmp_path):
         needs_update_after = 60
         max_directions_for_single_update = 3900
         
-        [notifications]
-        price_reduction_threshold_percents = 10
+        [users]
+        max_directions_per_user = 10
+        price_reduction_threshold_percents = 5
     """
         )
     )
@@ -38,5 +39,5 @@ def test_read_settings(tmp_path):
         DirectionUpdaterSettings(
             needs_update_after=60, max_directions_for_single_update=3900
         ),
-        NotificationsSettings(price_reduction_threshold_percents=10),
+        UsersSettings(max_directions_per_user=10, price_reduction_threshold_percents=5),
     )

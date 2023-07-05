@@ -23,7 +23,8 @@ from air_bot.bot.utils.validation import validate_user_data_for_direction
 from air_bot.config import config
 from air_bot.domain.exceptions import InternalError, TicketsAPIConnectionError
 from air_bot.domain.model import FlightDirection
-from air_bot.service.user import track
+from air_bot.service.user import check_if_new_tracking_available, track
+from air_bot.settings import SettingsStorage
 
 router = Router()
 
@@ -41,9 +42,14 @@ class NewDirection(StatesGroup):
 
 @router.callback_query(Text(text="add_flight_direction"))
 async def add_flight_direction_inline(
-    callback: CallbackQuery, state: FSMContext
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_maker,
+    settings_storage: SettingsStorage,
 ) -> None:
-    await add_flight_direction(callback.message, state)
+    await add_flight_direction(
+        callback.message, state, session_maker, settings_storage, callback.from_user.id
+    )
     await callback.answer()
 
 
@@ -58,7 +64,20 @@ async def cmd_cancel(message: Message, state: FSMContext) -> None:
 
 @router.message(Text(text=user_home_kb.new_search_btn_text))
 @router.message(Command(commands=["search"]))
-async def add_flight_direction(message: Message, state: FSMContext) -> None:
+async def add_flight_direction(
+    message: Message,
+    state: FSMContext,
+    session_maker,
+    settings_storage: SettingsStorage,
+    user_id=None,
+):
+    if user_id is None:
+        # This is so we get correct user id for both usual and inline buttons
+        user_id = message.from_user.id
+    uow = SqlAlchemyUnitOfWork(session_maker)
+    if not await check_if_new_tracking_available(settings_storage, uow, user_id):
+        await message.answer(text=i18n.translate("you_reached_tracking_limit"))
+        return
     await message.answer(
         f'{i18n.translate("choose_search_type")} 👇',
         reply_markup=with_or_without_return_kb.keyboard,

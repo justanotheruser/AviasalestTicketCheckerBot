@@ -50,3 +50,4 @@ delete_direction: Удалить
 direction_deleted: Направление удалено
 low_price_calendar: календарь низких цен
 button_is_outdated: Кнопка устарела
+you_reached_tracking_limit: Вы достгили максимального количества отслеживаемых направлений

@@ -11,12 +11,14 @@ from air_bot.bot.handlers import (
 from air_bot.bot.middlewares.add_calendar_view import AddCalendarViewMiddleware
 from air_bot.bot.middlewares.add_http_session_maker import AddHttpSessionMakerMiddleware
 from air_bot.bot.middlewares.add_session_maker import AddSessionMakerMiddleware
+from air_bot.bot.middlewares.add_settings_storage import AddSettingsStorageMiddleware
 from air_bot.bot.middlewares.add_ticket_view import AddTicketViewMiddleware
 from air_bot.bot.presentation.low_price_calendar import CalendarView
 from air_bot.bot.presentation.tickets import TicketView
 from air_bot.config import BotConfig
 from air_bot.domain.model import FlightDirection, Ticket
 from air_bot.http_session import HttpSessionMaker
+from air_bot.settings import SettingsStorage
 
 
 class BotService:
@@ -25,6 +27,7 @@ class BotService:
         config: BotConfig,
         http_session_maker: HttpSessionMaker,
         session_maker: SessionMaker,
+        settings_storage: SettingsStorage,
     ):
         self.dp = Dispatcher(storage=MemoryStorage())
         self.bot = Bot(token=config.bot_token.get_secret_value())
@@ -36,6 +39,7 @@ class BotService:
 
         self.dp.update.middleware(AddSessionMakerMiddleware(session_maker))
         self.dp.update.middleware(AddHttpSessionMakerMiddleware(http_session_maker))
+        self.dp.update.middleware(AddSettingsStorageMiddleware(settings_storage))
         self.ticket_view = TicketView(config.currency)
         self.dp.update.middleware(AddTicketViewMiddleware(self.ticket_view))
         self.low_price_calendar_view = CalendarView(config.currency)

@@ -10,9 +10,9 @@ from air_bot.service.direction_updater import update
 from air_bot.settings import (
     DirectionUpdaterSettings,
     Interval,
-    NotificationsSettings,
     SchedulerSetting,
     Settings,
+    UsersSettings,
 )
 
 
@@ -77,10 +77,12 @@ def make_settings() -> Settings:
     direction_updater = DirectionUpdaterSettings(
         needs_update_after=60, max_directions_for_single_update=2
     )
-    notifications = NotificationsSettings(price_reduction_threshold_percents=10)
+    users = UsersSettings(
+        max_directions_per_user=10, price_reduction_threshold_percents=10
+    )
     settings = Settings(
         scheduler=scheduler,
         direction_updater=direction_updater,
-        notifications=notifications,
+        users=users,
     )
     return settings

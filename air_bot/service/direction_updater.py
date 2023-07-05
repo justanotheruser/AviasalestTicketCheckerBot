@@ -12,7 +12,7 @@ from air_bot.domain.exceptions import (
     TicketsParsingError,
 )
 from air_bot.domain.model import FlightDirectionInfo, Ticket
-from air_bot.settings import NotificationsSettings, Settings, SettingsStorage
+from air_bot.settings import Settings, SettingsStorage, UsersSettings
 
 
 class DirectionUpdater:
@@ -82,15 +82,13 @@ async def _update_direction(
         )
         await uow.commit()
 
-    await _notify_users(
-        uow, bot, settings.notifications, direction_info, last_price, tickets
-    )
+    await _notify_users(uow, bot, settings.users, direction_info, last_price, tickets)
 
 
 async def _notify_users(
     uow: AbstractUnitOfWork,
     bot,
-    settings: NotificationsSettings,
+    settings: UsersSettings,
     direction_info: FlightDirectionInfo,
     last_price: float | None,
     tickets: list[Ticket],
@@ -105,7 +103,7 @@ async def _notify_users(
 
 
 def _users_need_notification(
-    settings: NotificationsSettings, last_price: float | None, tickets: list[Ticket]
+    settings: UsersSettings, last_price: float | None, tickets: list[Ticket]
 ) -> bool:
     if len(tickets) == 0:
         return False

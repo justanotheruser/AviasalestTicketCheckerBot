@@ -7,6 +7,7 @@ from loguru import logger
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
 from air_bot.adapters.tickets_api import AbstractTicketsApi
 from air_bot.domain.model import FlightDirection, FlightDirectionInfo, Ticket
+from air_bot.settings import SettingsStorage
 
 N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION = 3
 
@@ -96,3 +97,14 @@ async def delete_direction_if_no_longer_tracked(
         if not users:
             await uow.flight_directions.delete_directions([direction_id])
         await uow.commit()
+
+
+async def check_if_new_tracking_available(
+    settings_storage: SettingsStorage, uow: AbstractUnitOfWork, user_id: int
+) -> bool:
+    max_directions_per_user = settings_storage.settings.users.max_directions_per_user
+    async with uow:
+        directions = await uow.users_directions.get_directions(user_id)
+        if len(directions) >= max_directions_per_user:
+            return False
+    return True
