@@ -1,8 +1,8 @@
 """Init
 
-Revision ID: c4a061ec9b20
+Revision ID: 2f4a080dd8fc
 Revises: 
-Create Date: 2023-06-24 11:46:48.652547
+Create Date: 2023-07-07 00:26:06.751541
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c4a061ec9b20'
+revision = '2f4a080dd8fc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,7 +34,6 @@ def upgrade() -> None:
     )
     op.create_table('historic_flight_directions',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('user_id', sa.BigInteger(), nullable=False),
     sa.Column('start_code', sa.String(length=3), nullable=False),
     sa.Column('start_name', sa.Text(), nullable=False),
     sa.Column('end_code', sa.String(length=3), nullable=False),
@@ -45,7 +44,7 @@ def upgrade() -> None:
     sa.Column('price', sa.Float(), nullable=True),
     sa.Column('last_update', sa.DateTime(), nullable=False),
     sa.Column('deleted_at', sa.DateTime(), nullable=False),
-    sa.Column('deleted_by_user', sa.DateTime(), nullable=False),
+    sa.Column('deleted_by_user', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',

@@ -1,8 +1,10 @@
+from dataclasses import asdict
 from datetime import datetime, timedelta
 
 import pytest
 
 from air_bot.adapters.repo.flight_directions import SqlAlchemyFlightDirectionRepo
+from air_bot.domain.model import FlightDirection
 
 
 @pytest.mark.asyncio
@@ -159,3 +161,47 @@ async def test_update_price(mysql_session_factory, moscow2spb_one_way_direction)
         await session.commit()
     assert direction.price == 200
     assert direction.last_update == last_update
+
+
+@pytest.mark.asyncio
+async def test_delete_direction(
+    mysql_session_factory, moscow2antalya_roundtrip_direction
+):
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        direction_id = await repo.add_direction_info(
+            moscow2antalya_roundtrip_direction, 100, datetime.now()
+        )
+        await session.commit()
+
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        await repo.delete_direction(direction_id)
+        await session.commit()
+
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        assert await repo.get_direction_info(direction_id) is None
+
+
+@pytest.mark.asyncio
+async def test_delete_outdated_directions(
+    mysql_session_factory, moscow2antalya_roundtrip_direction
+):
+    direction_dict = asdict(moscow2antalya_roundtrip_direction)
+    day_before_yesterday = datetime.now() - timedelta(days=2)
+    direction_dict["departure_at"] = datetime.strftime(day_before_yesterday, "%Y-%m-%d")
+    direction = FlightDirection(**direction_dict)
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        await repo.add_direction_info(direction, 100, datetime.now())
+        await session.commit()
+
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        await repo.delete_outdated_directions()
+        await session.commit()
+
+    async with mysql_session_factory() as session:
+        repo = SqlAlchemyFlightDirectionRepo(session)
+        assert await repo.get_direction_id(direction) is None

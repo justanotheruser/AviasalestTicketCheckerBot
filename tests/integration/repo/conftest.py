@@ -50,7 +50,6 @@ async def moscow2spb_one_way_direction_id(
 ):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
-        # last_update = datetime.datetime.now().replace(microsecond=0)
         await repo.add_direction_info(
             moscow2spb_one_way_direction, price=100, last_update=datetime.datetime.now()
         )

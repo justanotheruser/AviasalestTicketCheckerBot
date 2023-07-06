@@ -78,7 +78,6 @@ class Location:
 @dataclass(kw_only=True)
 class HistoricFlightDirection:
     id: int | None = None
-    user_id: int
     start_code: str
     start_name: str
     end_code: str

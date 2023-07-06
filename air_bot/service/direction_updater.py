@@ -34,8 +34,11 @@ class DirectionUpdater:
         await update(uow, aviasales_api, self.bot, self.settings_storage.settings)
 
     async def remove_outdated(self):
-        """Removes directions with either passed departure dates or not tracked by anyone"""
-        pass
+        """Removes directions with a past departure date"""
+        uow = SqlAlchemyUnitOfWork(self.session_maker)
+        async with uow:
+            await uow.flight_directions.delete_outdated_directions()
+            await uow.commit()
 
 
 async def update(

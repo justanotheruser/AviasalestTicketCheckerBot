@@ -1,6 +1,7 @@
 import asyncio
 
 from apscheduler.schedulers.async_ import AsyncScheduler
+from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
 from air_bot.service.direction_updater import DirectionUpdater
@@ -26,6 +27,9 @@ class ServiceScheduler:
         await self._schedule()
         await self.scheduler.add_schedule(
             self.setting_storage.reload, IntervalTrigger(seconds=5)
+        )
+        await self.scheduler.add_schedule(
+            self.direction_updater.remove_outdated, CronTrigger(hour=0, minute=1)
         )
         asyncio.create_task(self._monitor_settings_change())
 

@@ -93,7 +93,6 @@ historic_flight_direction_info_table = Table(
     "historic_flight_directions",
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("user_id", BigInteger, nullable=False),
     Column("start_code", String(3), nullable=False),
     Column("start_name", Text, nullable=False),
     Column("end_code", String(3), nullable=False),
@@ -104,7 +103,7 @@ historic_flight_direction_info_table = Table(
     Column("price", Float, nullable=True),
     Column("last_update", DateTime, nullable=False),
     Column("deleted_at", DateTime, nullable=False),
-    Column("deleted_by_user", DateTime, nullable=False),
+    Column("deleted_by_user", Boolean, nullable=False),
 )
 
 mapper_registry.map_imperatively(model.FlightDirectionInfo, flight_direction_info_table)

@@ -70,11 +70,11 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
                 self.directions[i].price = price
                 self.directions[i].last_update = last_update
 
-    async def delete_directions(self, direction_ids: list[int]):
+    async def delete_direction(self, direction_id: int):
         self.directions = [
             direction_info
             for direction_info in self.directions
-            if direction_info.id not in direction_ids
+            if direction_info.id != direction_id
         ]
 
 

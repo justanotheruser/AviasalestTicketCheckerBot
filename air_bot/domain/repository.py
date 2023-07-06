@@ -48,7 +48,7 @@ class AbstractFlightDirectionRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_directions(self, direction_ids: list[int]):
+    async def delete_direction(self, direction_id: int):
         raise NotImplementedError
 
 

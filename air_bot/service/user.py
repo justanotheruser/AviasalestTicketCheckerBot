@@ -95,7 +95,7 @@ async def delete_direction_if_no_longer_tracked(
     async with uow:
         users = await uow.users_directions.get_users(direction_id)
         if not users:
-            await uow.flight_directions.delete_directions([direction_id])
+            await uow.flight_directions.delete_direction(direction_id)
         await uow.commit()
 
 

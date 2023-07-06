@@ -88,7 +88,7 @@ async def test_delete_from_users_directions_when_direction_deleted(
 
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
-        await repo.delete_directions([moscow2spb_one_way_direction_id])
+        await repo.delete_direction(moscow2spb_one_way_direction_id)
         await session.commit()
 
     async with mysql_session_factory() as session:
