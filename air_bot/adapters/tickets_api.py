@@ -76,6 +76,7 @@ class AviasalesTicketsApi(AbstractTicketsApi):
                 response = await get_grouped_prices(
                     self.session,
                     self.token.get_secret_value(),
+                    self.currency,
                     direction.start_code,
                     direction.end_code,
                     direction.departure_at,
@@ -166,6 +167,7 @@ def datetime_from_ticket(datetime_str: str) -> datetime:
 async def get_grouped_prices(
     session: ClientSession,
     token: str,
+    currency: str,
     origin: str,
     destination: str,
     departure_at: str,
@@ -176,6 +178,7 @@ async def get_grouped_prices(
     travel_payouts_url = "https://api.travelpayouts.com/aviasales/v3/grouped_prices"
     params = {
         "token": token,
+        "currency": currency,
         "origin": origin,
         "destination": destination,
         "departure_at": departure_at,
