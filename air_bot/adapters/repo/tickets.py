@@ -24,7 +24,7 @@ class TicketDB:
     def from_ticket(ticket: model.Ticket, direction_id: int):
         duration_to = ticket.duration_to.seconds // 60
         if ticket.duration_back:
-            duration_back = ticket.duration_back // 60
+            duration_back = ticket.duration_back.seconds // 60
         else:
             duration_back = None
         return TicketDB(

@@ -1,8 +1,8 @@
 """Init
 
-Revision ID: 2f4a080dd8fc
+Revision ID: 35c6bd819b9f
 Revises: 
-Create Date: 2023-07-07 00:26:06.751541
+Create Date: 2023-07-07 11:43:10.087151
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2f4a080dd8fc'
+revision = '35c6bd819b9f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -58,7 +58,7 @@ def upgrade() -> None:
     sa.Column('departure_at', sa.DateTime(), nullable=False),
     sa.Column('duration_to', sa.Integer(), nullable=False),
     sa.Column('return_at', sa.DateTime(), nullable=True),
-    sa.Column('duration_back', sa.DateTime(), nullable=True),
+    sa.Column('duration_back', sa.Integer(), nullable=True),
     sa.Column('link', sa.Text(), nullable=False),
     sa.ForeignKeyConstraint(['direction_id'], ['flight_directions.id'], name='tickets_fk__flight_direction', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')

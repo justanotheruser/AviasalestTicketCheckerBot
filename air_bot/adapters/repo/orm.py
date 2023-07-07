@@ -79,7 +79,7 @@ tickets_table = Table(
     Column("departure_at", DateTime, nullable=False),
     Column("duration_to", Integer, nullable=False),
     Column("return_at", DateTime, nullable=True),
-    Column("duration_back", DateTime, nullable=True),
+    Column("duration_back", Integer, nullable=True),
     Column("link", Text, nullable=False),
     ForeignKeyConstraint(
         columns=["direction_id"],
