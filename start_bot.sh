@@ -1,7 +1,9 @@
 #!/bin/bash
-if [ "$1" == "-s" ]; then
+if [ "$2" == "-s" ]; then
     if [ -z "$STY" ]; then
-        exec screen -dm -S screenName /bin/bash "$0";
+        exec screen -dmS air_bot /bin/bash $0 $1;
     fi
 fi
+cd $1
+source ~/.profile
 poetry run python air_bot/main.py
