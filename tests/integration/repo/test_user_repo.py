@@ -18,3 +18,24 @@ async def test_can_add_user(mysql_session_factory):
         result = await session.execute(stmt)
         user = result.one()[0]
         assert user == User(user_tg_id)
+
+
+@pytest.mark.asyncio
+async def test_user_exists(mysql_session_factory):
+    user_id = 42
+    async with mysql_session_factory() as session:
+        users = SqlAlchemyUsersRepo(session)
+        exists = await users.exists(user_id)
+        await session.commit()
+    assert not exists
+
+    async with mysql_session_factory() as session:
+        users = SqlAlchemyUsersRepo(session)
+        await users.add(user_id)
+        await session.commit()
+
+    async with mysql_session_factory() as session:
+        users = SqlAlchemyUsersRepo(session)
+        exists = await users.exists(user_id)
+        await session.commit()
+    assert exists

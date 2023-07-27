@@ -13,15 +13,15 @@ N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION = 3
 
 
 async def add_user(user_id: int, uow: AbstractUnitOfWork):
-    async with uow:
-        try:
-            await uow.users.add(user_id)
-            await uow.commit()
-        except asyncmy.errors.IntegrityError:
-            # User already in repo
-            pass
-        except Exception as e:
-            logger.error(e)
+    try:
+        async with uow:
+            exists = await uow.users.exists(user_id)
+            if not exists:
+                logger.info(f"New user {user_id}")
+                await uow.users.add(user_id)
+                await uow.commit()
+    except Exception as e:
+        logger.error(e)
 
 
 async def track(

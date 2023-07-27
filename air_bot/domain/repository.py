@@ -54,6 +54,10 @@ class AbstractFlightDirectionRepo(ABC):
 
 class AbstractUserRepo(ABC):
     @abstractmethod
+    async def exists(self, user_id: int) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
     async def add(self, user_id: int):
         raise NotImplementedError
 
