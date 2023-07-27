@@ -38,7 +38,7 @@ class App(ServiceWithGracefulShutdown):
             )
             await self.session_maker.start()
             await service_scheduler.start()
-            await self.bot.start()
+            asyncio.create_task(self.bot.start())
 
     async def stop(self):
         self.http_session_maker.close()
