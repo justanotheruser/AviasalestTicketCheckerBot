@@ -68,8 +68,8 @@ async def test_notify_subscribed_users_if_new_price_below_threshold(
         bot.notify_user.call_args_list[i].args
         for i in range(bot.notify_user.call_count)
     ]
-    assert (1, tickets, moscow2spb_one_way_direction) in notify_call_args
-    assert (2, tickets, moscow2spb_one_way_direction) in notify_call_args
+    assert (1, tickets, moscow2spb_one_way_direction, direction_id) in notify_call_args
+    assert (2, tickets, moscow2spb_one_way_direction, direction_id) in notify_call_args
 
 
 def make_settings() -> Settings:

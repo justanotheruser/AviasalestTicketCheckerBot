@@ -8,6 +8,9 @@ from air_bot.bot.handlers import (
     start,
     user_profile,
 )
+from air_bot.bot.keyboards.low_prices_calendar_kb import (
+    show_low_prices_calendar_keyboard,
+)
 from air_bot.bot.middlewares.add_calendar_view import AddCalendarViewMiddleware
 from air_bot.bot.middlewares.add_http_session_maker import AddHttpSessionMakerMiddleware
 from air_bot.bot.middlewares.add_session_maker import AddSessionMakerMiddleware
@@ -51,12 +54,16 @@ class BotService:
         await self.dp.start_polling(self.bot)
 
     async def notify_user(
-        self, user_id: int, tickets: list[Ticket], direction: FlightDirection
+        self,
+        user_id: int,
+        tickets: list[Ticket],
+        direction: FlightDirection,
+        direction_id: int,
     ):
         await self.bot.send_message(
             user_id,
             text=self.ticket_view.print_tickets(tickets, direction),
             parse_mode="html",
             disable_web_page_preview=True,
-            # reply_markup=show_low_prices_calendar_keyboard(direction_id),
+            reply_markup=show_low_prices_calendar_keyboard(direction_id),
         )

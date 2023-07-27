@@ -102,7 +102,9 @@ async def _notify_users(
         user_ids = await uow.users_directions.get_users(direction_info.id)
         await uow.commit()
     for user_id in user_ids:
-        await bot.notify_user(user_id, tickets, direction_info.direction)
+        await bot.notify_user(
+            user_id, tickets, direction_info.direction, direction_info.id
+        )
 
 
 def _users_need_notification(
