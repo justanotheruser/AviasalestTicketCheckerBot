@@ -113,7 +113,9 @@ def _users_need_notification(
     if len(tickets) == 0:
         return False
     cheapest_ticket = tickets[0]
+    if last_price is None:
+        return True
     notification_threshold = last_price * (
         1 - settings.price_reduction_threshold_percents / 100
     )
-    return not last_price or cheapest_ticket.price <= notification_threshold
+    return cheapest_ticket.price <= notification_threshold

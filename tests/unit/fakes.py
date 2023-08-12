@@ -15,6 +15,9 @@ class FakeUserRepo(repository.AbstractUserRepo):
     async def add(self, user_id: int):
         self.users.append(model.User(user_id=user_id))
 
+    async def exists(self, user_id: int) -> bool:
+        return user_id in [user.user_id for user in self.users]
+
 
 class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
     def __init__(self):
