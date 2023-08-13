@@ -29,7 +29,7 @@ class ServiceScheduler:
             self.setting_storage.reload, IntervalTrigger(seconds=5)
         )
         await self.scheduler.add_schedule(
-            self.direction_updater.remove_outdated, CronTrigger(minute=7)
+            self.direction_updater.remove_outdated, CronTrigger(hour=0, minute=1)
         )
         asyncio.create_task(self._monitor_settings_change())
 
