@@ -2,14 +2,14 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.domain.model import User
-from air_bot.domain.repository import AbstractUserRepo
+from air_bot.domain.repository import UserRepo
 
 
 class DuplicatedUserIdError(Exception):
     pass
 
 
-class SqlAlchemyUsersRepo(AbstractUserRepo):
+class SqlAlchemyUsersRepo(UserRepo):
     def __init__(self, session: AsyncSession):
         super().__init__()
         self.session = session

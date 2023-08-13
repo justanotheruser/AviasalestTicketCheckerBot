@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
 from air_bot.domain import model
-from air_bot.domain.repository import AbstractTicketRepo
+from air_bot.domain.repository import TicketRepo
 
 
 @dataclass(kw_only=True)
@@ -38,7 +38,7 @@ class TicketDB:
         )
 
 
-class SqlAlchemyTicketRepo(AbstractTicketRepo):
+class SqlAlchemyTicketRepo(TicketRepo):
     def __init__(self, session: AsyncSession):
         super().__init__()
         self.session = session

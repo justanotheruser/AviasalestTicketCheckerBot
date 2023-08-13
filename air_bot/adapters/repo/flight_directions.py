@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
 from air_bot.domain import model
-from air_bot.domain.repository import AbstractFlightDirectionRepo
+from air_bot.domain.repository import FlightDirectionRepo
 
 
-class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
+class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
     def __init__(self, session: AsyncSession):
         super().__init__()
         self.session = session
@@ -108,7 +108,7 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         stmt = stmt.where(orm.flight_direction_info_table.c.id == direction_id)
         await self.session.execute(stmt)
 
-    async def delete_outdated_directions(self):
+    async def delete_outdated_directions(self) -> int:
         # Subtract one day, so we are sure direction is outdated in every time zone
         yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
         year_month = datetime.datetime.strftime(yesterday, "%Y-%m")
@@ -121,6 +121,8 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
         stmt = stmt.bindparams(year_month_day=year_month_day, year_month=year_month)
         result = await self.session.execute(stmt)
         outdated_directions = result.all()
+        if not outdated_directions:
+            return 0
 
         now = datetime.datetime.now()
         for row in outdated_directions:
@@ -148,3 +150,4 @@ class SqlAlchemyFlightDirectionRepo(AbstractFlightDirectionRepo):
             orm.flight_direction_info_table.c.id.in_(outdated_directions_ids)
         )
         await self.session.execute(stmt)
+        return len(outdated_directions)

@@ -24,16 +24,16 @@ class ServiceScheduler:
 
     async def start(self):
         await self.scheduler.start_in_background()
-        await self._schedule()
+        await self._schedule_direction_updater()
         await self.scheduler.add_schedule(
             self.setting_storage.reload, IntervalTrigger(seconds=5)
         )
         await self.scheduler.add_schedule(
-            self.direction_updater.remove_outdated, CronTrigger(hour=0, minute=1)
+            self.direction_updater.remove_outdated, CronTrigger(minute=7)
         )
         asyncio.create_task(self._monitor_settings_change())
 
-    async def _schedule(self):
+    async def _schedule_direction_updater(self):
         if self.direction_updater_schedule:
             await self.scheduler.remove_schedule(self.direction_updater_schedule)
         settings = self.setting_storage.settings.scheduler
@@ -50,5 +50,5 @@ class ServiceScheduler:
     async def _monitor_settings_change(self):
         while True:
             await self.settings_changed.wait()
-            await self._schedule()
+            await self._schedule_direction_updater()
             self.settings_changed.clear()

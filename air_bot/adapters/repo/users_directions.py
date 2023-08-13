@@ -4,7 +4,7 @@ from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
-from air_bot.domain.repository import AbstractUserDirectionRepo
+from air_bot.domain.repository import UserDirectionRepo
 
 
 @dataclass(kw_only=True)
@@ -13,7 +13,7 @@ class UserDirectionDB:
     direction_id: int
 
 
-class SqlAlchemyUserDirectionRepo(AbstractUserDirectionRepo):
+class SqlAlchemyUserDirectionRepo(UserDirectionRepo):
     def __init__(self, session: AsyncSession):
         super().__init__()
         self.session = session

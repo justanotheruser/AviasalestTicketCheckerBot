@@ -35,10 +35,12 @@ class DirectionUpdater:
 
     async def remove_outdated(self):
         """Removes directions with a past departure date"""
+        logger.info("Removing outdated directions")
         uow = SqlAlchemyUnitOfWork(self.session_maker)
         async with uow:
-            await uow.flight_directions.delete_outdated_directions()
+            n_directions = await uow.flight_directions.delete_outdated_directions()
             await uow.commit()
+        logger.info(f"Number of removed outdated directions: {n_directions}")
 
 
 async def update(

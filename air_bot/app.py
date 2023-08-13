@@ -29,6 +29,15 @@ class App(ServiceWithGracefulShutdown):
         )
 
     async def start(self):
+        await self.session_maker.start()
+        asyncio.create_task(self._start_scheduler())
+        asyncio.create_task(self.bot.start())
+
+    async def stop(self):
+        await self.http_session_maker.close()
+        await self.session_maker.stop()
+
+    async def _start_scheduler(self):
         async with AsyncScheduler() as scheduler:
             service_scheduler = ServiceScheduler(
                 scheduler,
@@ -36,10 +45,6 @@ class App(ServiceWithGracefulShutdown):
                 self.settings_changed_event,
                 self.direction_updater,
             )
-            await self.session_maker.start()
             await service_scheduler.start()
-            asyncio.create_task(self.bot.start())
-
-    async def stop(self):
-        self.http_session_maker.close()
-        await self.session_maker.stop()
+            while True:
+                await asyncio.sleep(1)

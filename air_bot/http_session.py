@@ -11,6 +11,6 @@ class HttpSessionMaker:
             self._session = aiohttp.ClientSession()
         return self._session
 
-    def close(self):
+    async def close(self):
         if self._session:
-            self._session.close()
+            await self._session.close()

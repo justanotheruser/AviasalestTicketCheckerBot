@@ -6,7 +6,7 @@ from air_bot.adapters.repo.uow import AbstractUnitOfWork
 from air_bot.domain import model, repository
 
 
-class FakeUserRepo(repository.AbstractUserRepo):
+class FakeUserRepo(repository.UserRepo):
     def __init__(self, users: list[model.User] = None):
         if users is None:
             users = []
@@ -19,7 +19,7 @@ class FakeUserRepo(repository.AbstractUserRepo):
         return user_id in [user.user_id for user in self.users]
 
 
-class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
+class FakeFlightDirectionRepo(repository.FlightDirectionRepo):
     def __init__(self):
         self._next_id = 0
         self.directions: list[model.FlightDirectionInfo] = []
@@ -80,8 +80,11 @@ class FakeFlightDirectionRepo(repository.AbstractFlightDirectionRepo):
             if direction_info.id != direction_id
         ]
 
+    async def delete_outdated_directions(self):
+        raise NotImplementedError
 
-class FakeUserFlightDirectionRepo(repository.AbstractUserDirectionRepo):
+
+class FakeUserFlightDirectionRepo(repository.UserDirectionRepo):
     def __init__(self, users_directions: list[Tuple[int, int]] = None):
         if users_directions is None:
             users_directions = []
@@ -104,7 +107,7 @@ class FakeUserFlightDirectionRepo(repository.AbstractUserDirectionRepo):
         ]
 
 
-class FakeTicketRepo(repository.AbstractTicketRepo):
+class FakeTicketRepo(repository.TicketRepo):
     def __init__(self, tickets: list[Tuple[model.Ticket, int]] = None):
         if tickets is None:
             tickets = []

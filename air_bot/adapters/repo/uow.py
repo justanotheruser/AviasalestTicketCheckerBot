@@ -4,23 +4,23 @@ from typing import Self
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from air_bot.adapters.repo.flight_directions import (
-    AbstractFlightDirectionRepo,
+    FlightDirectionRepo,
     SqlAlchemyFlightDirectionRepo,
 )
 from air_bot.adapters.repo.session_maker import AbstractSessionMaker
-from air_bot.adapters.repo.tickets import AbstractTicketRepo, SqlAlchemyTicketRepo
-from air_bot.adapters.repo.users import AbstractUserRepo, SqlAlchemyUsersRepo
+from air_bot.adapters.repo.tickets import SqlAlchemyTicketRepo, TicketRepo
+from air_bot.adapters.repo.users import SqlAlchemyUsersRepo, UserRepo
 from air_bot.adapters.repo.users_directions import (
-    AbstractUserDirectionRepo,
     SqlAlchemyUserDirectionRepo,
+    UserDirectionRepo,
 )
 
 
 class AbstractUnitOfWork(abc.ABC):
-    users: AbstractUserRepo
-    flight_directions: AbstractFlightDirectionRepo
-    users_directions: AbstractUserDirectionRepo
-    tickets: AbstractTicketRepo
+    users: UserRepo
+    flight_directions: FlightDirectionRepo
+    users_directions: UserDirectionRepo
+    tickets: TicketRepo
 
     def __init__(self, session_factory: AbstractSessionMaker):
         self.session_factory = session_factory

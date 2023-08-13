@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from air_bot.domain import model
 
 
-class AbstractFlightDirectionRepo(ABC):
+class FlightDirectionRepo(ABC):
     @abstractmethod
     async def add_direction_info(
         self,
@@ -51,8 +51,13 @@ class AbstractFlightDirectionRepo(ABC):
     async def delete_direction(self, direction_id: int):
         raise NotImplementedError
 
+    @abstractmethod
+    async def delete_outdated_directions(self) -> int:
+        """Returns number of deleted directions."""
+        raise NotImplementedError
 
-class AbstractUserRepo(ABC):
+
+class UserRepo(ABC):
     @abstractmethod
     async def exists(self, user_id: int) -> bool:
         raise NotImplementedError
@@ -62,7 +67,7 @@ class AbstractUserRepo(ABC):
         raise NotImplementedError
 
 
-class AbstractUserDirectionRepo(ABC):
+class UserDirectionRepo(ABC):
     @abstractmethod
     async def add(self, user_id: int, direction_id: int):
         raise NotImplementedError
@@ -82,7 +87,7 @@ class AbstractUserDirectionRepo(ABC):
         raise NotImplementedError
 
 
-class AbstractTicketRepo(ABC):
+class TicketRepo(ABC):
     @abstractmethod
     async def add(self, tickets: list[model.Ticket], direction_id: int):
         raise NotImplementedError
