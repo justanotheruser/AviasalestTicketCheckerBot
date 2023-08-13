@@ -46,7 +46,7 @@ class DirectionUpdater:
 async def update(
     uow: AbstractUnitOfWork, aviasales_api: AbstractTicketsApi, bot, settings: Settings
 ):
-    logger.info("Starting direction update")
+    logger.info("Checking if some directions need update")
     update_threshold = datetime.now() - timedelta(
         minutes=settings.direction_updater.needs_update_after
     )
@@ -56,6 +56,7 @@ async def update(
             settings.direction_updater.max_directions_for_single_update,
         )
         await uow.commit()
+    logger.info(f"{len(directions)} direction(s) need update")
     for direction in directions:
         await _update_direction(uow, aviasales_api, bot, settings, direction)
 
@@ -73,9 +74,11 @@ async def _update_direction(
     except (TicketsAPIConnectionError, TicketsAPIError, TicketsParsingError):
         return
     if tickets:
+        logger.info(f"Received tickets for direction {direction_info.id}")
         cheapest_price = tickets[0].price
     else:
         cheapest_price = None
+        logger.info(f"Received no tickets for direction {direction_info.id}")
     last_price = direction_info.price
     direction_info.price = cheapest_price
 
@@ -103,6 +106,7 @@ async def _notify_users(
     async with uow:
         user_ids = await uow.users_directions.get_users(direction_info.id)
         await uow.commit()
+    logger.info(f"Sending notifications about new price for direction {direction_info.id} to {len(user_ids)} users")
     for user_id in user_ids:
         await bot.notify_user(
             user_id, tickets, direction_info.direction, direction_info.id
