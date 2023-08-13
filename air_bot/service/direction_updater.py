@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from aiogram.exceptions import TelegramAPIError
 from loguru import logger
 
 from air_bot.adapters.repo.session_maker import SessionMaker
@@ -108,9 +109,13 @@ async def _notify_users(
         await uow.commit()
     logger.info(f"Sending notifications about new price for direction {direction_info.id} to {len(user_ids)} users")
     for user_id in user_ids:
-        await bot.notify_user(
-            user_id, tickets, direction_info.direction, direction_info.id
-        )
+        try:
+            await bot.notify_user(
+                user_id, tickets, direction_info.direction, direction_info.id
+            )
+        except TelegramAPIError:
+            # TODO: remove user in case of TelegramForbiddenError (bot was blocked by user)
+            pass
 
 
 def _users_need_notification(

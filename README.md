@@ -11,4 +11,4 @@ screen -x air_bot
 Для автоматического запуска после перезагрузки:
 crontab -e
 Добавить строчку
-/home/denis/my_github/AviasalestTicketCheckerBot
+@reboot sleep 10 && <путь к репозиторию>/start_bot.sh <путь к репозиторию>/air_bot_ru_prod -s
