@@ -36,8 +36,8 @@ class BotService:
         self.bot = Bot(token=config.bot_token.get_secret_value())
 
         self.dp.include_router(start.router)
-        self.dp.include_router(add_flight_direction.router)
         self.dp.include_router(user_profile.router)
+        self.dp.include_router(add_flight_direction.router)
         self.dp.include_router(low_prices_calendar.router)
 
         self.dp.update.middleware(AddSessionMakerMiddleware(session_maker))
