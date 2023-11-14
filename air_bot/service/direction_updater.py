@@ -107,7 +107,9 @@ async def _notify_users(
     async with uow:
         user_ids = await uow.users_directions.get_users(direction_info.id)
         await uow.commit()
-    logger.info(f"Sending notifications about new price for direction {direction_info.id} to {len(user_ids)} users")
+    logger.info(
+        f"Sending notifications about new price for direction {direction_info.id} to {len(user_ids)} users"
+    )
     for user_id in user_ids:
         try:
             await bot.notify_user(

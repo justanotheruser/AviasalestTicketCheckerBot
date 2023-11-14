@@ -12,6 +12,7 @@ def main():
         retention="7 days",
         compression="zip",
         level=log_level,
+        filter=lambda record: record["extra"].get("name") is None,
     )
     app = App()
     app.run()
