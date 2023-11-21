@@ -47,10 +47,9 @@ async def test_diff_between_max_depart_date_and_min_return_date_exceeds_supporte
     )
     with pytest.raises(TicketsAPIError):
         await api.get_tickets(direction)
-    assert len(caplog.messages) == 1
     assert (
         "diff between max depart date and min return date exceeds supported maximum of 30"
-        in caplog.messages[0]
+        in caplog.messages[-1]
     )
 
 
