@@ -30,9 +30,12 @@ class DirectionUpdater:
         self.http_session_maker = http_session_maker
 
     async def update(self):
-        uow = SqlAlchemyUnitOfWork(self.session_maker)
-        aviasales_api = AviasalesTicketsApi(self.http_session_maker)
-        await update(uow, aviasales_api, self.bot, self.settings_storage.settings)
+        try:
+            uow = SqlAlchemyUnitOfWork(self.session_maker)
+            aviasales_api = AviasalesTicketsApi(self.http_session_maker)
+            await update(uow, aviasales_api, self.bot, self.settings_storage.settings)
+        except Exception as e:
+            logger.error(e)
 
     async def remove_outdated(self):
         """Removes directions with a past departure date"""
