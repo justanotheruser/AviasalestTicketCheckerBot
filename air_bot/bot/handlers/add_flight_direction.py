@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.filters import Command, Text
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
@@ -40,7 +40,7 @@ class NewDirection(StatesGroup):
     choosing_return_date = State()
 
 
-@router.callback_query(Text(text="add_flight_direction"))
+@router.callback_query(F.text == "add_flight_direction")
 async def add_flight_direction_inline(
     callback: CallbackQuery,
     state: FSMContext,
@@ -53,8 +53,8 @@ async def add_flight_direction_inline(
     await callback.answer()
 
 
-@router.message(Command(commands=["cancel"]))
-@router.message(Text(text=i18n.translate("cancel"), text_ignore_case=True))
+@router.message(Command(commands=["cancel"], ignore_case=True))
+@router.message(F.text.lower() == i18n.translate("cancel").lower())
 async def cmd_cancel(message: Message, state: FSMContext) -> None:
     await message.answer(
         text="Добавление маршрута отменено", reply_markup=user_home_kb.keyboard
@@ -62,7 +62,7 @@ async def cmd_cancel(message: Message, state: FSMContext) -> None:
     await state.clear()
 
 
-@router.message(Text(text=user_home_kb.new_search_btn_text))
+@router.message(F.text == user_home_kb.new_search_btn_text)
 @router.message(Command(commands=["search"]))
 async def add_flight_direction(
     message: Message,

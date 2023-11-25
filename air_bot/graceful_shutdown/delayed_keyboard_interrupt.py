@@ -2,7 +2,7 @@
 
 import os
 import signal
-from typing import Optional
+from typing import Any, Optional
 
 from loguru import logger
 
@@ -34,7 +34,7 @@ class DelayedKeyboardInterrupt:
         self._propagate_to_forked_processes = propagate_to_forked_processes
         self._sig = None
         self._frame = None
-        self._old_signal_handler_map = None
+        self._old_signal_handler_map: Any = None
 
     def __enter__(self) -> None:
         self._old_signal_handler_map = {

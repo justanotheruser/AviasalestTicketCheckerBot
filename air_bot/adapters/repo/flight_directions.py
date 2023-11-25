@@ -29,7 +29,7 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
             **asdict(direction), price=price, last_update=last_update
         )
         result = await self.session.execute(stmt)
-        return result.lastrowid
+        return result.lastrowid  # type: ignore[attr-defined]
 
     async def get_direction_id(self, direction: model.FlightDirection) -> int | None:
         """Returns id of row with direction info if exists or None otherwise"""
@@ -99,12 +99,12 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
             deleted_at=now,
             deleted_by_user=True,
         )
-        stmt = insert(model.HistoricFlightDirection).values(
+        stmt = insert(model.HistoricFlightDirection).values(  # type: ignore[assignment]
             **asdict(historic_direction)
         )
         await self.session.execute(stmt)
 
-        stmt = delete(model.FlightDirectionInfo)
+        stmt = delete(model.FlightDirectionInfo)  # type: ignore[assignment]
         stmt = stmt.where(orm.flight_direction_info_table.c.id == direction_id)
         await self.session.execute(stmt)
 
@@ -139,14 +139,14 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
                 deleted_at=now,
                 deleted_by_user=False,
             )
-            stmt = insert(model.HistoricFlightDirection).values(
+            stmt = insert(model.HistoricFlightDirection).values(  # type: ignore[assignment]
                 **asdict(historic_direction)
             )
             await self.session.execute(stmt)
 
         outdated_directions_ids = [row[0] for row in outdated_directions]
-        stmt = delete(model.FlightDirectionInfo)
-        stmt = stmt.where(
+        stmt = delete(model.FlightDirectionInfo)  # type: ignore[assignment]
+        stmt = stmt.where(  # type: ignore[attr-defined]
             orm.flight_direction_info_table.c.id.in_(outdated_directions_ids)
         )
         await self.session.execute(stmt)

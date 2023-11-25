@@ -12,14 +12,15 @@ asyncmy = "^0.2.8"
 cryptography = "^41.0.1"
 alembic = "^1.11"
 python-dotenv = "^1.0.0"
-pydantic = {version = "^1.10", extras = ["dotenv"]}
 aiohttp = "^3.8.4"
 async-timeout = "^4.0.2"
 loguru = "^0.7.0"
-aiogram = "3.0.0b4"
+aiogram = "^3.2.0"
 babel = "^2.12.1"
 pyyaml = "^6.0"
 apscheduler = "4.0.0a2"
+pydantic = {extras = ["dotenv"], version = "^2.5.2"}
+pydantic-settings = "^2.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -32,6 +33,7 @@ pre-commit = "^3.3.2"
 pytest-asyncio = "^0.21.0"
 flake8-pyproject = "^1.2.3"
 pytest-unordered = "^0.5.2"
+types-pyyaml = "^6.0.12.12"
 
 [build-system]
 requires = ["poetry-core"]
@@ -39,7 +41,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.flake8]
 # Ignore 'line too long'
-ignore = ['E501']
+ignore = ['E501','W293']
 
 [tool.isort]
 profile = "black"

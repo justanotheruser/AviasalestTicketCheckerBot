@@ -1,5 +1,5 @@
-from aiogram import Router
-from aiogram.filters import Command, Text
+from aiogram import F, Router
+from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
 from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
@@ -19,7 +19,7 @@ from air_bot.service.user import (
 router = Router()
 
 
-@router.message(Text(text=user_home_kb.personal_account_btn_text))
+@router.message(F.text == user_home_kb.personal_account_btn_text)
 @router.message(Command(commands=["settings", "настройки"]))
 async def show_user_flight_directions(message: Message, session_maker) -> None:
     await message.answer(f"{i18n.translate('tracked_directions')} 👇:")
@@ -35,7 +35,7 @@ async def show_user_flight_directions(message: Message, session_maker) -> None:
         )
 
 
-@router.callback_query(Text(text_startswith="show_direction_info"))
+@router.callback_query(F.text.startswith("show_direction_info"))
 async def show_direction_info(
     callback: CallbackQuery,
     session_maker,
@@ -70,7 +70,7 @@ async def show_direction_info(
     await callback.answer()
 
 
-@router.callback_query(Text(text_startswith="delete_direction"))
+@router.callback_query(F.text.startswith("delete_direction"))
 async def delete_direction(
     callback: CallbackQuery,
     session_maker,

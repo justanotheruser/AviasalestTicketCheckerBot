@@ -1,8 +1,7 @@
 import datetime
 from datetime import date
 
-from aiogram import Router
-from aiogram.filters import Text
+from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from loguru import logger
@@ -20,7 +19,7 @@ from air_bot.domain.model import FlightDirection, Ticket
 router = Router()
 
 
-@router.callback_query(Text(text_startswith="show_low_prices_calendar"))
+@router.callback_query(F.text.startswith("show_low_prices_calendar"))
 async def show_low_prices_calendar(
     callback: CallbackQuery,
     state: FSMContext,
@@ -138,7 +137,7 @@ async def show_calendar(
     return updated_calendar_messages
 
 
-@router.callback_query(Text(text="low_prices_calendar__prev_month"))
+@router.callback_query(F.text == "low_prices_calendar__prev_month")
 async def show_previous_month(
     callback: CallbackQuery,
     state: FSMContext,
@@ -157,7 +156,7 @@ async def show_previous_month(
     await state.update_data(low_prices_calendar_data=calendar_data)
 
 
-@router.callback_query(Text(text="low_prices_calendar__next_month"))
+@router.callback_query(F.text == "low_prices_calendar__next_month")
 async def show_next_month(
     callback: CallbackQuery,
     state: FSMContext,

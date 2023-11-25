@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from fakes import FakeUnitOfWork
 
 from air_bot.domain.model import Ticket
 from air_bot.service.direction_updater import update
@@ -14,6 +13,7 @@ from air_bot.settings import (
     Settings,
     UsersSettings,
 )
+from tests.unit.fakes import FakeUnitOfWork
 
 
 def get_tickets(prices, roundtrip=False) -> list[Ticket]:

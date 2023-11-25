@@ -1,7 +1,6 @@
 import datetime
 from typing import Tuple
 
-import asyncmy.errors
 from loguru import logger
 
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
@@ -42,34 +41,30 @@ async def track(
             tickets = await uow.tickets.get_direction_tickets(direction_id)
         await uow.commit()
 
-    if not tickets:
+    if len(tickets) == 0:
         tickets = await tickets_api.get_tickets(
             direction, limit=N_CHEAPEST_TICKETS_FOR_NEW_DIRECTION
         )
-        if tickets:
+        if len(tickets) > 0:
             got_tickets_from_api = True
 
-    if direction_id is None and not tickets:
+    if direction_id is None:
+        cheapest_price = tickets[0].price if tickets else None
         async with uow:
             direction_id = await uow.flight_directions.add_direction_info(
-                direction, None, datetime.datetime.now()
+                direction, cheapest_price, datetime.datetime.now()
             )
             await uow.users_directions.add(user_id, direction_id)
+            await uow.tickets.add(tickets, direction_id)
             await uow.commit()
-        return [], direction_id
+        return tickets, direction_id
 
     if got_tickets_from_api:
         cheapest_price = tickets[0].price
         async with uow:
-            if direction_id is None:
-                direction_id = await uow.flight_directions.add_direction_info(
-                    direction, cheapest_price, datetime.datetime.now()
-                )
-                await uow.users_directions.add(user_id, direction_id)
-            else:
-                await uow.flight_directions.update_price(
-                    direction_id, cheapest_price, datetime.datetime.now()
-                )
+            await uow.flight_directions.update_price(
+                direction_id, cheapest_price, datetime.datetime.now()
+            )
             await uow.tickets.remove_for_direction(direction_id)
             await uow.tickets.add(tickets, direction_id)
             await uow.commit()

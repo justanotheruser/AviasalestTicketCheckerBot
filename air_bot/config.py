@@ -2,7 +2,8 @@
 import os
 
 from dotenv import load_dotenv
-from pydantic import BaseSettings, SecretStr
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings
 
 
 class BotConfig(BaseSettings):
@@ -33,5 +34,5 @@ class BotConfig(BaseSettings):
 
 
 load_dotenv()
-config = BotConfig()
+config = BotConfig()  # type: ignore[call-arg]
 config.settings_file_path = os.path.expanduser(config.settings_file_path)

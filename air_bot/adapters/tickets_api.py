@@ -19,7 +19,7 @@ from air_bot.domain.model import FlightDirection, Ticket
 class AbstractTicketsApi(ABC):
     @abstractmethod
     async def get_tickets(self, direction: FlightDirection, limit: int) -> list[Ticket]:
-        """Returns 'limit' cheapest tickets for 'direction'."""
+        """Returns 'limit' cheapest tickets for 'direction' ordered by price"""
         raise NotImplementedError
 
     @abstractmethod
@@ -53,7 +53,7 @@ class AviasalesTicketsApi(AbstractTicketsApi):
                     self.currency,
                 )
         except asyncio.TimeoutError:
-            logger.error(f"Request for tickets timed out")
+            logger.error("Request for tickets timed out")
             raise TicketsAPIConnectionError()
         except ClientConnectionError as e:
             logger.error(e)
@@ -84,7 +84,7 @@ class AviasalesTicketsApi(AbstractTicketsApi):
                     is_direct,
                 )
         except asyncio.TimeoutError:
-            logger.error(f"Request for cheapest tickets for month timed out")
+            logger.error("Request for cheapest tickets for month timed out")
             raise TicketsAPIConnectionError()
         except ClientConnectionError as e:
             logger.error(e)

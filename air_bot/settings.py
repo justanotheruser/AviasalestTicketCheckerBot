@@ -4,8 +4,6 @@ import configparser
 from dataclasses import dataclass
 from enum import Enum
 
-from apscheduler.schedulers.async_ import AsyncScheduler
-from apscheduler.triggers.interval import IntervalTrigger
 from loguru import logger
 
 

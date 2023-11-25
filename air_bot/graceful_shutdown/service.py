@@ -63,11 +63,11 @@ class ServiceWithGracefulShutdown(ABC):
 
         def __loop_exception_handler(loop, context):
             if "exception" in context:
-                if type(context["exception"]) == ConnectionResetError:
+                if isinstance(context["exception"], ConnectionResetError):
                     logger.info(
                         "_stop.__loop_exception_handler: suppressing ConnectionResetError"
                     )
-                elif type(context["exception"]) == OSError:
+                elif isinstance(context["exception"], OSError):
                     logger.info("_stop.__loop_exception_handler: suppressing OSError")
                 return
 
@@ -94,7 +94,7 @@ class ServiceWithGracefulShutdown(ABC):
         for task in to_cancel:
             task.cancel()
 
-        self._loop.run_until_complete(
+        self._loop.run_until_complete(  # type: ignore[union-attr]
             asyncio.tasks.gather(*to_cancel, return_exceptions=True)
         )
 
@@ -103,7 +103,7 @@ class ServiceWithGracefulShutdown(ABC):
                 continue
 
             if task.exception() is not None:
-                self._loop.call_exception_handler(
+                self._loop.call_exception_handler(  # type: ignore[union-attr]
                     {
                         "message": "unhandled exception during run() shutdown",
                         "exception": task.exception(),

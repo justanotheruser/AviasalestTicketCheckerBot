@@ -3,11 +3,11 @@ import random
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from fakes import FakeUnitOfWork
 from pytest_unordered import unordered
 
 from air_bot.domain.model import FlightDirection, Ticket
 from air_bot.service.user import track
+from tests.unit.fakes import FakeUnitOfWork
 
 FLIGHT_DIRECTION_NO_RETURN = FlightDirection(
     start_code="STA",
@@ -76,6 +76,7 @@ def get_random_tickets(roundtrip: bool, amount: int):
 @pytest.mark.asyncio
 async def test_add_new_direction_and_get_tickets():
     tickets = get_random_tickets(roundtrip=True, amount=2)
+    tickets = sorted(tickets, key=lambda ticket: ticket.price)
     tickets_api = Mock(get_tickets=AsyncMock(return_value=tickets))
     uow = FakeUnitOfWork()
     user_id = 1

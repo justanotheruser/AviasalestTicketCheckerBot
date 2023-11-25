@@ -4,6 +4,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from air_bot.adapters.repo.session_maker import SessionMaker
 from air_bot.bot.handlers import (
     add_flight_direction,
+    admin,
     low_prices_calendar,
     start,
     user_profile,
@@ -11,11 +12,7 @@ from air_bot.bot.handlers import (
 from air_bot.bot.keyboards.low_prices_calendar_kb import (
     show_low_prices_calendar_keyboard,
 )
-from air_bot.bot.middlewares.add_calendar_view import AddCalendarViewMiddleware
-from air_bot.bot.middlewares.add_http_session_maker import AddHttpSessionMakerMiddleware
-from air_bot.bot.middlewares.add_session_maker import AddSessionMakerMiddleware
-from air_bot.bot.middlewares.add_settings_storage import AddSettingsStorageMiddleware
-from air_bot.bot.middlewares.add_ticket_view import AddTicketViewMiddleware
+from air_bot.bot.middlewares.depends import Depends
 from air_bot.bot.presentation.low_price_calendar import CalendarView
 from air_bot.bot.presentation.tickets import TicketView
 from air_bot.config import BotConfig
@@ -36,19 +33,22 @@ class BotService:
         self.bot = Bot(token=config.bot_token.get_secret_value())
 
         self.dp.include_router(start.router)
+        self.dp.include_router(admin.router)
         self.dp.include_router(user_profile.router)
         self.dp.include_router(add_flight_direction.router)
         self.dp.include_router(low_prices_calendar.router)
 
-        self.dp.update.middleware(AddSessionMakerMiddleware(session_maker))
-        self.dp.update.middleware(AddHttpSessionMakerMiddleware(http_session_maker))
-        self.dp.update.middleware(AddSettingsStorageMiddleware(settings_storage))
         self.ticket_view = TicketView(config.currency)
-        self.dp.update.middleware(AddTicketViewMiddleware(self.ticket_view))
         self.low_price_calendar_view = CalendarView(config.currency)
-        self.dp.update.middleware(
-            AddCalendarViewMiddleware(self.low_price_calendar_view)
-        )
+        handler_dependencies = [
+            ("session_maker", session_maker),
+            ("http_session_maker", http_session_maker),
+            ("settings_storage", settings_storage),
+            ("ticket_view", self.ticket_view),
+            ("calendar_view", self.low_price_calendar_view),
+        ]
+        for arg_name, arg_value in handler_dependencies:
+            self.dp.update.middleware(Depends(arg_name, arg_value))
 
     async def start(self) -> None:
         await self.dp.start_polling(self.bot)

@@ -7,7 +7,7 @@ from air_bot.domain import model, repository
 
 
 class FakeUserRepo(repository.UserRepo):
-    def __init__(self, users: list[model.User] = None):
+    def __init__(self, users: list[model.User] | None = None):
         if users is None:
             users = []
         self.users = users
@@ -85,7 +85,7 @@ class FakeFlightDirectionRepo(repository.FlightDirectionRepo):
 
 
 class FakeUserFlightDirectionRepo(repository.UserDirectionRepo):
-    def __init__(self, users_directions: list[Tuple[int, int]] = None):
+    def __init__(self, users_directions: list[Tuple[int, int]] | None = None):
         if users_directions is None:
             users_directions = []
         self.users_directions = users_directions
@@ -108,7 +108,7 @@ class FakeUserFlightDirectionRepo(repository.UserDirectionRepo):
 
 
 class FakeTicketRepo(repository.TicketRepo):
-    def __init__(self, tickets: list[Tuple[model.Ticket, int]] = None):
+    def __init__(self, tickets: list[Tuple[model.Ticket, int]] | None = None):
         if tickets is None:
             tickets = []
         self.ticket_rows = tickets
