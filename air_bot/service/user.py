@@ -5,6 +5,7 @@ from loguru import logger
 
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
 from air_bot.adapters.tickets_api import AbstractTicketsApi
+from air_bot.domain.exceptions import DuplicatedFlightDirection
 from air_bot.domain.model import FlightDirection, FlightDirectionInfo, Ticket
 from air_bot.settings import SettingsStorage
 
@@ -37,6 +38,16 @@ async def track(
     async with uow:
         direction_id = await uow.flight_directions.get_direction_id(direction)
         if direction_id is not None:
+            existing_user_directions = await uow.users_directions.get_directions(
+                user_id
+            )
+            if direction_id in existing_user_directions:
+                # TODO: add unit test for that
+                raise DuplicatedFlightDirection(
+                    user_id=user_id,
+                    direction_id=direction_id,
+                    flight_direction=direction,
+                )
             await uow.users_directions.add(user_id, direction_id)
             tickets = await uow.tickets.get_direction_tickets(direction_id)
         await uow.commit()

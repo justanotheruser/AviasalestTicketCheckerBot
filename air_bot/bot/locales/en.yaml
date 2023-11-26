@@ -51,3 +51,4 @@ direction_deleted: Direction deleted
 low_price_calendar: low price calendar
 button_is_outdated: Button is outdated
 you_reached_tracking_limit: You have reached maximum amount of tracked directions
+you_already_track_this_direction: You are already tracking this direction

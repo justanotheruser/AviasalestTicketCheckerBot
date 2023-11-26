@@ -21,7 +21,11 @@ from air_bot.bot.presentation.tickets import TicketView
 from air_bot.bot.utils.date import date_reader
 from air_bot.bot.utils.validation import validate_user_data_for_direction
 from air_bot.config import config
-from air_bot.domain.exceptions import InternalError, TicketsAPIConnectionError
+from air_bot.domain.exceptions import (
+    DuplicatedFlightDirection,
+    InternalError,
+    TicketsAPIConnectionError,
+)
 from air_bot.domain.model import FlightDirection
 from air_bot.service.user import check_if_new_tracking_available, track
 from air_bot.settings import SettingsStorage
@@ -40,7 +44,7 @@ class NewDirection(StatesGroup):
     choosing_return_date = State()
 
 
-@router.callback_query(F.text == "add_flight_direction")
+@router.callback_query(lambda c: c.data == "add_flight_direction")
 async def add_flight_direction_inline(
     callback: CallbackQuery,
     state: FSMContext,
@@ -88,12 +92,11 @@ async def add_flight_direction(
 
 @router.callback_query(
     NewDirection.choosing_with_return_or_not,
-    F.data.in_(
-        [
-            with_or_without_return_kb.one_way_cb_data,
-            with_or_without_return_kb.round_trip_cb_data,
-        ]
-    ),
+    lambda c: c.data
+    in [
+        with_or_without_return_kb.one_way_cb_data,
+        with_or_without_return_kb.round_trip_cb_data,
+    ],
 )
 async def choose_with_or_without_transfer(
     callback: CallbackQuery, state: FSMContext
@@ -110,12 +113,11 @@ async def choose_with_or_without_transfer(
 
 @router.callback_query(
     NewDirection.choosing_with_transfer_or_not,
-    F.data.in_(
-        [
-            direct_or_transfer_kb.direct_flights_cb_data,
-            direct_or_transfer_kb.transfer_flights_cb_data,
-        ]
-    ),
+    lambda c: c.data
+    in [
+        direct_or_transfer_kb.direct_flights_cb_data,
+        direct_or_transfer_kb.transfer_flights_cb_data,
+    ],
 )
 async def choose_airport_start(callback: CallbackQuery, state: FSMContext) -> None:
     with_transfer = callback.data == direct_or_transfer_kb.transfer_flights_cb_data
@@ -368,23 +370,31 @@ async def add_direction_and_show_result(
     except TicketsAPIConnectionError:
         text = f'{i18n.translate("smth_went_wrong")} 😔 \n {i18n.translate("try_search_again")} 🔄'
         await message.answer(text, reply_markup=user_home_kb.keyboard)
-        await state.clear()
-        return
+    except DuplicatedFlightDirection as e:
+        logger.warning(
+            "User tried to add the same direction second time",
+            user_id=e.user_id,
+            direction=e.flight_direction,
+            direction_id=e.direction_id,
+        )
+        await message.answer(
+            i18n.translate("you_already_track_this_direction"),
+            reply_markup=user_home_kb.keyboard,
+        )
     except Exception as e:
         if not isinstance(e, InternalError):
             logger.error(e)
         text = f'{i18n.translate("smth_went_wrong")} 😔 \n {i18n.translate("we_fixing_this")} 🔄'
         await message.answer(text, reply_markup=user_home_kb.keyboard)
+    else:
+        await message.answer(
+            text=f"✅ {i18n.translate('direction_added_here_are_tickets')}\n👇👇👇"
+        )
+        await message.answer(
+            text=ticket_view.print_tickets(tickets, direction),
+            parse_mode="html",
+            disable_web_page_preview=True,
+            reply_markup=show_low_prices_calendar_keyboard(direction_id),
+        )
+    finally:
         await state.clear()
-        return
-
-    await message.answer(
-        text=f"✅ {i18n.translate('direction_added_here_are_tickets')}\n👇👇👇"
-    )
-    await message.answer(
-        text=ticket_view.print_tickets(tickets, direction),
-        parse_mode="html",
-        disable_web_page_preview=True,
-        reply_markup=show_low_prices_calendar_keyboard(direction_id),
-    )
-    await state.clear()

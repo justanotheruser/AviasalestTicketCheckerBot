@@ -37,7 +37,7 @@ async def show_user_flight_directions(message: Message, session_maker) -> None:
         )
 
 
-@router.callback_query(F.text.startswith("show_direction_info"))
+@router.callback_query(lambda c: c.data.startswith("show_direction_info"))
 async def show_direction_info(
     callback: CallbackQuery,
     session_maker,
@@ -80,7 +80,7 @@ async def show_direction_info(
     await callback.answer()
 
 
-@router.callback_query(F.text.startswith("delete_direction"))
+@router.callback_query(lambda c: c.data.startswith("delete_direction"))
 async def delete_direction(
     callback: CallbackQuery,
     session_maker,

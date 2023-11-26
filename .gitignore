@@ -4,6 +4,7 @@ __pycache__/
 build/
 .env
 *.log
+*.log.zip
 temp/
 dist/
 .mypy_cache
