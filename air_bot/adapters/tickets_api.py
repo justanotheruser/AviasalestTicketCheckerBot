@@ -71,6 +71,7 @@ class AviasalesTicketsApi(AbstractTicketsApi):
         self, direction: FlightDirection, departure_year: int, departure_month: int
     ) -> dict[str, Ticket]:
         is_direct = "false" if direction.with_transfer else "true"
+        departure_at = f"{departure_year}-{departure_month:02d}"
         try:
             async with timeout(10):
                 response = await get_grouped_prices(
@@ -79,7 +80,7 @@ class AviasalesTicketsApi(AbstractTicketsApi):
                     self.currency,
                     direction.start_code,
                     direction.end_code,
-                    direction.departure_at,
+                    departure_at,
                     direction.return_at,
                     is_direct,
                 )
