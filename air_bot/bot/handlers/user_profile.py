@@ -23,6 +23,7 @@ router = Router()
 @router.message(F.text == user_home_kb.personal_account_btn_text)
 @router.message(Command(commands=["settings", "настройки"]))
 async def show_user_flight_directions(message: Message, session_maker) -> None:
+    logger.info("User opened account info")
     await message.answer(f"{i18n.translate('tracked_directions')} 👇:")
     user_id = message.from_user.id  # type: ignore[union-attr]
     uow = SqlAlchemyUnitOfWork(session_maker)

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from apscheduler.schedulers.async_ import AsyncScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -16,6 +17,8 @@ class ServiceScheduler:
         settings_changed: asyncio.Event,
         direction_updater: DirectionUpdater,
     ):
+        logging.basicConfig()
+        logging.getLogger("apscheduler").setLevel(logging.WARN)
         self.scheduler = scheduler
         self.setting_storage = setting_storage
         self.settings_changed = settings_changed
