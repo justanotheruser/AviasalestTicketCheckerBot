@@ -3,7 +3,8 @@ from dataclasses import asdict
 from typing import Tuple
 
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
-from air_bot.domain import model, repository
+from air_bot.domain import model
+from air_bot.domain.ports import repository
 
 
 class FakeUserRepo(repository.UserRepo):
@@ -66,7 +67,7 @@ class FakeFlightDirectionRepo(repository.FlightDirectionRepo):
         return sorted_directions[: min(limit, len(sorted_directions))]
 
     async def update_price(
-        self, direction_id: int, price: float, last_update: datetime.datetime
+        self, direction_id: int, price: float | None, last_update: datetime.datetime
     ):
         for i in range(len(self.directions)):
             if self.directions[i].id == direction_id:

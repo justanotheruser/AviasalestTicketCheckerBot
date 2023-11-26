@@ -46,7 +46,7 @@ async def mysql_session_factory(mysql_db_engine) -> async_sessionmaker:
 
 @pytest_asyncio.fixture
 async def moscow2spb_one_way_direction_id(
-    mysql_session_factory, moscow2spb_one_way_direction
+    mysql_session_factory: async_sessionmaker, moscow2spb_one_way_direction
 ):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)

@@ -17,17 +17,20 @@ from air_bot.bot.presentation.low_price_calendar import CalendarView
 from air_bot.bot.presentation.tickets import TicketView
 from air_bot.config import BotConfig
 from air_bot.domain.model import FlightDirection, Ticket
+from air_bot.domain.ports.user_notifier import UserNotifier
 from air_bot.http_session import HttpSessionMaker
+from air_bot.service.direction_updater import DirectionUpdater
 from air_bot.settings import SettingsStorage
 
 
-class BotService:
+class BotService(UserNotifier):
     def __init__(
         self,
         config: BotConfig,
         http_session_maker: HttpSessionMaker,
         session_maker: SessionMaker,
         settings_storage: SettingsStorage,
+        direction_updater: DirectionUpdater,
     ):
         self.dp = Dispatcher(storage=MemoryStorage())
         self.bot = Bot(token=config.bot_token.get_secret_value())
@@ -46,6 +49,7 @@ class BotService:
             ("settings_storage", settings_storage),
             ("ticket_view", self.ticket_view),
             ("calendar_view", self.low_price_calendar_view),
+            ("direction_updater", direction_updater),
         ]
         for arg_name, arg_value in handler_dependencies:
             self.dp.update.middleware(Depends(arg_name, arg_value))

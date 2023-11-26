@@ -28,10 +28,10 @@ async def track(
     direction: FlightDirection,
     tickets_api: AbstractTicketsApi,
     uow: AbstractUnitOfWork,
-) -> Tuple[list[Ticket] | None, int]:
-    """Adds new direction to directions tracked by user with user_id. Returns list of cheapest
-    tickets for this direction or None if request to Aviasales API failed for some reason.
-    If direction is already in DB, returns tickets from DB."""
+) -> Tuple[list[Ticket], int]:
+    """Adds new direction to directions tracked by user with user_id. Returns list of cheapest tickets for this
+    direction and direction id (existing or new one if it is the first user tracking this direction).
+    If DB already contains tickets for this direction - returns tickets from DB."""
     tickets = []
     got_tickets_from_api = False
     async with uow:

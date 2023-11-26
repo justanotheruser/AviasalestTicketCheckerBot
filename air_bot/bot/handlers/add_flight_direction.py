@@ -73,7 +73,7 @@ async def add_flight_direction(
 ):
     if user_id is None:
         # This is so we get correct user id for both usual and inline buttons
-        user_id = message.from_user.id
+        user_id = message.from_user.id  # type: ignore[union-attr]
     uow = SqlAlchemyUnitOfWork(session_maker)
     if not await check_if_new_tracking_available(settings_storage, uow, user_id):
         await message.answer(text=i18n.translate("you_reached_tracking_limit"))
@@ -314,7 +314,7 @@ async def got_return_date_as_text(
         return
     await state.update_data(return_at=return_date)
     await add_direction_and_show_result(
-        message.from_user.id,
+        message.from_user.id,  # type: ignore[union-attr]
         state,
         message,
         session_maker,
@@ -336,7 +336,7 @@ async def got_return_date_from_button(
     await add_direction_and_show_result(
         callback.from_user.id,
         state,
-        callback.message,
+        callback.message,  # type: ignore[arg-type]
         session_maker,
         http_session_maker,
         ticket_view,

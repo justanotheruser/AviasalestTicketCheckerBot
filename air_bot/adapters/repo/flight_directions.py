@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
 from air_bot.domain import model
-from air_bot.domain.repository import FlightDirectionRepo
+from air_bot.domain.ports.repository import FlightDirectionRepo
 
 
 class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
@@ -67,7 +67,7 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
         return [row[0] for row in result.all()]
 
     async def update_price(
-        self, direction_id: int, price: float, last_update: datetime.datetime
+        self, direction_id: int, price: float | None, last_update: datetime.datetime
     ):
         stmt = (
             update(model.FlightDirectionInfo)

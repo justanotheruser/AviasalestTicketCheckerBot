@@ -34,7 +34,7 @@ december: декабрь
 cant_recognize_date_try_again: Failed to recognize the date, please try again
 choose_arrival_date: Укажите дату отправления
 tracked_directions: Отслеживаемые направления
-try_search_again: Попробуйте задать поиск заного.
+try_search_again: Попробуйте задать поиск заново.
 we_fixing_this: Мы уже работаем над исправлением этой ошибки.
 direction_added_here_are_tickets: Направление добавлено, а вот самые низкие цены на сегодня
 no_flights: Рейсов нет!
@@ -50,4 +50,4 @@ delete_direction: Удалить
 direction_deleted: Направление удалено
 low_price_calendar: календарь низких цен
 button_is_outdated: Кнопка устарела
-you_reached_tracking_limit: Вы достгили максимального количества отслеживаемых направлений
+you_reached_tracking_limit: Вы достигли максимального количества отслеживаемых направлений

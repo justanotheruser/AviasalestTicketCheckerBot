@@ -4,7 +4,7 @@ from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
-from air_bot.domain.repository import UserDirectionRepo
+from air_bot.domain.ports.repository import UserDirectionRepo
 
 
 @dataclass(kw_only=True)

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.adapters.repo import orm
 from air_bot.domain import model
-from air_bot.domain.repository import TicketRepo
+from air_bot.domain.ports.repository import TicketRepo
 
 
 @dataclass(kw_only=True)

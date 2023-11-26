@@ -2,6 +2,7 @@ from dataclasses import asdict
 from datetime import datetime, timedelta
 
 import pytest
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from air_bot.adapters.repo.flight_directions import SqlAlchemyFlightDirectionRepo
 from air_bot.domain.model import FlightDirection
@@ -9,7 +10,7 @@ from air_bot.domain.model import FlightDirection
 
 @pytest.mark.asyncio
 async def test_add_direction_and_get_direction_id(
-    mysql_session_factory,
+    mysql_session_factory: async_sessionmaker,
     moscow2spb_one_way_direction,
     moscow2antalya_roundtrip_direction,
 ):
@@ -34,7 +35,7 @@ async def test_add_direction_and_get_direction_id(
             moscow2spb_one_way_direction,
             moscow2antalya_roundtrip_direction,
         ]:
-            direction_id = await repo.get_direction_id(direction)
+            direction_id = await repo.get_direction_id(direction)  # type: ignore[assignment]
             selected_direction_ids.append(direction_id)
 
     assert inserted_direction_ids == selected_direction_ids
@@ -42,7 +43,7 @@ async def test_add_direction_and_get_direction_id(
 
 @pytest.mark.asyncio
 async def test_get_directions_by_ids(
-    mysql_session_factory,
+    mysql_session_factory: async_sessionmaker,
     moscow2spb_one_way_direction,
     moscow2antalya_roundtrip_direction,
 ):
@@ -79,7 +80,9 @@ async def test_get_directions_by_ids(
 
 
 @pytest.mark.asyncio
-async def test_get_non_existing_directions_by_ids(mysql_session_factory):
+async def test_get_non_existing_directions_by_ids(
+    mysql_session_factory: async_sessionmaker,
+):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         directions = await repo.get_directions_info([-1])
@@ -87,7 +90,9 @@ async def test_get_non_existing_directions_by_ids(mysql_session_factory):
 
 
 @pytest.mark.asyncio
-async def test_get_non_existing_direction_by_id(mysql_session_factory):
+async def test_get_non_existing_direction_by_id(
+    mysql_session_factory: async_sessionmaker,
+):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         direction = await repo.get_direction_info(-1)
@@ -96,7 +101,7 @@ async def test_get_non_existing_direction_by_id(mysql_session_factory):
 
 @pytest.mark.asyncio
 async def test_get_most_outdated_directions(
-    mysql_session_factory, moscow2spb_one_way_direction
+    mysql_session_factory: async_sessionmaker, moscow2spb_one_way_direction
 ):
     direction = moscow2spb_one_way_direction
     earliest_direction_last_update = datetime.now()
@@ -140,7 +145,12 @@ async def test_get_most_outdated_directions(
 
 
 @pytest.mark.asyncio
-async def test_update_price(mysql_session_factory, moscow2spb_one_way_direction):
+@pytest.mark.parametrize("new_price", [200.5, None])
+async def test_update_price(
+    mysql_session_factory: async_sessionmaker,
+    moscow2spb_one_way_direction,
+    new_price: float | None,
+):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         direction_id = await repo.add_direction_info(
@@ -151,7 +161,7 @@ async def test_update_price(mysql_session_factory, moscow2spb_one_way_direction)
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
         last_update = datetime.now().replace(microsecond=0)
-        await repo.update_price(direction_id, 200, last_update)
+        await repo.update_price(direction_id, new_price, last_update)
         await session.commit()
 
     async with mysql_session_factory() as session:
@@ -159,13 +169,13 @@ async def test_update_price(mysql_session_factory, moscow2spb_one_way_direction)
         directions = await repo.get_directions_info([direction_id])
         direction = directions[0]
         await session.commit()
-    assert direction.price == 200
+    assert direction.price == new_price
     assert direction.last_update == last_update
 
 
 @pytest.mark.asyncio
 async def test_delete_direction(
-    mysql_session_factory, moscow2antalya_roundtrip_direction
+    mysql_session_factory: async_sessionmaker, moscow2antalya_roundtrip_direction
 ):
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
@@ -186,7 +196,7 @@ async def test_delete_direction(
 
 @pytest.mark.asyncio
 async def test_delete_outdated_directions(
-    mysql_session_factory, moscow2antalya_roundtrip_direction
+    mysql_session_factory: async_sessionmaker, moscow2antalya_roundtrip_direction
 ):
     direction_dict = asdict(moscow2antalya_roundtrip_direction)
     day_before_yesterday = datetime.now() - timedelta(days=2)

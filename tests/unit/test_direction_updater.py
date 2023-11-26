@@ -39,7 +39,7 @@ def get_tickets(prices, roundtrip=False) -> list[Ticket]:
     return result
 
 
-class FakeBotService:
+class FakeUserNotifier:
     def __init__(self):
         self.notify_user = AsyncMock()
 
@@ -60,7 +60,7 @@ async def test_notify_subscribed_users_if_new_price_below_threshold(
     await uow.users_directions.add(user_id=2, direction_id=direction_id)
     tickets = get_tickets([89, 100, 120])
     aviasales_api = Mock(get_tickets=AsyncMock(return_value=tickets))
-    bot = FakeBotService()
+    bot = FakeUserNotifier()
     settings = make_settings()
     await update(uow, aviasales_api, bot, settings)
     assert bot.notify_user.call_count == 2
@@ -88,7 +88,7 @@ async def test_notify_subscribed_users_if_first_ticket_appears(
     await uow.users_directions.add(user_id=1, direction_id=direction_id)
     tickets = get_tickets([89, 100, 120])
     aviasales_api = Mock(get_tickets=AsyncMock(return_value=tickets))
-    bot = FakeBotService()
+    bot = FakeUserNotifier()
     settings = make_settings()
     await update(uow, aviasales_api, bot, settings)
     assert bot.notify_user.call_count == 1

@@ -43,7 +43,7 @@ class FlightDirectionRepo(ABC):
 
     @abstractmethod
     async def update_price(
-        self, direction_id: int, price: float, last_update: datetime.datetime
+        self, direction_id: int, price: float | None, last_update: datetime.datetime
     ):
         raise NotImplementedError
 

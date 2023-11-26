@@ -1,6 +1,7 @@
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 
 from air_bot.adapters.repo.uow import SqlAlchemyUnitOfWork
 from air_bot.bot.i18n import i18n
@@ -31,7 +32,7 @@ async def show_user_flight_directions(message: Message, session_maker) -> None:
     for direction_info in users_directions:
         await message.answer(
             print_direction(direction_info),
-            reply_markup=flight_direction_actions(direction_info.id),
+            reply_markup=flight_direction_actions(direction_info.id),  # type: ignore[arg-type]
         )
 
 
@@ -59,6 +60,14 @@ async def show_direction_info(
     async with uow:
         direction_info = await uow.flight_directions.get_direction_info(direction_id)
         await uow.commit()
+
+    if direction_info is None:
+        logger.warning(
+            "User tried to display direction info but it wasn't found",
+            direction_id=direction_id,
+        )
+        await callback.message.answer(i18n.translate("button_is_outdated"))  # type: ignore[union-attr]
+        return
 
     text = ticket_view.print_ticket(cheapest_ticket, direction_info.direction)
     await callback.message.answer(  # type: ignore[union-attr]

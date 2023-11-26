@@ -58,6 +58,8 @@ class TicketView:
         departure_arrival_at_str = print_datetime(
             ticket.departure_at + ticket.duration_to
         )
+        assert ticket.return_at
+        assert ticket.duration_back
         return_at_str = print_datetime(ticket.return_at)
         return_arrival_at_str = print_datetime(ticket.return_at + ticket.duration_back)
         ticket_link = get_ticket_link(

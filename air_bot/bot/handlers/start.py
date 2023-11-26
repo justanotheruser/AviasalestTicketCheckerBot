@@ -14,10 +14,10 @@ router = Router()
 
 @router.message(Command(commands=["start"]))
 async def start(message: Message, session_maker: AbstractSessionMaker) -> None:
-    await add_user(message.from_user.id, SqlAlchemyUnitOfWork(session_maker))
+    await add_user(message.from_user.id, SqlAlchemyUnitOfWork(session_maker))  # type: ignore[union-attr]
     await message.answer(
         i18n.translate(
-            "start_greeting", username=message.from_user.first_name
+            "start_greeting", username=message.from_user.first_name  # type: ignore[union-attr]
         ),  # type: ignore[union-attr]
         reply_markup=user_home_kb.keyboard,
     )

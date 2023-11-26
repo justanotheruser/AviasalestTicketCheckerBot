@@ -21,12 +21,17 @@ class App(ServiceWithGracefulShutdown):
         self.settings_storage = SettingsStorage(
             config.settings_file_path, self.settings_changed_event
         )
-        self.bot = BotService(
-            config, self.http_session_maker, self.session_maker, self.settings_storage
-        )
         self.direction_updater = DirectionUpdater(
-            self.settings_storage, self.bot, self.session_maker, self.http_session_maker
+            self.settings_storage, self.session_maker, self.http_session_maker
         )
+        self.bot = BotService(
+            config,
+            self.http_session_maker,
+            self.session_maker,
+            self.settings_storage,
+            self.direction_updater,
+        )
+        self.direction_updater.set_user_notifier(self.bot)
 
     async def start(self):
         await self.session_maker.start()

@@ -25,7 +25,7 @@ class AbstractTicketsApi(ABC):
     @abstractmethod
     async def get_cheapest_tickets_for_month(
         self, direction: FlightDirection, departure_year: int, departure_month: int
-    ) -> list[Ticket]:
+    ) -> dict[str, Ticket]:
         raise NotImplementedError
 
 
@@ -191,7 +191,7 @@ async def get_grouped_prices(
         return await response.text()
 
 
-def parse_tickets_by_date(json_response):
+def parse_tickets_by_date(json_response) -> dict[str, Ticket]:
     if "data" not in json_response:
         logger.error(f"Unexpected response from Aviasales: {json_response}")
         raise TicketsParsingError()

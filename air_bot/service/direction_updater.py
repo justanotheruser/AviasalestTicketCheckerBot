@@ -6,34 +6,39 @@ from loguru import logger
 from air_bot.adapters.repo.session_maker import SessionMaker
 from air_bot.adapters.repo.uow import AbstractUnitOfWork, SqlAlchemyUnitOfWork
 from air_bot.adapters.tickets_api import AbstractTicketsApi, AviasalesTicketsApi
-from air_bot.bot.service import BotService
 from air_bot.domain.exceptions import (
     TicketsAPIConnectionError,
     TicketsAPIError,
     TicketsParsingError,
 )
 from air_bot.domain.model import FlightDirectionInfo, Ticket
+from air_bot.domain.ports.user_notifier import UserNotifier
 from air_bot.settings import Settings, SettingsStorage, UsersSettings
 
 
+# TODO: move this into domain
 class DirectionUpdater:
     def __init__(
         self,
         settings_storage: SettingsStorage,
-        bot: BotService,
         session_maker: SessionMaker,
         http_session_maker,
     ):
         self.settings_storage = settings_storage
-        self.bot = bot
+        self.user_notifier: UserNotifier | None = None
         self.session_maker = session_maker
         self.http_session_maker = http_session_maker
+
+    def set_user_notifier(self, bot: UserNotifier):
+        self.user_notifier = bot
 
     async def update(self):
         try:
             uow = SqlAlchemyUnitOfWork(self.session_maker)
             aviasales_api = AviasalesTicketsApi(self.http_session_maker)
-            await update(uow, aviasales_api, self.bot, self.settings_storage.settings)
+            await update(
+                uow, aviasales_api, self.user_notifier, self.settings_storage.settings
+            )
         except Exception as e:
             logger.error(e)
 
@@ -48,7 +53,10 @@ class DirectionUpdater:
 
 
 async def update(
-    uow: AbstractUnitOfWork, aviasales_api: AbstractTicketsApi, bot, settings: Settings
+    uow: AbstractUnitOfWork,
+    aviasales_api: AbstractTicketsApi,
+    user_notifier: UserNotifier | None,
+    settings: Settings,
 ):
     logger.info("Checking if some directions need update")
     update_threshold = datetime.now() - timedelta(
@@ -62,13 +70,13 @@ async def update(
         await uow.commit()
     logger.info(f"{len(directions)} direction(s) need update")
     for direction in directions:
-        await _update_direction(uow, aviasales_api, bot, settings, direction)
+        await _update_direction(uow, aviasales_api, user_notifier, settings, direction)
 
 
 async def _update_direction(
     uow: AbstractUnitOfWork,
     aviasales_api: AbstractTicketsApi,
-    bot,
+    user_notifier: UserNotifier | None,
     settings: Settings,
     direction_info: FlightDirectionInfo,
 ):
@@ -86,6 +94,7 @@ async def _update_direction(
     last_price = direction_info.price
     direction_info.price = cheapest_price
 
+    assert direction_info.id is not None
     async with uow:
         await uow.tickets.remove_for_direction(direction_info.id)
         await uow.tickets.add(tickets, direction_info.id)
@@ -94,17 +103,23 @@ async def _update_direction(
         )
         await uow.commit()
 
-    await _notify_users(uow, bot, settings.users, direction_info, last_price, tickets)
+    if user_notifier is None:
+        logger.warning("Can't notify users after update - bot was not set yet")
+        return
+    await _notify_users(
+        uow, user_notifier, settings.users, direction_info, last_price, tickets
+    )
 
 
 async def _notify_users(
     uow: AbstractUnitOfWork,
-    bot,
+    user_notifier: UserNotifier,
     settings: UsersSettings,
     direction_info: FlightDirectionInfo,
     last_price: float | None,
     tickets: list[Ticket],
 ):
+    assert direction_info.id is not None
     if not _users_need_notification(settings, last_price, tickets):
         return
     async with uow:
@@ -115,7 +130,7 @@ async def _notify_users(
     )
     for user_id in user_ids:
         try:
-            await bot.notify_user(
+            await user_notifier.notify_user(
                 user_id, tickets, direction_info.direction, direction_info.id
             )
         except TelegramAPIError:

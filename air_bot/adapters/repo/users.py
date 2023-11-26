@@ -2,7 +2,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from air_bot.domain.model import User
-from air_bot.domain.repository import UserRepo
+from air_bot.domain.ports.repository import UserRepo
 
 
 class DuplicatedUserIdError(Exception):
