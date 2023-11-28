@@ -81,6 +81,7 @@ async def _update_direction(
     settings: Settings,
     direction_info: FlightDirectionInfo,
 ):
+    logger.info(f"Updating info about direction {direction_info.id}")
     update_timestamp = datetime.now()
     try:
         tickets = await aviasales_api.get_tickets(direction_info.direction, limit=3)
@@ -122,14 +123,22 @@ async def _notify_users(
 ):
     assert direction_info.id is not None
     if not _users_need_notification(settings, last_price, tickets):
+        logger.info("No notifications needed", direction_id=direction_info.id)
         return
     async with uow:
         user_ids = await uow.users_directions.get_users(direction_info.id)
         await uow.commit()
     logger.info(
-        f"Sending notifications about new price for direction {direction_info.id} to {len(user_ids)} users"
+        f"Sending notifications about new price for direction {direction_info.id} to {len(user_ids)} user(s)",
+        user_ids=user_ids,
     )
     for user_id in user_ids:
+        # TODO make this parallel!
+        logger.info(
+            "Sending price update notification to user",
+            user_id=user_id,
+            direction_id=direction_info.id,
+        )
         try:
             await user_notifier.notify_user(
                 user_id, tickets, direction_info.direction, direction_info.id
