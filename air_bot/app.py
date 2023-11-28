@@ -1,6 +1,7 @@
 import asyncio
 
 from apscheduler.schedulers.async_ import AsyncScheduler
+from loguru import logger
 
 from air_bot.adapters.repo.session_maker import SessionMaker
 from air_bot.bot.service import BotService
@@ -15,6 +16,7 @@ from air_bot.settings import SettingsStorage
 class App(ServiceWithGracefulShutdown):
     def __init__(self):
         super().__init__()
+        logger.info(f"Starting with config: {config}")
         self.session_maker = SessionMaker()
         self.http_session_maker = HttpSessionMaker()
         self.settings_changed_event = asyncio.Event()

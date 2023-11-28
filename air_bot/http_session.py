@@ -35,7 +35,8 @@ def get_trace_config() -> aiohttp.TraceConfig:
 
 
 def create_aiohttp_logger():
-    log_level = "DEBUG" if config.env == "debug" else "INFO"
+    # TODO: configure separately
+    log_level = config.log_level
     logger.add(
         "logs/aiohttp_client_{time}.log",
         rotation="1 day",

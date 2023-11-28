@@ -28,7 +28,7 @@ class InterceptHandler(logging.Handler):
 
 
 def main():
-    log_level = "DEBUG" if config.env == "debug" else "INFO"
+    log_level = config.log_level.upper()
     logger.add(
         "logs/air_bot_{time}.log",
         rotation="1 day",

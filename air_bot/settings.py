@@ -42,6 +42,7 @@ class SettingsStorage:
         self.settings_file_path = settings_file_path
         self.settings_changed = settings_changed
         self._settings = read_config(self.settings_file_path)
+        logger.info(f"Started with settings: {self._settings}")
 
     @property
     def settings(self) -> Settings:

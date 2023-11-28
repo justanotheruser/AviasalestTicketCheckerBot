@@ -17,7 +17,8 @@ class BotConfig(BaseSettings):
     locale: str
     currency: str
     settings_file_path: str
-    env: str
+    log_level: str
+    log_level_sqlalchemy: str = "WARNING"
 
     class Config:
         env_prefix = "AIR_BOT_"
