@@ -5,7 +5,10 @@ from loguru import logger
 
 from air_bot.adapters.repo.uow import AbstractUnitOfWork
 from air_bot.adapters.tickets_api import AbstractTicketsApi
-from air_bot.domain.exceptions import DuplicatedFlightDirection
+from air_bot.domain.exceptions import (
+    DuplicatedFlightDirection,
+    StartAndEndOfDirectionAreTheSameError,
+)
 from air_bot.domain.model import FlightDirection, FlightDirectionInfo, Ticket
 from air_bot.settings import SettingsStorage
 
@@ -33,6 +36,8 @@ async def track(
     """Adds new direction to directions tracked by user with user_id. Returns list of cheapest tickets for this
     direction and direction id (existing or new one if it is the first user tracking this direction).
     If DB already contains tickets for this direction - returns tickets from DB."""
+    if direction.start_code == direction.end_code:
+        raise StartAndEndOfDirectionAreTheSameError(user_id, direction)
     tickets = []
     got_tickets_from_api = False
     async with uow:

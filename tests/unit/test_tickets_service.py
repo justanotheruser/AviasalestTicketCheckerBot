@@ -1,10 +1,12 @@
 import datetime
 import random
+from dataclasses import asdict
 from unittest.mock import AsyncMock, Mock
 
 import pytest
 from pytest_unordered import unordered
 
+from air_bot.domain.exceptions import StartAndEndOfDirectionAreTheSameError
 from air_bot.domain.model import FlightDirection, Ticket
 from air_bot.service.user import track
 from tests.unit.fakes import FakeUnitOfWork
@@ -125,3 +127,12 @@ async def test_get_tickets_from_api_for_existing_direction_with_no_tickets():
     assert tracked_direction_id == direction_id
     tickets_in_repo = await uow.tickets.get_direction_tickets(direction_id)
     assert tickets_in_repo == tickets
+
+
+@pytest.mark.asyncio
+async def test_cant_add_direction_with_destination_same_as_origin():
+    direction_dict = asdict(FLIGHT_DIRECTION_WITH_RETURN)
+    direction_dict["end_code"] = direction_dict["start_code"]
+    direction = FlightDirection(**direction_dict)
+    with pytest.raises(StartAndEndOfDirectionAreTheSameError):
+        await track(42, direction, Mock(), Mock())
