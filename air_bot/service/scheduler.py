@@ -24,6 +24,7 @@ class ServiceScheduler:
         self.settings_changed = settings_changed
         self.direction_updater = direction_updater
         self.direction_updater_schedule = None
+        self.update_cycle_task = None
 
     async def start(self):
         await self.scheduler.start_in_background()
@@ -41,14 +42,24 @@ class ServiceScheduler:
             await self.scheduler.remove_schedule(self.direction_updater_schedule)
         settings = self.setting_storage.settings.scheduler
         interval = settings.directions_update_interval
+        #if settings.directions_update_interval_units == Interval.MINUTES:
+        #    trigger = IntervalTrigger(minutes=interval)
+        #else:
+        #    trigger = IntervalTrigger(seconds=interval)
+        #self.direction_updater_schedule = await self.scheduler.add_schedule(
+        #    self.direction_updater.update, trigger
+        #)
+
         if settings.directions_update_interval_units == Interval.MINUTES:
-            trigger = IntervalTrigger(minutes=interval)
-        else:
-            trigger = IntervalTrigger(seconds=interval)
-        self.direction_updater_schedule = await self.scheduler.add_schedule(
-            self.direction_updater.update, trigger
-        )
-        pass
+            interval *= 60
+        if self.update_cycle_task:
+            self.update_cycle_task.cancel()
+        self.update_cycle_task = asyncio.create_task(self.update_cycle(interval))
+
+    async def update_cycle(self, interval: int):
+        while True:
+            await self.direction_updater.update()
+            await asyncio.sleep(interval)
 
     async def _monitor_settings_change(self):
         while True:

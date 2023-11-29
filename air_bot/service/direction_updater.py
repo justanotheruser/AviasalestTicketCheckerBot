@@ -16,7 +16,6 @@ from air_bot.domain.ports.user_notifier import UserNotifier
 from air_bot.settings import Settings, SettingsStorage, UsersSettings
 
 
-# TODO: move this into domain
 class DirectionUpdater:
     def __init__(
         self,
