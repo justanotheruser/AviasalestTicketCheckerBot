@@ -44,6 +44,8 @@ class FakeUserNotifier:
         self.notify_user = AsyncMock()
 
 
+# TODO: check last_update and last_update_try are updated
+# TODO: run integration tests for repo with FakeRepos too
 @pytest.mark.asyncio
 async def test_notify_subscribed_users_if_new_price_below_threshold(
     moscow2spb_one_way_direction,
