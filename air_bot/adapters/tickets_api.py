@@ -160,9 +160,7 @@ def parse_ticket(json_ticket) -> Ticket:
 
 def datetime_from_ticket(datetime_str: str) -> datetime:
     """Converts datetime from string in Aviasales API response to Python's datetime; ditches timezone"""
-    return datetime.strptime(
-        str(datetime_str)[: len(datetime_str) - 9], "%Y-%m-%dT%H:%M"
-    )
+    return datetime.strptime(datetime_str[:16], "%Y-%m-%dT%H:%M")
 
 
 async def get_grouped_prices(
