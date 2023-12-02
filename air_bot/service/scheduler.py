@@ -4,6 +4,7 @@ import logging
 from apscheduler.schedulers.async_ import AsyncScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from loguru import logger
 
 from air_bot.service.direction_updater import DirectionUpdater
 from air_bot.settings import Interval, SettingsStorage
@@ -42,13 +43,13 @@ class ServiceScheduler:
             await self.scheduler.remove_schedule(self.direction_updater_schedule)
         settings = self.setting_storage.settings.scheduler
         interval = settings.directions_update_interval
-        #if settings.directions_update_interval_units == Interval.MINUTES:
+        # if settings.directions_update_interval_units == Interval.MINUTES:
         #    trigger = IntervalTrigger(minutes=interval)
-        #else:
+        # else:
         #    trigger = IntervalTrigger(seconds=interval)
-        #self.direction_updater_schedule = await self.scheduler.add_schedule(
+        # self.direction_updater_schedule = await self.scheduler.add_schedule(
         #    self.direction_updater.update, trigger
-        #)
+        # )
 
         if settings.directions_update_interval_units == Interval.MINUTES:
             interval *= 60
@@ -58,8 +59,12 @@ class ServiceScheduler:
 
     async def update_cycle(self, interval: int):
         while True:
-            await self.direction_updater.update()
-            await asyncio.sleep(interval)
+            try:
+                await self.direction_updater.update()
+            except Exception as e:
+                logger.exception(f"Exception in direction updater: {e}")
+            finally:
+                await asyncio.sleep(interval)
 
     async def _monitor_settings_change(self):
         while True:
