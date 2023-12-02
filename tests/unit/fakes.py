@@ -36,7 +36,8 @@ class FakeFlightDirectionRepo(repository.FlightDirectionRepo):
                 id=self._next_id,
                 **asdict(direction),
                 price=price,
-                last_update=last_update
+                last_update=last_update,
+                last_update_try=last_update
             )
         )
         row_id = self._next_id

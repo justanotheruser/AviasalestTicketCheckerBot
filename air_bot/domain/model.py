@@ -39,6 +39,7 @@ class FlightDirectionInfo:
     return_at: Optional[str]
     price: float | None
     last_update: datetime.datetime
+    last_update_try: datetime.datetime
 
     @cached_property
     def direction(self):

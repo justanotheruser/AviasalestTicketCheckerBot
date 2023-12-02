@@ -85,6 +85,7 @@ async def _update_direction(
     try:
         tickets = await aviasales_api.get_tickets(direction_info.direction, limit=3)
     except (TicketsAPIConnectionError, TicketsAPIError, TicketsParsingError):
+        # logger.info(f'Failed to update info about direction {direction_info.id} due to connection errors')
         return
     if tickets:
         logger.info(f"Received tickets for direction {direction_info.id}")

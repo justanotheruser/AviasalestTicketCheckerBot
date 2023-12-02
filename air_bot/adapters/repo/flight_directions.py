@@ -22,8 +22,9 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
     ) -> int:
         stmt = text(
             "INSERT INTO flight_directions (start_code, start_name, end_code, end_name, "
-            "with_transfer, departure_at, return_at, price, last_update) VALUES (:start_code, :start_name,"
-            ":end_code, :end_name, :with_transfer, :departure_at, :return_at, :price, :last_update)"
+            "with_transfer, departure_at, return_at, price, last_update, last_update_try) VALUES (:start_code, "
+            ":start_name, :end_code, :end_name, :with_transfer, :departure_at, :return_at, :price, :last_update, "
+            ":last_update)"
         )
         stmt = stmt.bindparams(
             **asdict(direction), price=price, last_update=last_update
