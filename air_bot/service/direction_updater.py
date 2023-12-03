@@ -63,9 +63,11 @@ async def update(
         minutes=settings.direction_updater.needs_update_after
     )
     async with uow:
-        directions = await uow.flight_directions.get_directions_with_last_update_before(
-            update_threshold,
-            settings.direction_updater.max_directions_for_single_update,
+        directions = (
+            await uow.flight_directions.get_directions_with_last_update_try_before(
+                update_threshold,
+                settings.direction_updater.max_directions_for_single_update,
+            )
         )
         await uow.commit()
     logger.info(f"{len(directions)} direction(s) need update")
@@ -81,11 +83,23 @@ async def _update_direction(
     direction_info: FlightDirectionInfo,
 ):
     logger.info(f"Updating info about direction {direction_info.id}")
+    assert direction_info.id is not None
     update_timestamp = datetime.now()
     try:
         tickets = await aviasales_api.get_tickets(direction_info.direction, limit=3)
-    except (TicketsAPIConnectionError, TicketsAPIError, TicketsParsingError):
+    except TicketsAPIConnectionError:
+        logger.info(
+            f"Failed to update info about direction {direction_info.id} due to connection errors"
+        )
         return
+    except (TicketsAPIError, TicketsParsingError):
+        async with uow:
+            await uow.flight_directions.update_last_update_try(
+                direction_info.id, update_timestamp
+            )
+            await uow.commit()
+        return
+
     if tickets:
         logger.info(f"Received tickets for direction {direction_info.id}")
         cheapest_price = tickets[0].price
@@ -95,7 +109,6 @@ async def _update_direction(
     last_price = direction_info.price
     direction_info.price = cheapest_price
 
-    assert direction_info.id is not None
     async with uow:
         await uow.tickets.remove_for_direction(direction_info.id)
         await uow.tickets.add(tickets, direction_info.id)

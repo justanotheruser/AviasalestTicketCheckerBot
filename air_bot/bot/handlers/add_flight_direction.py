@@ -382,8 +382,7 @@ async def add_direction_and_show_result(
             reply_markup=user_home_kb.keyboard,
         )
     except Exception as e:
-        if not isinstance(e, InternalError):
-            logger.error(e)
+        logger.exception(e)
         text = f'{i18n.translate("smth_went_wrong")} 😔 \n {i18n.translate("we_fixing_this")} 🔄'
         await message.answer(text, reply_markup=user_home_kb.keyboard)
     else:

@@ -120,7 +120,7 @@ async def test_get_most_outdated_directions(
     last_update = last_updates[-1] - timedelta(minutes=time_step // 2)
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
-        directions = await repo.get_directions_with_last_update_before(
+        directions = await repo.get_directions_with_last_update_try_before(
             last_update, limit=100
         )
     assert len(directions) == len(last_updates) - 1
@@ -130,7 +130,7 @@ async def test_get_most_outdated_directions(
 
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
-        directions = await repo.get_directions_with_last_update_before(
+        directions = await repo.get_directions_with_last_update_try_before(
             last_update, limit=1
         )
     assert len(directions) == 1
@@ -138,7 +138,7 @@ async def test_get_most_outdated_directions(
     last_update = earliest_direction_last_update - timedelta(seconds=1)
     async with mysql_session_factory() as session:
         repo = SqlAlchemyFlightDirectionRepo(session)
-        directions = await repo.get_directions_with_last_update_before(
+        directions = await repo.get_directions_with_last_update_try_before(
             last_update, limit=100
         )
     assert directions == []

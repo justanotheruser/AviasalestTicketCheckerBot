@@ -40,6 +40,7 @@ flight_direction_info_table = Table(
     Column("return_at", String(10), nullable=True),
     Column("price", Float, nullable=True),
     Column("last_update", DateTime, nullable=False),
+    Column("last_update_try", DateTime, nullable=False),
     UniqueConstraint(
         "start_code",
         "end_code",

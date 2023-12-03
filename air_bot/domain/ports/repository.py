@@ -36,7 +36,7 @@ class FlightDirectionRepo(ABC):
             return None
 
     @abstractmethod
-    async def get_directions_with_last_update_before(
+    async def get_directions_with_last_update_try_before(
         self, last_update: datetime.datetime, limit: int
     ) -> list[model.FlightDirectionInfo]:
         raise NotImplementedError
@@ -44,6 +44,12 @@ class FlightDirectionRepo(ABC):
     @abstractmethod
     async def update_price(
         self, direction_id: int, price: float | None, last_update: datetime.datetime
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_last_update_try(
+        self, direction_id: int, last_update_try: datetime.datetime
     ):
         raise NotImplementedError
 

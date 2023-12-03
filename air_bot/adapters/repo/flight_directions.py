@@ -22,8 +22,9 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
     ) -> int:
         stmt = text(
             "INSERT INTO flight_directions (start_code, start_name, end_code, end_name, "
-            "with_transfer, departure_at, return_at, price, last_update) VALUES (:start_code, :start_name,"
-            ":end_code, :end_name, :with_transfer, :departure_at, :return_at, :price, :last_update)"
+            "with_transfer, departure_at, return_at, price, last_update, last_update_try) VALUES (:start_code, "
+            ":start_name, :end_code, :end_name, :with_transfer, :departure_at, :return_at, :price, :last_update, "
+            ":last_update)"
         )
         stmt = stmt.bindparams(
             **asdict(direction), price=price, last_update=last_update
@@ -54,12 +55,12 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
         result = await self.session.execute(stmt)
         return [row[0] for row in result.all()]
 
-    async def get_directions_with_last_update_before(
-        self, last_update: datetime.datetime, limit: int
+    async def get_directions_with_last_update_try_before(
+        self, last_update_try: datetime.datetime, limit: int
     ) -> list[model.FlightDirectionInfo]:
         stmt = (
             select(model.FlightDirectionInfo)
-            .where(orm.flight_direction_info_table.c.last_update < last_update)
+            .where(orm.flight_direction_info_table.c.last_update_try < last_update_try)
             .order_by(orm.flight_direction_info_table.c.last_update)
             .limit(limit)
         )
@@ -72,7 +73,17 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
         stmt = (
             update(model.FlightDirectionInfo)
             .where(orm.flight_direction_info_table.c.id == direction_id)
-            .values(price=price, last_update=last_update)
+            .values(price=price, last_update=last_update, last_update_try=last_update)
+        )
+        await self.session.execute(stmt)
+
+    async def update_last_update_try(
+        self, direction_id: int, last_update_try: datetime.datetime
+    ):
+        stmt = (
+            update(model.FlightDirectionInfo)
+            .where(orm.flight_direction_info_table.c.id == direction_id)
+            .values(last_update_try=last_update_try)
         )
         await self.session.execute(stmt)
 

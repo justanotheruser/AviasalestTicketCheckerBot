@@ -36,7 +36,8 @@ class FakeFlightDirectionRepo(repository.FlightDirectionRepo):
                 id=self._next_id,
                 **asdict(direction),
                 price=price,
-                last_update=last_update
+                last_update=last_update,
+                last_update_try=last_update
             )
         )
         row_id = self._next_id
@@ -58,11 +59,12 @@ class FakeFlightDirectionRepo(repository.FlightDirectionRepo):
                 result.append(direction_info)
         return result
 
-    async def get_directions_with_last_update_before(
-        self, last_update: datetime.datetime, limit: int
+    # TODO: make cutoff by last_update_try
+    async def get_directions_with_last_update_try_before(
+        self, last_update_try: datetime.datetime, limit: int
     ) -> list[model.FlightDirectionInfo]:
         sorted_directions = sorted(
-            self.directions, key=lambda direction: direction.last_update
+            self.directions, key=lambda direction: direction.last_update_try
         )
         return sorted_directions[: min(limit, len(sorted_directions))]
 
@@ -73,6 +75,14 @@ class FakeFlightDirectionRepo(repository.FlightDirectionRepo):
             if self.directions[i].id == direction_id:
                 self.directions[i].price = price
                 self.directions[i].last_update = last_update
+                self.directions[i].last_update_try = last_update
+
+    async def update_last_update_try(
+        self, direction_id: int, last_update_try: datetime.datetime
+    ):
+        for i in range(len(self.directions)):
+            if self.directions[i].id == direction_id:
+                self.directions[i].last_update_try = last_update_try
 
     async def delete_direction(self, direction_id: int):
         self.directions = [
