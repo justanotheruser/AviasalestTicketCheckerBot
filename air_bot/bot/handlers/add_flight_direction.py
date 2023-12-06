@@ -23,7 +23,6 @@ from air_bot.bot.utils.validation import validate_user_data_for_direction
 from air_bot.config import config
 from air_bot.domain.exceptions import (
     DuplicatedFlightDirection,
-    InternalError,
     TicketsAPIConnectionError,
 )
 from air_bot.domain.model import FlightDirection

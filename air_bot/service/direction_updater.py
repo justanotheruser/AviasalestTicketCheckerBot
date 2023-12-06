@@ -1,6 +1,8 @@
+import asyncio
 from datetime import datetime, timedelta
 
 from aiogram.exceptions import TelegramAPIError
+from async_timeout import timeout
 from loguru import logger
 
 from air_bot.adapters.repo.session_maker import SessionMaker
@@ -14,6 +16,8 @@ from air_bot.domain.exceptions import (
 from air_bot.domain.model import FlightDirectionInfo, Ticket
 from air_bot.domain.ports.user_notifier import UserNotifier
 from air_bot.settings import Settings, SettingsStorage, UsersSettings
+
+UPDATE_TIMEOUT_SEC = 10
 
 
 class DirectionUpdater:
@@ -72,7 +76,15 @@ async def update(
         await uow.commit()
     logger.info(f"{len(directions)} direction(s) need update")
     for direction in directions:
-        await _update_direction(uow, aviasales_api, user_notifier, settings, direction)
+        try:
+            async with timeout(UPDATE_TIMEOUT_SEC):
+                await _update_direction(
+                    uow, aviasales_api, user_notifier, settings, direction
+                )
+        except asyncio.TimeoutError:
+            logger.warning(
+                f"Update for direction {direction.id} took longer than {UPDATE_TIMEOUT_SEC} seconds"
+            )
 
 
 async def _update_direction(
@@ -88,11 +100,12 @@ async def _update_direction(
     try:
         tickets = await aviasales_api.get_tickets(direction_info.direction, limit=3)
     except TicketsAPIConnectionError:
-        logger.info(
+        logger.warning(
             f"Failed to update info about direction {direction_info.id} due to connection errors"
         )
         return
-    except (TicketsAPIError, TicketsParsingError):
+    except (TicketsAPIError, TicketsParsingError) as e:
+        logger.error(f"Failed to update info about direction {direction_info.id}: {e}")
         async with uow:
             await uow.flight_directions.update_last_update_try(
                 direction_info.id, update_timestamp
