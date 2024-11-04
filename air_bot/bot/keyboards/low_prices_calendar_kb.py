@@ -18,7 +18,7 @@ def show_low_prices_calendar_keyboard(direction_id: int) -> InlineKeyboardMarkup
 def low_prices_calendar_nav_keyboard(
     show_prev_button: bool, show_next_button: bool
 ) -> InlineKeyboardMarkup:
-    kb: list[list[InlineKeyboardButton]] = [[]]
+    kb: List[List[InlineKeyboardButton]] = [[]]
     if show_prev_button:
         kb[0].append(
             InlineKeyboardButton(

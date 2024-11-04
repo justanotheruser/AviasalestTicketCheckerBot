@@ -1,5 +1,6 @@
 import datetime
 from dataclasses import asdict
+from typing import List, Optional
 
 from sqlalchemy import delete, insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +18,7 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
     async def add_direction_info(
         self,
         direction: model.FlightDirection,
-        price: float | None,
+        price: Optional[float],
         last_update: datetime.datetime,
     ) -> int:
         stmt = text(
@@ -32,7 +33,7 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
         result = await self.session.execute(stmt)
         return result.lastrowid  # type: ignore[attr-defined]
 
-    async def get_direction_id(self, direction: model.FlightDirection) -> int | None:
+    async def get_direction_id(self, direction: model.FlightDirection) -> Optional[int]:
         """Returns id of row with direction info if exists or None otherwise"""
         stmt = select(model.FlightDirectionInfo).filter_by(
             start_code=direction.start_code,
@@ -48,8 +49,8 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
         return row[0].id
 
     async def get_directions_info(
-        self, direction_ids: list[int]
-    ) -> list[model.FlightDirectionInfo]:
+        self, direction_ids: List[int]
+    ) -> List[model.FlightDirectionInfo]:
         stmt = select(model.FlightDirectionInfo)
         stmt = stmt.where(orm.flight_direction_info_table.c.id.in_(direction_ids))
         result = await self.session.execute(stmt)
@@ -57,7 +58,7 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
 
     async def get_directions_with_last_update_try_before(
         self, last_update_try: datetime.datetime, limit: int
-    ) -> list[model.FlightDirectionInfo]:
+    ) -> List[model.FlightDirectionInfo]:
         stmt = (
             select(model.FlightDirectionInfo)
             .where(orm.flight_direction_info_table.c.last_update_try < last_update_try)
@@ -68,7 +69,7 @@ class SqlAlchemyFlightDirectionRepo(FlightDirectionRepo):
         return [row[0] for row in result.all()]
 
     async def update_price(
-        self, direction_id: int, price: float | None, last_update: datetime.datetime
+        self, direction_id: int, price: Optional[float], last_update: datetime.datetime
     ):
         stmt = (
             update(model.FlightDirectionInfo)

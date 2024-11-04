@@ -1,5 +1,5 @@
 import datetime
-from typing import Tuple
+from typing import List, Tuple
 
 from loguru import logger
 
@@ -32,7 +32,7 @@ async def track(
     direction: FlightDirection,
     tickets_api: AbstractTicketsApi,
     uow: AbstractUnitOfWork,
-) -> Tuple[list[Ticket], int]:
+) -> Tuple[List[Ticket], int]:
     """Adds new direction to directions tracked by user with user_id. Returns list of cheapest tickets for this
     direction and direction id (existing or new one if it is the first user tracking this direction).
     If DB already contains tickets for this direction - returns tickets from DB."""
@@ -90,7 +90,7 @@ async def track(
 
 async def get_user_directions(
     user_id: int, uow: AbstractUnitOfWork
-) -> list[FlightDirectionInfo]:
+) -> List[FlightDirectionInfo]:
     async with uow:
         direction_ids = await uow.users_directions.get_directions(user_id)
         if not direction_ids:

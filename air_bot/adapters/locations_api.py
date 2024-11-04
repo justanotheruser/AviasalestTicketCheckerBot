@@ -1,6 +1,7 @@
 import asyncio
 import json
 from abc import ABC, abstractmethod
+from typing import List
 
 from aiohttp import ClientConnectionError, ClientSession
 from async_timeout import timeout
@@ -15,7 +16,7 @@ from air_bot.domain.model import Location
 
 class AbstractLocationsApi(ABC):
     @abstractmethod
-    async def get_locations(self, airport_or_city: str) -> list[Location]:
+    async def get_locations(self, airport_or_city: str) -> List[Location]:
         raise NotImplementedError
 
 
@@ -24,7 +25,7 @@ class TravelPayoutsLocationsApi(AbstractLocationsApi):
         self.session = session_maker()
         self.locale = locale
 
-    async def get_locations(self, airport_or_city: str) -> list[Location]:
+    async def get_locations(self, airport_or_city: str) -> List[Location]:
         response = await get_locations_response(
             self.session, self.locale, airport_or_city
         )

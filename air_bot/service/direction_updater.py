@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime, timedelta
+from typing import List, Optional
 
 from aiogram.exceptions import TelegramAPIError
 from async_timeout import timeout
@@ -28,7 +29,7 @@ class DirectionUpdater:
         http_session_maker,
     ):
         self.settings_storage = settings_storage
-        self.user_notifier: UserNotifier | None = None
+        self.user_notifier: Optional[UserNotifier] = None
         self.session_maker = session_maker
         self.http_session_maker = http_session_maker
 
@@ -59,7 +60,7 @@ class DirectionUpdater:
 async def update(
     uow: AbstractUnitOfWork,
     aviasales_api: AbstractTicketsApi,
-    user_notifier: UserNotifier | None,
+    user_notifier: Optional[UserNotifier],
     settings: Settings,
 ):
     logger.info("Checking if some directions need update")
@@ -90,7 +91,7 @@ async def update(
 async def _update_direction(
     uow: AbstractUnitOfWork,
     aviasales_api: AbstractTicketsApi,
-    user_notifier: UserNotifier | None,
+    user_notifier: Optional[UserNotifier],
     settings: Settings,
     direction_info: FlightDirectionInfo,
 ):
@@ -143,8 +144,8 @@ async def _notify_users(
     user_notifier: UserNotifier,
     settings: UsersSettings,
     direction_info: FlightDirectionInfo,
-    last_price: float | None,
-    tickets: list[Ticket],
+    last_price: Optional[float],
+    tickets: List[Ticket],
 ):
     assert direction_info.id is not None
     if not _users_need_notification(settings, last_price, tickets):
@@ -174,7 +175,7 @@ async def _notify_users(
 
 
 def _users_need_notification(
-    settings: UsersSettings, last_price: float | None, tickets: list[Ticket]
+    settings: UsersSettings, last_price: Optional[float], tickets: List[Ticket]
 ) -> bool:
     if len(tickets) == 0:
         return False

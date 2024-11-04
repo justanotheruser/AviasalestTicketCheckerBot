@@ -1,5 +1,6 @@
 import datetime
 from dataclasses import asdict, dataclass
+from typing import List, Optional
 
 from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,16 +10,16 @@ from air_bot.domain import model
 from air_bot.domain.ports.repository import TicketRepo
 
 
-@dataclass(kw_only=True)
+@dataclass
 class TicketDB:
-    id: int | None = None
     direction_id: int
     price: float
     departure_at: datetime.datetime
     duration_to: int
-    return_at: datetime.datetime | None = None
-    duration_back: int | None = None
     link: str
+    return_at: Optional[datetime.datetime] = None
+    duration_back: Optional[int] = None
+    id: Optional[int] = None
 
     @staticmethod
     def from_ticket(ticket: model.Ticket, direction_id: int):
@@ -43,7 +44,7 @@ class SqlAlchemyTicketRepo(TicketRepo):
         super().__init__()
         self.session = session
 
-    async def add(self, tickets: list[model.Ticket], direction_id: int):
+    async def add(self, tickets: List[model.Ticket], direction_id: int):
         for ticket in tickets:
             ticket_db = TicketDB.from_ticket(ticket, direction_id)
             stmt = text(
@@ -57,8 +58,8 @@ class SqlAlchemyTicketRepo(TicketRepo):
             await self.session.execute(stmt)
 
     async def get_direction_tickets(
-        self, direction_id: int, limit: int | None = None
-    ) -> list[model.Ticket]:
+        self, direction_id: int, limit: Optional[int] = None
+    ) -> List[model.Ticket]:
         stmt = (
             select(TicketDB)
             .filter_by(direction_id=direction_id)

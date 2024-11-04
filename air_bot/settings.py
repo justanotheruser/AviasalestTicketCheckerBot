@@ -1,6 +1,8 @@
 """This module is for settings that can be changed at runtime without stopping the bot"""
 import asyncio
 import configparser
+import contextvars
+import functools
 from dataclasses import dataclass
 from enum import Enum
 
@@ -51,9 +53,7 @@ class SettingsStorage:
     async def reload(self):
         logger.debug("Reload settings")
         try:
-            loaded_settings = await asyncio.to_thread(
-                read_config, self.settings_file_path
-            )
+            loaded_settings = await to_thread(read_config, self.settings_file_path)
         except Exception as e:
             logger.error(
                 f"Failed to reload settings from {self.settings_file_path}: {e}"
@@ -113,3 +113,10 @@ def _parse_users_settings(config):
             config["price_reduction_threshold_percents"]
         ),
     )
+
+
+async def to_thread(func, /, *args, **kwargs):
+    loop = asyncio.get_running_loop()
+    ctx = contextvars.copy_context()
+    func_call = functools.partial(ctx.run, func, *args, **kwargs)
+    return await loop.run_in_executor(None, func_call)

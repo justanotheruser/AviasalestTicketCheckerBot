@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 from air_bot.bot.presentation.utils import NUMBER2MONTH_NAME, get_ticket_link
 from air_bot.domain.exceptions import InternalError
 from air_bot.domain.model import Ticket
@@ -26,8 +28,8 @@ class CalendarView:
             raise InternalError(f"Unexpected currency: {currency}")
 
     def print_calendar(
-        self, month: int, tickets_by_date: dict[str, Ticket]
-    ) -> list[str]:
+        self, month: int, tickets_by_date: Dict[str, Ticket]
+    ) -> List[str]:
         calendar_tickets = get_calendar_tickets(
             tickets_by_date, self.currency_symbol, self.domain
         )
@@ -38,7 +40,7 @@ class CalendarView:
         return calendar_tables
 
 
-def get_calendar_tables(lines: list[str]) -> list[str]:
+def get_calendar_tables(lines: List[str]) -> List[str]:
     # Because all lines together can easily exceed message symbol limit we split table if necessary
     tables = []
     cur_table = ""
@@ -52,7 +54,7 @@ def get_calendar_tables(lines: list[str]) -> list[str]:
     return tables
 
 
-def get_calendar_lines(calendar_tickets: list[CalendarTicket]) -> list[str]:
+def get_calendar_lines(calendar_tickets: List[CalendarTicket]) -> List[str]:
     if not calendar_tickets:
         return [""]
     if len(calendar_tickets) == 1:
@@ -67,8 +69,8 @@ def get_calendar_lines(calendar_tickets: list[CalendarTicket]) -> list[str]:
 
 
 def get_calendar_tickets(
-    tickets_by_date: dict[str, Ticket], currency_symbol: str, aviasales_domain: str
-) -> list[CalendarTicket]:
+    tickets_by_date: Dict[str, Ticket], currency_symbol: str, aviasales_domain: str
+) -> List[CalendarTicket]:
     """List is sorted by ticket's day."""
     result = [
         CalendarTicket(full_date, ticket, currency_symbol, aviasales_domain)

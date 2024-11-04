@@ -1,5 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
+from typing import List, Optional
 
 from air_bot.domain import model
 
@@ -9,26 +10,26 @@ class FlightDirectionRepo(ABC):
     async def add_direction_info(
         self,
         direction: model.FlightDirection,
-        price: float | None,
+        price: Optional[float],
         last_update: datetime.datetime,
     ) -> int:
         """Return id of inserted row"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_direction_id(self, direction: model.FlightDirection) -> int | None:
+    async def get_direction_id(self, direction: model.FlightDirection) -> Optional[int]:
         """Returns id of row with direction info if exists or None otherwise"""
         raise NotImplementedError
 
     @abstractmethod
     async def get_directions_info(
-        self, direction_ids: list[int]
-    ) -> list[model.FlightDirectionInfo]:
+        self, direction_ids: List[int]
+    ) -> List[model.FlightDirectionInfo]:
         raise NotImplementedError
 
     async def get_direction_info(
         self, direction_id: int
-    ) -> model.FlightDirectionInfo | None:
+    ) -> Optional[model.FlightDirectionInfo]:
         directions = await self.get_directions_info([direction_id])
         if directions:
             return directions[0]
@@ -38,12 +39,12 @@ class FlightDirectionRepo(ABC):
     @abstractmethod
     async def get_directions_with_last_update_try_before(
         self, last_update: datetime.datetime, limit: int
-    ) -> list[model.FlightDirectionInfo]:
+    ) -> List[model.FlightDirectionInfo]:
         raise NotImplementedError
 
     @abstractmethod
     async def update_price(
-        self, direction_id: int, price: float | None, last_update: datetime.datetime
+        self, direction_id: int, price: Optional[float], last_update: datetime.datetime
     ):
         raise NotImplementedError
 
@@ -79,12 +80,12 @@ class UserDirectionRepo(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_directions(self, user_id: int) -> list[int]:
+    async def get_directions(self, user_id: int) -> List[int]:
         """Returns list of direction ids tracked by this user"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_users(self, direction_id: int) -> list[int]:
+    async def get_users(self, direction_id: int) -> List[int]:
         """Returns list of users that track this direction"""
         raise NotImplementedError
 
@@ -95,13 +96,13 @@ class UserDirectionRepo(ABC):
 
 class TicketRepo(ABC):
     @abstractmethod
-    async def add(self, tickets: list[model.Ticket], direction_id: int):
+    async def add(self, tickets: List[model.Ticket], direction_id: int):
         raise NotImplementedError
 
     @abstractmethod
     async def get_direction_tickets(
-        self, direction_id: int, limit: int | None = None
-    ) -> list[model.Ticket]:
+        self, direction_id: int, limit: Optional[int] = None
+    ) -> List[model.Ticket]:
         raise NotImplementedError
 
     @abstractmethod

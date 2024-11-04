@@ -1,5 +1,6 @@
 import datetime
 from datetime import date
+from typing import Dict, List
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
@@ -85,11 +86,11 @@ async def show_calendar(
     message_for_answering: Message,
     calendar_view: CalendarView,
     month: int,
-    tickets_by_date: dict[str, Ticket],
-    old_calendar_messages: list[Message],
+    tickets_by_date: Dict[str, Ticket],
+    old_calendar_messages: List[Message],
     show_prev_button: bool,
     show_next_button: bool,
-) -> list[Message]:
+) -> List[Message]:
     calendar_tables = calendar_view.print_calendar(month, tickets_by_date)
     updated_calendar_messages = []
     for i, (message, table) in enumerate(zip(old_calendar_messages, calendar_tables)):
@@ -180,7 +181,7 @@ async def edit_calendar(
     calendar_view: CalendarView,
     calendar_data,
     callback: CallbackQuery,
-) -> list[Message]:
+) -> List[Message]:
     """Updates calendar message(s) to ticket prices for departure year and month specified in calendar_data.
     Returns list or updated calendar messages."""
     aviasales_api = AviasalesTicketsApi(http_session_maker)

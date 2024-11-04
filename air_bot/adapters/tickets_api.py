@@ -2,6 +2,7 @@ import asyncio
 import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
+from typing import Dict, List, Optional
 
 from aiohttp import ClientConnectionError, ClientSession
 from async_timeout import timeout
@@ -18,14 +19,14 @@ from air_bot.domain.model import FlightDirection, Ticket
 
 class AbstractTicketsApi(ABC):
     @abstractmethod
-    async def get_tickets(self, direction: FlightDirection, limit: int) -> list[Ticket]:
+    async def get_tickets(self, direction: FlightDirection, limit: int) -> List[Ticket]:
         """Returns 'limit' cheapest tickets for 'direction' ordered by price"""
         raise NotImplementedError
 
     @abstractmethod
     async def get_cheapest_tickets_for_month(
         self, direction: FlightDirection, departure_year: int, departure_month: int
-    ) -> dict[str, Ticket]:
+    ) -> Dict[str, Ticket]:
         raise NotImplementedError
 
 
@@ -37,7 +38,7 @@ class AviasalesTicketsApi(AbstractTicketsApi):
 
     async def get_tickets(
         self, direction: FlightDirection, limit: int = 3
-    ) -> list[Ticket]:
+    ) -> List[Ticket]:
         is_direct = "false" if direction.with_transfer else "true"
         try:
             async with timeout(10):
@@ -69,7 +70,7 @@ class AviasalesTicketsApi(AbstractTicketsApi):
 
     async def get_cheapest_tickets_for_month(
         self, direction: FlightDirection, departure_year: int, departure_month: int
-    ) -> dict[str, Ticket]:
+    ) -> Dict[str, Ticket]:
         is_direct = "false" if direction.with_transfer else "true"
         departure_at = f"{departure_year}-{departure_month:02d}"
         try:
@@ -105,7 +106,7 @@ async def get_tickets_response(
     start_code: str,
     end_code: str,
     departure_date: str,
-    return_date: str | None,
+    return_date: Optional[str],
     is_direct: str,
     limit: int,
     currency: str,
@@ -127,7 +128,7 @@ async def get_tickets_response(
         return await response.text()
 
 
-def parse_tickets(json_response) -> list[Ticket]:
+def parse_tickets(json_response) -> List[Ticket]:
     if "data" not in json_response:
         logger.error(f"Unexpected response from Aviasales: {json_response}")
         raise TicketsParsingError()
@@ -170,7 +171,7 @@ async def get_grouped_prices(
     origin: str,
     destination: str,
     departure_at: str,
-    return_at: str | None,
+    return_at: Optional[str],
     is_direct: str,
     group_by: str = "departure_at",
 ):
@@ -190,7 +191,7 @@ async def get_grouped_prices(
         return await response.text()
 
 
-def parse_tickets_by_date(json_response) -> dict[str, Ticket]:
+def parse_tickets_by_date(json_response) -> Dict[str, Ticket]:
     if "data" not in json_response:
         logger.error(f"Unexpected response from Aviasales: {json_response}")
         raise TicketsParsingError()

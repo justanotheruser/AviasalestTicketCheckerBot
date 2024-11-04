@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from air_bot.bot.i18n import i18n
 from air_bot.bot.presentation.utils import get_ticket_link
@@ -17,7 +18,7 @@ class TicketView:
         else:
             raise InternalError(f"Unexpected currency: {currency}")
 
-    def print_tickets(self, tickets: list[Ticket], direction: FlightDirection) -> str:
+    def print_tickets(self, tickets: List[Ticket], direction: FlightDirection) -> str:
         if not tickets:
             return i18n.translate("no_flights")
         text = f"<b>{direction.start_name} - {direction.end_name} | {i18n.translate('current_prices')}</b>\n"

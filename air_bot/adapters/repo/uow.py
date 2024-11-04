@@ -1,5 +1,4 @@
 import abc
-from typing import Self
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
@@ -26,7 +25,7 @@ class AbstractUnitOfWork(abc.ABC):
         self.session_factory = session_factory
         self._is_commited = False
 
-    async def __aenter__(self) -> Self:
+    async def __aenter__(self) -> "AbstractUnitOfWork":
         return self
 
     async def __aexit__(self, *args):

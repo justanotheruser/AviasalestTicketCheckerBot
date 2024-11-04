@@ -1,3 +1,5 @@
+from typing import List
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
@@ -60,7 +62,7 @@ class BotService(UserNotifier):
     async def notify_user(
         self,
         user_id: int,
-        tickets: list[Ticket],
+        tickets: List[Ticket],
         direction: FlightDirection,
         direction_id: int,
     ):

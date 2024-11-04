@@ -2,7 +2,7 @@ import copy
 import re
 from datetime import datetime
 from random import shuffle
-from typing import Any, Optional
+from typing import Any, List, Optional, Tuple
 
 
 class DateReader:
@@ -42,7 +42,7 @@ class DateReader:
         return None
 
     @classmethod
-    def get_examples(cls, n: int = 3) -> list[str]:
+    def get_examples(cls, n: int = 3) -> List[str]:
         date_formats = copy.copy(cls.strptime_patterns)
         shuffle(date_formats)
         return [
@@ -52,7 +52,7 @@ class DateReader:
 
 
 def make_parser(strptime_pattern: str) -> Any:
-    def parser(user_date: str) -> tuple[Optional[int], Optional[int], Optional[int]]:
+    def parser(user_date: str) -> Tuple[Optional[int], Optional[int], Optional[int]]:
         try:
             date = datetime.strptime(user_date, strptime_pattern)
         except ValueError:
@@ -66,7 +66,7 @@ def make_parser(strptime_pattern: str) -> Any:
 
 def parse_two_digits_couples(
     user_date: str,
-) -> tuple[Optional[int], Optional[int], Optional[int]]:
+) -> Tuple[Optional[int], Optional[int], Optional[int]]:
     year, month, day = None, None, None
     two_numbers_regex = re.compile(r"(\d\d)(\.|-|\s)(\d\d)")
     match = two_numbers_regex.fullmatch(user_date)
