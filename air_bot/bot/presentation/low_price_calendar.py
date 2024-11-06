@@ -11,7 +11,7 @@ class CalendarTicket:
     ):
         self.day = full_date[-2:]
         link_text = f"{int(ticket.price)} {currency_symbol}"
-        day_text = "{day:>02}".format(day=self.day)
+        day_text = "{day:0>2}".format(day=self.day)
         self.visible_text = f"{day_text} - {link_text}"
         link = get_ticket_link(ticket, link_text, domain, parse_mode="Markdownv2")
         self.markup = rf"{day_text} \- {link}"

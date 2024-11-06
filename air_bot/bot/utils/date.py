@@ -37,8 +37,8 @@ class DateReader:
             year, month, day = parser(user_date)
             if year:
                 if day:
-                    return f"{year}-{month:02d}-{day:02d}"
-                return f"{year}-{month:02d}"
+                    return "{year}-{month:0>2}-{day:0>2}".format(year=year, month=month, day=day)
+                return "{year}-{month:0>2}".format(year=year, month=month)
         return None
 
     @classmethod
