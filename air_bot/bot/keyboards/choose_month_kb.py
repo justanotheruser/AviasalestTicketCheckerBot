@@ -20,7 +20,7 @@ class ChooseMonthKb:
             for _ in range(4):
                 month = months[month_idx]
                 year = current_year + year_delta
-                year_month = f"{year}-{month:02}"
+                year_month = "{year}-{month:>02}".format(year=year, month=month)
                 row.append(
                     types.InlineKeyboardButton(
                         text=NUMBER2MONTH_NAME[month], callback_data=year_month

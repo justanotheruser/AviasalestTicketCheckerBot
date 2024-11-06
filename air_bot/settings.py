@@ -51,7 +51,7 @@ class SettingsStorage:
         return self._settings
 
     async def reload(self):
-        logger.debug("Reload settings")
+        #logger.debug("Reload settings")
         try:
             loaded_settings = await to_thread(read_config, self.settings_file_path)
         except Exception as e:
