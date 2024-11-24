@@ -6,4 +6,4 @@ if [ "$2" == "-s" ]; then
 fi
 cd "$1" || exit
 source ~/.profile
-poetry run python air_bot/main.py
+poetry run python3 air_bot/main.py

@@ -32,7 +32,7 @@ october: october
 november: november
 december: december
 cant_recognize_date_try_again:
-choose_arrival_date: Choose arrival date
+choose_arrival_date: Choose date of arrival back
 tracked_directions: Tracked directions
 try_search_again: Try search again.
 we_fixing_this: We are already working on a fix.

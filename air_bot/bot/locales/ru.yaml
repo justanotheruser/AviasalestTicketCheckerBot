@@ -31,8 +31,8 @@ september: сентябрь
 october: октябрь
 november: ноябрь
 december: декабрь
-cant_recognize_date_try_again: Failed to recognize the date, please try again
-choose_arrival_date: Укажите дату отправления
+cant_recognize_date_try_again: Не могу прочитать дату, попробуйте ещё раз
+choose_arrival_date: Укажите дату отправления обратно
 tracked_directions: Отслеживаемые направления
 try_search_again: Попробуйте задать поиск заново.
 we_fixing_this: Мы уже работаем над исправлением этой ошибки.
