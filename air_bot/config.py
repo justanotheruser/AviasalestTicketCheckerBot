@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings
 class BotConfig(BaseSettings):
     bot_token: SecretStr
     aviasales_api_token: SecretStr
+    aviasales_marker: str
     db_host: str
     db_port: int
     db_user: str

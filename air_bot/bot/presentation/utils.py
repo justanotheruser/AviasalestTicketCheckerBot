@@ -1,5 +1,7 @@
 from air_bot.bot.i18n import i18n
 from air_bot.domain.model import Ticket
+from air_bot.config import config
+
 
 NUMBER2MONTH_NAME = {
     1: i18n.translate("january"),
@@ -20,7 +22,7 @@ NUMBER2MONTH_NAME = {
 def get_ticket_link(
     ticket: Ticket, link_text: str, aviasales_domain: str, parse_mode: str
 ) -> str:
-    url = f"https://www.aviasales.{aviasales_domain}{ticket.link}&marker=18946"
+    url = f"https://www.aviasales.{aviasales_domain}{ticket.link}&marker={config.aviasales_marker}"
     if parse_mode == "html":
         return f'<a href="{url}">{link_text}</a>'
     elif parse_mode == "Markdownv2":
